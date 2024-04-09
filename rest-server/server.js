@@ -43,7 +43,7 @@ app.use(
 app.use(express.static(path.join(__dirname, "www")));
 
 // routes
-app.use("/foo", require("./routes/foo"));
+app.use("/v1", require("./routes/v1"));
 
 async function start() {
   app.listen(process.env.PORT, () => {
