@@ -4,7 +4,7 @@
   "description": "Backend for the XP ICON Community project.",
   "main": "index.js",
   "scripts": {
-    "start-server": "node rest-server/server.js",
+    "start": "node rest-server/server.js",
     "dev": "nodemon rest-server/server.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
