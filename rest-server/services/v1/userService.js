@@ -1,16 +1,14 @@
 //
 require("dotenv").config();
 const USER = process.env.USER_COLLECTION;
+const { createEntry, getAllEntries } = require("./common");
 
 async function createUser(user, connection) {
-  const model = connection.model(USER);
-  const newUser = new model(user);
-  return await newUser.save();
+  return await createEntry(user, USER, connection);
 }
 
 async function getAllUsers(connection) {
-  const model = connection.model(USER);
-  return await model.find();
+  return await getAllEntries(USER, connection);
 }
 
 module.exports = {

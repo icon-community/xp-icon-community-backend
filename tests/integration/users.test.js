@@ -16,9 +16,14 @@ describe("User Collection", () => {
     await db.stop();
   });
 
-  it("should insert a doc into collection", async () => {
+  it("should insert a user into the Users collection", async () => {
     const user = mockUsers[0];
     const response = await createUser(user, db.connection);
     assert.equal(response.walletAddress, user.walletAddress);
+  });
+
+  it("should get all users added in the collection", async () => {
+    const response = await getAllUsers(db.connection);
+    assert.equal(response.length, 1);
   });
 });
