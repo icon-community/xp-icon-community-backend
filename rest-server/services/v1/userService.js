@@ -1,14 +1,19 @@
-const db = require("../../db/db");
+//
+require("dotenv").config();
+const USER = process.env.USER_COLLECTION;
 
-async function getUserAllSeasons(user) {
-  return db.a.user.wallet === user ? db.a : null;
+async function createUser(user, connection) {
+  const model = connection.model(USER);
+  const newUser = new model(user);
+  return await newUser.save();
 }
 
-async function getUserBySeason(user, season) {
-  return db.b.user.wallet === user ? db.b : null;
+async function getAllUsers(connection) {
+  const model = connection.model(USER);
+  return await model.find();
 }
 
 module.exports = {
-  getUserAllSeasons,
-  getUserBySeason
+  createUser,
+  getAllUsers,
 };
