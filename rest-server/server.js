@@ -7,6 +7,7 @@ const helmet = require("helmet");
 const morgan = require("morgan");
 const path = require("path");
 const cors = require("cors");
+const PORT = process.env.REST_PORT;
 
 // Configure middlewares
 morgan.token("body", (req, res) => {
@@ -25,7 +26,7 @@ const corsOptions = {
   origin: "*",
   methods: "GET,HEAD,PUT,PATCH,POST,DELETE",
   preflightContinue: false,
-  optionsSuccessStatus: 204
+  optionsSuccessStatus: 204,
 };
 
 // Create the express app
@@ -36,8 +37,8 @@ app.use(express.json());
 app.use(helmet());
 app.use(
   morgan(
-    ":method :req[header] :url :status :body - :response-time ms \n------------\n"
-  )
+    ":method :req[header] :url :status :body - :response-time ms \n------------\n",
+  ),
 );
 
 app.use(express.static(path.join(__dirname, "www")));
@@ -46,8 +47,8 @@ app.use(express.static(path.join(__dirname, "www")));
 app.use("/v1", require("./routes/v1"));
 
 async function start() {
-  app.listen(process.env.PORT, () => {
-    console.log(`Server is listening on port ${process.env.PORT}`);
+  app.listen(PORT, () => {
+    console.log(`Server is listening on port ${PORT}`);
   });
 }
 
