@@ -33,3 +33,10 @@ Eslint is used for linting, I recommend to setup eslint in your editor. The proj
 Migration guide -> https://eslint.org/docs/latest/use/configure/migration-guide
 
 For prettier  we are using V3 this should be easier to setup in your editor.
+
+## Routes
+
+The following routes are available:
+
+- `/v1/user/:userWallet` - GET - Get all season data for a user
+- `/v1/user/:userWallet/season/:seasonId` - GET - Get season data for a user
