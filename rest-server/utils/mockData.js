@@ -6,8 +6,8 @@ const users = [
     dailyCheckInStreak: 2,
     willEarnCheckInStreak: true,
     referrals: [new mongoose.Types.ObjectId("6626ec13e91bc8310e12cc84")],
-    createdAt: new Date("1640995200"),
-    updatedAt: new Date("1641081600"),
+    createdAt: new Date(1640995200 * 1000),
+    updatedAt: new Date(1641081600 * 1000),
     seasons: [
       {
         seasonId: new mongoose.Types.ObjectId("6626ec203cbca472f1b27e94"),
@@ -47,8 +47,8 @@ const users = [
     willEarnCheckInStreak: false,
     _id: new mongoose.Types.ObjectId("6626ec13e91bc8310e12cc84"),
     referrals: [],
-    createdAt: new Date("1641168000"),
-    updatedAt: new Date("1641254400"),
+    createdAt: new Date(1641168000 * 1000),
+    updatedAt: new Date(1641254400 * 1000),
     seasons: [
       {
         seasonId: new mongoose.Types.ObjectId("6626ec203cbca472f1b27e94"),
@@ -92,7 +92,7 @@ const tasks = [
     criteria: { info: "criteria for task of type 1" },
     title: "title of task 1",
     rewardFormula: "reward formula for task 1",
-    createdAt: new Date("1640995199"),
+    createdAt: new Date(1640995199) * 1000,
   },
   {
     _id: new mongoose.Types.ObjectId("6626ec1ebf9fc687f47d9df9"),
@@ -101,7 +101,7 @@ const tasks = [
     criteria: { info: "criteria for task of type 2" },
     title: "title of task 2",
     rewardFormula: "reward formula for task 2",
-    createdAt: new Date("1640995190"),
+    createdAt: new Date(1640995190 * 1000),
   },
 ];
 
