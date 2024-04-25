@@ -4,3 +4,9 @@ node_modules
 local
 *.bkp
 db-manager/database
+.gradle
+.idea
+build
+out
+.vscode
+bin
