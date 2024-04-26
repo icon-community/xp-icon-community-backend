@@ -55,10 +55,14 @@ public class RegistrationBook
      */
     @External
     public void registerUser(Address user) {
-        long block = Context.getBlockHeight();
-        book.set(user, block);
-        UserRegistered(user, block);
-
+        Address caller = Context.getCaller();
+        if (caller.equals(user) || caller.equals(Context.getOwner())) {
+            long block = Context.getBlockHeight();
+            book.set(user, block);
+            UserRegistered(user, block);
+        } else {
+            Context.revert("Only the owner or the user can register the user.");
+        }
     }
 
     @EventLog(indexed=2)
