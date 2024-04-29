@@ -18,6 +18,9 @@ project-root/
 ├───db-manager/                   # Database management scripts or jobs
 │   └───blockchain_scraper.js     # Script for fetching data from blockchain
 │
+├───db/                           # MongoDB database files
+│   └───docker-compose.yml        # Docker Compose file for running MongoDB
+│
 ├───tests/                        # Unit and integration tests
 │
 └───node_modules/                 # Node.js modules (generated after running npm install)
