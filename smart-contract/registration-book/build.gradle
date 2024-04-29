@@ -14,9 +14,11 @@ dependencies {
 
 optimizedJar {
     mainClassName = 'org.example.RegistrationBook'
+    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+    from { configurations.runtimeClasspath.collect { it.isDirectory() ? it : zipTree(it) } }
     archivesBaseName = 'registration-book'
 
-    enableDebug = true
+    // enableDebug = true
 }
 
 test {
