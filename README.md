@@ -6,6 +6,12 @@ Backend for the XP ICON Community project.
 ```
 project-root/
 │
+├───db/                           # MongoDB database files
+│   └───docker-compose.yml        # Docker Compose file for running MongoDB
+│
+├───db-manager/                   # Database management scripts or jobs
+│   └───blockchain_scraper.js     # Script for fetching data from blockchain
+│
 ├───rest-server/                  # Source code for the REST API server
 │   ├───controllers/              # Route controllers
 │   ├───models/                   # Database models (MongoDB schemas)
@@ -13,17 +19,11 @@ project-root/
 │   ├───services/                 # Business logic or services
 │   └───utils/                    # Backend Utility functions
 │
-├───utils/                       # Global utility files (e.g., database connection)
-│
-├───db-manager/                   # Database management scripts or jobs
-│   └───blockchain_scraper.js     # Script for fetching data from blockchain
-│
-├───db/                           # MongoDB database files
-│   └───docker-compose.yml        # Docker Compose file for running MongoDB
+├───smart-contract/               # Source code for smart contract
 │
 ├───tests/                        # Unit and integration tests
 │
-├───smart-contract/               # Source code for smart contract
+├───utils/                       # Global utility files (e.g., database connection)
 │
 └───node_modules/                 # Node.js modules (generated after running npm install)
 
