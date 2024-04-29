@@ -3,6 +3,9 @@ require("dotenv").config();
 const SELECTED_CHAIN =
   process.env.CHAIN == null ? "mainnet" : process.env.CHAIN;
 const config = {
+  misc: {
+    termPeriod: 43200,
+  },
   ports: {
     backend: process.env.REST_PORT,
     dbManager: process.env.DB_MANAGER_PORT,
@@ -25,6 +28,7 @@ const config = {
       nid: 1,
       contracts: {
         chain: "cx0000000000000000000000000000000000000000",
+        registrationBook: "cxadd474e5c9845be73aff4168d25426368190fddc",
       },
     },
     lisbon: {
@@ -32,6 +36,7 @@ const config = {
       nid: 2,
       contracts: {
         chain: "cx0000000000000000000000000000000000000000",
+        registrationBook: "cx095c4e2fbacc1d5268c16a1ef6232290b1db0d8d",
       },
     },
   },
