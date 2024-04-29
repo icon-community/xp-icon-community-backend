@@ -23,6 +23,8 @@ project-root/
 │
 ├───tests/                        # Unit and integration tests
 │
+├───smart-contract/               # Source code for smart contract
+│
 └───node_modules/                 # Node.js modules (generated after running npm install)
 
 ```
