@@ -1,6 +1,6 @@
 //
-require("dotenv").config();
-const SEASON = process.env.SEASON_COLLECTION;
+const config = require("../../../utils/config");
+const SEASON = config.collections.season;
 const { createEntry, getAllEntries } = require("./common");
 
 async function createSeason(season, connection) {

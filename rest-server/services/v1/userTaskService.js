@@ -1,6 +1,6 @@
 //
-require("dotenv").config();
-const USER_TASK = process.env.USER_TASK_COLLECTION;
+const config = require("../../utils/config");
+const USER_TASK = config.collections.userTask;
 const { createEntry, getAllEntries } = require("./common");
 
 async function createUserTask(userTask, connection) {

@@ -1,16 +1,17 @@
 // rest-server/server.js
 // REST API server. Gets data from the local mongoDB database and serves it to the client.
 //
-require("dotenv").config();
 const express = require("express");
 const helmet = require("helmet");
 const morgan = require("morgan");
 const path = require("path");
-const cors = require("cors");
-const PORT = process.env.REST_PORT;
+// const cors = require("cors");
+const config = require("../utils/config");
+const PORT = config.ports.backend;
 
 // Configure middlewares
 morgan.token("body", (req, res) => {
+  void res;
   if (req.body == null) {
     return {};
   } else {
@@ -22,12 +23,12 @@ morgan.token("body", (req, res) => {
   }
 });
 
-const corsOptions = {
-  origin: "*",
-  methods: "GET,HEAD,PUT,PATCH,POST,DELETE",
-  preflightContinue: false,
-  optionsSuccessStatus: 204,
-};
+// const corsOptions = {
+//   origin: "*",
+//   methods: "GET,HEAD,PUT,PATCH,POST,DELETE",
+//   preflightContinue: false,
+//   optionsSuccessStatus: 204,
+// };
 
 // Create the express app
 const app = express();

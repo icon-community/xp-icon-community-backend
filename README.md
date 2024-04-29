@@ -11,9 +11,9 @@ project-root/
 │   ├───models/                   # Database models (MongoDB schemas)
 │   ├───routes/                   # API route definitions
 │   ├───services/                 # Business logic or services
-│   └───utils/                    # Utility functions
+│   └───utils/                    # Backend Utility functions
 │
-├───config/                       # Configuration files (e.g., database connection)
+├───utils/                       # Global utility files (e.g., database connection)
 │
 ├───db-manager/                   # Database management scripts or jobs
 │   └───blockchain_scraper.js     # Script for fetching data from blockchain

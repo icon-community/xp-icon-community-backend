@@ -1,5 +1,5 @@
 const assert = require("assert");
-const MockDb = require("../../config/mockDb");
+const MockDb = require("../../utils/mockDb");
 const mockTasks = require("../mockData/tasks");
 const {
   createTask,

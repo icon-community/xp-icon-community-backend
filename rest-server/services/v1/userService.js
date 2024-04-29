@@ -1,6 +1,6 @@
 //
-require("dotenv").config();
-const USER = process.env.USER_COLLECTION;
+const config = require("../../utils/config");
+const USER = config.collections.users;
 const isTestEnv = process.env.USE_MOCK_DB != null ? true : false;
 const { createEntry, getAllEntries } = require("./common");
 const mockData = require("../../utils/mockData");
