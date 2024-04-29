@@ -23,6 +23,9 @@ const config = {
     useMockDb: process.env.USE_MOCK_DB,
   },
   jvm: {
+    routes: {
+      v3: "/api/v3",
+    },
     mainnet: {
       rpc: "https://ctz.solidwallet.io/api/v3",
       nid: 1,

@@ -35,6 +35,7 @@
     "mocha": "^10.4.0",
     "mongodb-memory-server": "^9.1.8",
     "mongoose": "^8.3.2",
-    "morgan": "^1.10.0"
+    "morgan": "^1.10.0",
+    "rqst": "github:FidelVe/rqst"
   }
 }
