@@ -110,7 +110,8 @@ class Monitor {
 
           // fetch network info from this block to see if term has changed
           await this.checkoutChainTerm(height);
-          // DEBUG PRINT
+
+          // execute tasks if term has changed
           if (this.executeTasks) {
             console.log("latest term: ", this.latestTerm);
             if (this.tasks.length > 0) {

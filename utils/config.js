@@ -32,6 +32,10 @@ const config = {
       contracts: {
         chain: "cx0000000000000000000000000000000000000000",
         registrationBook: "cxadd474e5c9845be73aff4168d25426368190fddc",
+        balanced: {
+          savings: "cxd82fb5d3effecd8c9071a4bba3856ad7222c4b91",
+          loans: "cx66d4d90f5f113eba575bf793570135f9b10cece1",
+        },
       },
     },
     lisbon: {

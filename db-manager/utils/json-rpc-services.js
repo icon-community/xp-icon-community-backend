@@ -30,7 +30,71 @@ async function getPRepTerm(height = null) {
     console.error(e);
   }
 }
+
+async function getAccountPositions(
+  _owner,
+  height = null,
+  contract = config.jvm.default.contracts.balanced.loans,
+) {
+  try {
+    const requestObj = makeJsonRpcRequestObject(
+      "getAccountPositions",
+      {
+        _owner: _owner,
+      },
+      contract,
+      height,
+    );
+    return await makeJsonRpcCall(requestObj, config.jvm.default.rpc);
+  } catch (e) {
+    console.log("Error making getAccountPositions request");
+    console.error(e);
+  }
+}
+
+async function getLockedAmount(
+  user,
+  height = null,
+  contract = config.jvm.default.contracts.balanced.savings,
+) {
+  try {
+    const requestObj = makeJsonRpcRequestObject(
+      "getLockedAmount",
+      {
+        user: user,
+      },
+      contract,
+      height,
+    );
+    return await makeJsonRpcCall(requestObj, config.jvm.default.rpc);
+  } catch (e) {
+    console.log("Error making getLockedAmount request");
+    console.error(e);
+  }
+}
+
+async function getUsersList(
+  height = null,
+  contract = config.jvm.default.contracts.registrationBook,
+) {
+  try {
+    const requestObj = makeJsonRpcRequestObject(
+      "getUsersList",
+      null,
+      contract,
+      height,
+    );
+    return await makeJsonRpcCall(requestObj, config.jvm.default.rpc);
+  } catch (e) {
+    console.log("Error making getUsersList request");
+    console.error(e);
+  }
+}
+
 module.exports = {
   getNetworkInfo,
   getPRepTerm,
+  getAccountPositions,
+  getLockedAmount,
+  getUsersList,
 };

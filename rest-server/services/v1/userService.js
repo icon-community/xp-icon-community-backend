@@ -14,6 +14,16 @@ async function getAllUsers(connection) {
 }
 
 async function getUserAllSeasons(userWallet) {
+  // TODO: the following logic is pulling static data from
+  // a mock file. the entire section inside the if block
+  // should be replaced with a call to the database once
+  // the database is set up and implemented.
+  // In the meantime the new logic should be implemented
+  // in the else block.
+  // In the end the if block should be removed and only
+  // the information that was in the else block should
+  // remain, also delete this comment once the changes
+  // are made.
   if (isTestEnv) {
     const filteredUser = mockData.users.filter(
       (user) => user.address === userWallet,
@@ -26,11 +36,22 @@ async function getUserAllSeasons(userWallet) {
       return null;
     }
   } else {
+    // TODO: new logic should be implemented here
     return null;
   }
 }
 
 async function getUserBySeason(userWallet, userSeason) {
+  // TODO: the following logic is pulling static data from
+  // a mock file. the entire section inside the if block
+  // should be replaced with a call to the database once
+  // the database is set up and implemented.
+  // In the meantime the new logic should be implemented
+  // in the else block.
+  // In the end the if block should be removed and only
+  // the information that was in the else block should
+  // remain, also delete this comment once the changes
+  // are made.
   console.log("getUserBySeason");
   console.log(userWallet);
   console.log(userSeason);
@@ -54,6 +75,7 @@ async function getUserBySeason(userWallet, userSeason) {
       return null;
     }
   } else {
+    // TODO: new logic should be implemented here
     return null;
   }
 }
