@@ -3,7 +3,6 @@ node_modules
 *.swp*
 local
 *.bkp
-db-manager
 db/data
 .gradle
 .idea
