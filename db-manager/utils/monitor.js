@@ -25,7 +25,7 @@ class Monitor {
     this.tasks = tasks;
     this.latestTerm = null;
     this.executeTasks = false;
-    this.blockHeightIncrement = 40000;
+    this.blockHeightIncrement = 10000;
 
     // this.filterResponseMessageEvent =
     //   this.filterResponseMessageEvent.bind(this);
@@ -83,7 +83,13 @@ class Monitor {
   async checkoutChainTerm(height) {
     const response = await getPRepTerm(height);
     if (response != null && response.sequence != null) {
+      if (this.latestTerm === response.sequence) {
+        // term period is the same, no need to execute tasks
+        this.executeTasks = false;
+        return;
+      }
       this.latestTerm = response.sequence;
+      this.executeTasks = true;
     }
   }
 
@@ -104,20 +110,19 @@ class Monitor {
 
           // fetch network info from this block to see if term has changed
           await this.checkoutChainTerm(height);
-
           // DEBUG PRINT
-          console.log("latest term: ", this.latestTerm);
-          this.currentBlockHeight = block.height + this.blockHeightIncrement;
-
-          for (const tx of block.confirmedTransactionList) {
-            const txResult = await this.getTxResult(tx.txHash);
-            // execute each task asynchronously
+          if (this.executeTasks) {
+            console.log("latest term: ", this.latestTerm);
             if (this.tasks.length > 0) {
+              console.log("Executing tasks");
               for (const task of this.tasks) {
-                task(txResult);
+                await task(block);
               }
+            } else {
+              console.log("No tasks to execute");
             }
           }
+          this.currentBlockHeight = block.height + this.blockHeightIncrement;
         } else {
           await this.sleep(1000);
         }

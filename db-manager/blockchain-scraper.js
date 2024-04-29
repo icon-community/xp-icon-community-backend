@@ -5,7 +5,7 @@ const { JVM_SERVICE, IconBuilder } = require("./utils/utils");
 const INIT_BLOCK_HEIGHT = 80670350;
 async function task(input) {
   const f = {
-    blockHeight: input.blockHeight,
+    blockHeight: input.height,
   };
   console.log(f);
 }
