@@ -14,6 +14,10 @@ const userSchema = new Schema({
     index: true,
     required: [true, "Please specify field"],
   },
+  registrationBlock: {
+    type: Number,
+    required: [true, "Please specify field"],
+  },
   dailyCheckInStreak: {
     type: Number,
     default: 0,

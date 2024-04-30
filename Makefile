@@ -1,12 +1,21 @@
-start:
+start-rest-server:
 	@docker compose up -d
 	@echo "Docker containers up"
 
-stop:
+stop-rest-server:
 	@docker compose down
 	@echo "Docker containers down"
 
-rebuild:
+rebuild-rest-server:
 	@docker compose down
 	@docker compose up -d --build
 	@echo "Docker containers up"
+
+test-scraper:
+	@echo "> Running scraper tests"
+	@echo "Starting mongodb container"
+	@docker compose -f db/docker-compose-non-persistent.yml up -d
+	@echo "Starting blockchain scraper"
+	@node db-manager/blockchain-scraper.js
+	@echo "Stopping mongodb container"
+	@docker compose -f db/docker-compose-non-persistent.yml down

@@ -1,5 +1,5 @@
 //
-const config = require("../../utils/config");
+const config = require("../../../utils/config");
 const USER_TASK = config.collections.userTask;
 const { createEntry, getAllEntries } = require("./common");
 

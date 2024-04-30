@@ -5,7 +5,7 @@ const MockDb = require("../utils/mockDb");
 const MainDb = require("../utils/mainDb");
 const { fetchRegisteredUsersAndUpdateDb } = require("./tasks");
 
-const USE_MOCK_DB = true;
+const USE_MOCK_DB = false;
 const db = USE_MOCK_DB ? new MockDb() : new MainDb();
 const INIT_BLOCK_HEIGHT = 80670350;
 

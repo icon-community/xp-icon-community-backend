@@ -93,9 +93,18 @@ async function makeJsonRpcCall(data, url, queryMethod = rqst) {
   }
 }
 
+function isValidHex(str) {
+  if (typeof str !== "string") {
+    return false;
+  }
+  const hexRegex = /^0x[0-9a-fA-F]+$/;
+  return hexRegex.test(str);
+}
+
 module.exports = {
   JVM_SERVICE,
   IconBuilder,
   makeJsonRpcRequestObject,
   makeJsonRpcCall,
+  isValidHex,
 };

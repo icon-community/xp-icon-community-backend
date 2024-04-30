@@ -91,10 +91,30 @@ async function getUsersList(
   }
 }
 
+async function getUserRegistrationBlock(
+  user,
+  height = null,
+  contract = config.jvm.default.contracts.registrationBook,
+) {
+  try {
+    const requestObj = makeJsonRpcRequestObject(
+      "getUserRegistrationBlock",
+      { user: user },
+      contract,
+      height,
+    );
+    return await makeJsonRpcCall(requestObj, config.jvm.default.rpc);
+  } catch (e) {
+    console.log("Error making getUserRegistrationBlock request");
+    console.error(e);
+  }
+}
+
 module.exports = {
   getNetworkInfo,
   getPRepTerm,
   getAccountPositions,
   getLockedAmount,
   getUsersList,
+  getUserRegistrationBlock,
 };
