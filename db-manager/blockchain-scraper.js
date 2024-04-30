@@ -4,7 +4,7 @@ const { JVM_SERVICE, IconBuilder, taskRunner } = require("./utils/utils");
 const MainDb = require("../utils/mainDb");
 const {
   fetchRegisteredUsersAndUpdateDb,
-  fetchCollateralAndUpdateDb,
+  fetchCollateralsAndUpdateDb,
   fetchLoansAndUpdateDb,
   fetchLockedSavingsAndUpdateDb,
 } = require("./tasks");
@@ -21,7 +21,7 @@ tasks.push(taskRunner(fetchRegisteredUsersAndUpdateDb, db));
 
 // Run task that fetches collateral deposited by each user and updates the db
 
-tasks.push(taskRunner(fetchCollateralAndUpdateDb, db));
+tasks.push(taskRunner(fetchCollateralsAndUpdateDb, db));
 
 // Run task that fetches loans taken by each user and updates the db
 tasks.push(taskRunner(fetchLoansAndUpdateDb, db));

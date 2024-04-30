@@ -1,11 +1,11 @@
 const fetchRegisteredUsersAndUpdateDb = require("./fetchRegisteredUsersAndUpdateDb");
-const fetchCollateralAndUpdateDb = require("./fetchCollateralAndUpdateDb");
+const fetchCollateralsAndUpdateDb = require("./fetchCollateralsAndUpdateDb");
 const fetchLoansAndUpdateDb = require("./fetchLoansAndUpdateDb");
 const fetchLockedSavingsAndUpdateDb = require("./fetchLockedSavingsAndUpdateDb");
 
 module.exports = {
   fetchRegisteredUsersAndUpdateDb,
-  fetchCollateralAndUpdateDb,
+  fetchCollateralsAndUpdateDb,
   fetchLoansAndUpdateDb,
   fetchLockedSavingsAndUpdateDb,
 };
