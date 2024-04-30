@@ -11,7 +11,7 @@ const config = {
     dbManager: process.env.DB_MANAGER_PORT,
   },
   collections: {
-    users: process.env.USERS_COLLECTION,
+    users: process.env.USER_COLLECTION,
     task: process.env.TASK_COLLECTION,
     season: process.env.SEASON_COLLECTION,
     userTask: process.env.USER_TASK_COLLECTION,
