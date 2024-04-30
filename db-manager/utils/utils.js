@@ -101,10 +101,15 @@ function isValidHex(str) {
   return hexRegex.test(str);
 }
 
+function taskRunner(task, db) {
+  return async (input) => await task(input, db);
+}
+
 module.exports = {
   JVM_SERVICE,
   IconBuilder,
   makeJsonRpcRequestObject,
   makeJsonRpcCall,
   isValidHex,
+  taskRunner,
 };

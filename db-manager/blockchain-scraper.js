@@ -1,21 +1,36 @@
 //
 const Monitor = require("./utils/monitor");
-const { JVM_SERVICE, IconBuilder } = require("./utils/utils");
-const MockDb = require("../utils/mockDb");
+const { JVM_SERVICE, IconBuilder, taskRunner } = require("./utils/utils");
 const MainDb = require("../utils/mainDb");
-const { fetchRegisteredUsersAndUpdateDb } = require("./tasks");
+const {
+  fetchRegisteredUsersAndUpdateDb,
+  fetchCollateralAndUpdateDb,
+  fetchLoansAndUpdateDb,
+  fetchLockedSavingsAndUpdateDb,
+} = require("./tasks");
 
-const USE_MOCK_DB = false;
-const db = USE_MOCK_DB ? new MockDb() : new MainDb();
+const db = new MainDb();
 const INIT_BLOCK_HEIGHT = 80670350;
 
+// Array of tasks that will be run by the monitor. these
+// task are run in the order they are added to the array
 const tasks = [];
-tasks.push(taskRunner(fetchRegisteredUsersAndUpdateDb, db));
-const monitor = new Monitor(JVM_SERVICE, tasks, IconBuilder, INIT_BLOCK_HEIGHT);
 
-function taskRunner(task, db = db) {
-  return async (input) => await task(input, db);
-}
+// first run task that fetches registered users and updates the db
+tasks.push(taskRunner(fetchRegisteredUsersAndUpdateDb, db));
+
+// Run task that fetches collateral deposited by each user and updates the db
+
+tasks.push(taskRunner(fetchCollateralAndUpdateDb, db));
+
+// Run task that fetches loans taken by each user and updates the db
+tasks.push(taskRunner(fetchLoansAndUpdateDb, db));
+
+// Run task that fetches locked savings by each user and updates the db
+tasks.push(taskRunner(fetchLockedSavingsAndUpdateDb, db));
+
+// Create a monitor instance
+const monitor = new Monitor(JVM_SERVICE, tasks, IconBuilder, INIT_BLOCK_HEIGHT);
 
 async function main() {
   // start monitor

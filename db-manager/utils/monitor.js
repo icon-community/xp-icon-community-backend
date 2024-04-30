@@ -113,14 +113,14 @@ class Monitor {
 
           // execute tasks if term has changed
           if (this.executeTasks) {
-            console.log("latest term: ", this.latestTerm);
+            console.log("> Currently querying term: ", this.latestTerm);
             if (this.tasks.length > 0) {
-              console.log("Executing tasks");
+              console.log("> Executing tasks:");
               for (const task of this.tasks) {
                 await task(block);
               }
             } else {
-              console.log("No tasks to execute");
+              console.log("> No tasks to execute.");
             }
           }
           this.currentBlockHeight = block.height + this.blockHeightIncrement;
