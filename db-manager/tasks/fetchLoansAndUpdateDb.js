@@ -1,6 +1,6 @@
-async function fetchLoansAndUpdateDb(input, db) {
-  console.log(`> Running fetchLoansAndUpdateDb task on block ${input.height}`);
-  void input, db;
+async function fetchLoansAndUpdateDb(block, db) {
+  console.log(`> Running fetchLoansAndUpdateDb task on block ${block}`);
+  void block, db;
 }
 
 module.exports = fetchLoansAndUpdateDb;

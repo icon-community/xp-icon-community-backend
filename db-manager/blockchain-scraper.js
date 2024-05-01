@@ -10,7 +10,11 @@ const {
 } = require("./tasks");
 
 const db = new MainDb();
-const INIT_BLOCK_HEIGHT = 80670350;
+
+const INIT_BLOCK_HEIGHT = parseInt(process.env.BLOCK);
+if (Number.isNaN(INIT_BLOCK_HEIGHT)) {
+  throw new Error("Invalid block height");
+}
 
 // Array of tasks that will be run by the monitor. these
 // task are run in the order they are added to the array
@@ -39,7 +43,7 @@ async function main() {
   // run monitor for 20 seconds
   setTimeout(() => {
     monitor.stop();
-  }, 20000);
+  }, 60000);
 }
 
 // Enable graceful stop

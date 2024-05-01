@@ -8,19 +8,11 @@ const {
 } = require("../utils/json-rpc-services");
 const { isValidHex } = require("../utils/utils");
 
-async function fetchRegisteredUsersAndUpdateDb(input, db) {
+async function fetchRegisteredUsersAndUpdateDb(block, db) {
   console.log(
-    `> Running fetchRegisteredUsersAndUpdateDb task on block ${input.height}`,
+    `> Running fetchRegisteredUsersAndUpdateDb task on block ${block}`,
   );
   try {
-    // input is the block information passed from the
-    // parent code logic calling this function, for the
-    // case of this task we DO NOT need to call the
-    // functions at an specific block number, so we can
-    // ignore the input parameter and just call the
-    // functions without any parameters.
-    void input;
-
     // Create connection to DB.
     console.log("Creating connection to DB");
     await db.createConnection();

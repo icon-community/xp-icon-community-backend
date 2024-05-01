@@ -16,6 +16,14 @@ test-scraper:
 	@echo "Starting mongodb container"
 	@docker compose -f db/docker-compose-non-persistent.yml up -d
 	@echo "Starting blockchain scraper"
-	@node db-manager/blockchain-scraper.js
+	@BLOCK=80670350 node db-manager/blockchain-scraper.js
 	@echo "Stopping mongodb container"
 	@docker compose -f db/docker-compose-non-persistent.yml down
+# test-scraper:
+# 	@echo "> Running scraper tests"
+# 	@echo "Starting mongodb container"
+# 	@docker compose -f db/docker-compose-non-persistent.yml up -d
+# 	@echo "Starting blockchain scraper"
+# 	@node db-manager/blockchain-scraper.js
+# 	@echo "Stopping mongodb container"
+# 	@docker compose -f db/docker-compose-non-persistent.yml down

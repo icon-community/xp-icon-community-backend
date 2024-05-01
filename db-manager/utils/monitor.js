@@ -1,10 +1,18 @@
-//
+// imports
+const { getPRepTerm } = require("./json-rpc-services");
+
+// Amount of block from the period end block to fetch all
+// the tasks related information.
+// This value MUST be higher than 43200 which in theory is
+// period length in blocks
+const amountOfBlocksFromLatest = 100;
+const lineBreaker = "\n------------------------------------";
+
 /*
  * Monitor class to monitor the JVM chain for new blocks and transactions.
  * The class uses the JVM service to get blocks and transactions.
  * The class is designed to be run in the background.
  */
-const { getPRepTerm } = require("./json-rpc-services");
 class Monitor {
   // Constructor for the Monitor class.
   // jvmService: The JVM service to use for getting blocks and transactions.
@@ -12,7 +20,13 @@ class Monitor {
   //                 If not provided, the monitor will start from the latest block.
   //                 If provided, the monitor will start from the provided block height.
   //
-  constructor(jvmService, tasks = [], jvmBuilder, initBlockHeight = null) {
+  constructor(
+    jvmService,
+    tasks = [],
+    jvmBuilder,
+    initBlockHeight = null,
+    bypassTasks = false,
+  ) {
     if (jvmService == null || tasks == null || jvmBuilder == null) {
       throw new Error("Invalid argument in Monitor constructor");
     }
@@ -21,18 +35,15 @@ class Monitor {
     this.initBlockHeight = initBlockHeight;
     this.running = false;
     this.timer = null;
+    this.sleepTimer = null;
     this.currentBlockHeight = null;
     this.tasks = tasks;
     this.latestTerm = null;
-    this.executeTasks = false;
-    this.blockHeightIncrement = 10000;
+    this.amountToSleep = 1000;
+    this.bypassTasks = bypassTasks;
 
     // this.filterResponseMessageEvent =
     //   this.filterResponseMessageEvent.bind(this);
-  }
-
-  getCurrentBlockHeight() {
-    return this.currentBlockHeight;
   }
 
   start() {
@@ -62,75 +73,88 @@ class Monitor {
     }
   }
 
-  async getTxResult(txHash) {
-    const maxLoops = 10;
-    let loop = 0;
-    while (loop < maxLoops) {
-      try {
-        return await this.jvmService.getTransactionResult(txHash).execute();
-      } catch (e) {
-        void e;
-        loop++;
-        await this.sleep(1000);
-      }
-    }
-  }
-
   async sleep(ms) {
     return new Promise((resolve) => setTimeout(resolve, ms));
-  }
-
-  async checkoutChainTerm(height) {
-    const response = await getPRepTerm(height);
-    if (response != null && response.sequence != null) {
-      if (this.latestTerm === response.sequence) {
-        // term period is the same, no need to execute tasks
-        this.executeTasks = false;
-        return;
-      }
-      this.latestTerm = response.sequence;
-      this.executeTasks = true;
-    }
   }
 
   async runLoop() {
     this.timer = setTimeout(async () => {
       if (this.running) {
+        this.amountToSleep = 1000;
+        console.log(lineBreaker);
+        if (this.latestTerm == null) {
+          console.log("> Executing First loop");
+        } else {
+          console.log("> Latest term set to: ", this.latestTerm);
+        }
+        // this.currentBlockHeight is null when the monitor is started.
+        // On monitor start we either start from the latest block or from the value provided to this.initBlockHeight
         const height =
           this.currentBlockHeight !== null
             ? this.currentBlockHeight
-            : this.initBlockHeight == null
-              ? null
-              : this.initBlockHeight;
+            : this.initBlockHeight;
+
+        // fetch block data. If the block is not available, wait for 1 second and try again
         const block = await this.getBlockJvm(height);
         if (block != null) {
-          // DEBUG PRINT
-          // console.log("block data");
-          // console.log(block);
+          console.log(`> Block (${height}) available.`);
+          const prepTerm = await getPRepTerm(height);
+          console.log(`> Setting latest term to: ${prepTerm.sequence}`);
+          this.latestTerm = prepTerm.sequence;
+          console.log(`> Calculating block of interest`);
+          const blockOfInterest =
+            parseInt(prepTerm.endBlockHeight, 16) - amountOfBlocksFromLatest;
 
-          // fetch network info from this block to see if term has changed
-          await this.checkoutChainTerm(height);
-
-          // execute tasks if term has changed
-          if (this.executeTasks) {
-            console.log("> Currently querying term: ", this.latestTerm);
-            if (this.tasks.length > 0) {
+          console.log(`> Block of interest: ${blockOfInterest}`);
+          if (height === blockOfInterest) {
+            console.log(
+              "> Current block is the block of interest. Proceed with tasks.",
+            );
+            if (this.tasks.length > 0 && !this.bypassTasks) {
               console.log("> Executing tasks:");
               for (const task of this.tasks) {
-                await task(block);
+                await task(height);
               }
             } else {
               console.log("> No tasks to execute.");
             }
+            console.log(
+              "> Setting next block to fetch to the first block of the next term",
+            );
+            this.currentBlockHeight += amountOfBlocksFromLatest + 1;
+          } else {
+            console.log(
+              "> Setting next block to fetch to the block of interest",
+            );
+            this.currentBlockHeight = blockOfInterest;
           }
-          this.currentBlockHeight = block.height + this.blockHeightIncrement;
         } else {
-          await this.sleep(1000);
+          let latestBlock = null;
+          try {
+            latestBlock = await this.getBlockJvm();
+            if (latestBlock != null && height != null) {
+              console.log("> Dinamically calculating amount to sleep");
+              this.amountToSleep = (height - latestBlock.height) * 1000;
+            }
+          } catch (err) {
+            console.log(err);
+            console.log(
+              "> Error getting latest block, Cant dinamically calculate amount to sleep. Sleep interval set to default value of 1s.",
+            );
+            this.amountToSleep = 1000;
+          }
+          console.log(
+            `> Block (${height}) not available, chain currently on block ${latestBlock.height}.`,
+          );
+          console.log("*-*-*-*-*-*-*-*-*-*-*-*-*");
+          console.log(`* > Sleeping for ${this.amountToSleep / 1000} s`);
+          console.log("*-*-*-*-*-*-*-*-*-*-*-*-*");
+          // await this.sleep(amountToSleep);
         }
 
         this.runLoop();
       }
-    }, 1000); // Adjust the interval as needed
+    }, this.amountToSleep); // Adjust the interval as needed
   }
 
   async stop() {
