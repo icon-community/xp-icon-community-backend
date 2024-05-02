@@ -28,6 +28,10 @@ const userSchema = new Schema({
       ref: "User",
     },
   ],
+  updatedAtBlock: {
+    type: Number,
+    required: [true, "Please specify field"],
+  },
   createdAt: { type: Date, default: Date.now },
   updatedAt: { type: Date, default: Date.now },
 });

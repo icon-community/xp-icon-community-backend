@@ -8,10 +8,14 @@ const {
   fetchLoansAndUpdateDb,
   fetchLockedSavingsAndUpdateDb,
 } = require("./tasks");
+const INIT_BLOCK_HEIGHT = parseInt(process.env.BLOCK);
+const RUN_TIME = parseInt(process.env.TIME);
+const NO_TASK_RUN = process.env.NO_TASK == null ? false : true;
+const CHAIN = process.env.CHAIN;
+void CHAIN;
 
 const db = new MainDb();
 
-const INIT_BLOCK_HEIGHT = parseInt(process.env.BLOCK);
 if (Number.isNaN(INIT_BLOCK_HEIGHT)) {
   throw new Error("Invalid block height");
 }
@@ -34,17 +38,34 @@ tasks.push(taskRunner(fetchLoansAndUpdateDb, db));
 tasks.push(taskRunner(fetchLockedSavingsAndUpdateDb, db));
 
 // Create a monitor instance
-const monitor = new Monitor(JVM_SERVICE, tasks, IconBuilder, INIT_BLOCK_HEIGHT);
+const monitor = new Monitor(
+  JVM_SERVICE,
+  tasks,
+  IconBuilder,
+  INIT_BLOCK_HEIGHT,
+  NO_TASK_RUN,
+);
 
 async function main() {
   // start monitor
   monitor.start();
 
-  // run monitor for 20 seconds
-  setTimeout(() => {
-    monitor.stop();
-  }, 60000);
+  if (RUN_TIME != null && !Number.isNaN(RUN_TIME)) {
+    // run monitor for specified time
+    setTimeout(() => {
+      monitor.stop();
+    }, RUN_TIME * 1000);
+  }
 }
+
+// catch uncought exceptions
+process.on("uncaughtException", (err) => {
+  console.log("!!!!! Uncaught exception: ");
+  console.log(err);
+  db.stop();
+  monitor.stop();
+  process.exit(1);
+});
 
 // Enable graceful stop
 process.once("SIGINT", () => {

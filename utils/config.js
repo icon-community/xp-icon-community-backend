@@ -38,12 +38,28 @@ const config = {
         },
       },
     },
+    devnet: {
+      rpc: "https://tt.net.solidwallet.io/jvm-rpc/api/v3",
+      nid: 3,
+      contracts: {
+        chain: "cx0000000000000000000000000000000000000000",
+        registrationBook: null,
+        balanced: {
+          savings: null,
+          loans: null,
+        },
+      },
+    },
     lisbon: {
       rpc: "https://lisbon.net.solidwallet.io/api/v3",
       nid: 2,
       contracts: {
         chain: "cx0000000000000000000000000000000000000000",
         registrationBook: "cx095c4e2fbacc1d5268c16a1ef6232290b1db0d8d",
+        balanced: {
+          savings: null,
+          loans: null,
+        },
       },
     },
   },

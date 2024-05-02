@@ -30,6 +30,7 @@ async function fetchRegisteredUsersAndUpdateDb(block, db) {
         usersDict[user] = {
           walletAddress: user,
           registrationBlock: parseInt(registrationBlock, 16),
+          updatedAtBlock: parseInt(registrationBlock, 16),
         };
       }
     }
