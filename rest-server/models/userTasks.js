@@ -4,6 +4,16 @@
 const mongoose = require("mongoose");
 const { Schema } = mongoose;
 
+const xpEarnedSchema = new Schema({
+  xp: {
+    type: Number,
+    required: true,
+  },
+  block: {
+    type: Number,
+    required: true,
+  },
+});
 /*
  *
  */
@@ -29,12 +39,15 @@ const userTasksSchema = new Schema({
     default: "pending",
   },
   xpEarned: {
-    type: Number,
-    default: 0,
+    type: [xpEarnedSchema],
   },
   createdAt: {
     type: Date,
     default: Date.now,
+  },
+  updatedAtBlock: {
+    type: Number,
+    required: true,
   },
 });
 

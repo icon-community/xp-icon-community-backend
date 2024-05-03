@@ -62,9 +62,28 @@ async function main() {
 process.on("uncaughtException", (err) => {
   console.log("!!!!! Uncaught exception: ");
   console.log(err);
-  db.stop();
-  monitor.stop();
-  process.exit(1);
+
+  // overall in the logic of the code a error with
+  // message "CRITICAL" is thrown when a critical error
+  // is encountered. This error is used to stop the
+  // monitor and the db connection
+  // This is done to prevent the monitor from running
+  // when these type of errors are encountered
+  // An example that is currently implemented
+  // (file: /rest-server/models/seasons.js) in the
+  // schema creation process for the "seasons" is that
+  // when the environment variable doesnt have an entry
+  // for the Tasks collection a critical error is thrown
+  // the reason to throw that error is to prevent the
+  // monitor from running if no tasks is associated with
+  // the season
+  // TODO: this works, but it there might be a better way
+  // to implemented this?, maybe?
+  if (err.message === "CRITICAL") {
+    db.stop();
+    monitor.stop();
+    process.exit(1);
+  }
 });
 
 // Enable graceful stop
