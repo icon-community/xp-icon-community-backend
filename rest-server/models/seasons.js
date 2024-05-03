@@ -44,6 +44,7 @@ const seasonSchema = new Schema({
     {
       type: Schema.Types.ObjectId,
       ref: config.collections.task,
+      required: true,
     },
   ],
 });

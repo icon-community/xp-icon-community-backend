@@ -9,6 +9,7 @@ const {
   createSeason,
   getAllSeasons,
 } = require("../../rest-server/services/v1/seasonService");
+const { getAllTasks } = require("../../rest-server/services/v1/taskService");
 const fs = require("fs");
 const customPath = require("../../utils/customPath");
 const SEASON_SEED = "db-manager/data/seasons-seed.json";
@@ -29,8 +30,8 @@ async function feedSeasonSeedDataToDb(db) {
     );
 
     // DEBUG PRINT
-    console.log("Seasons seed data:");
-    console.log(seasons);
+    // console.log("Seasons seed data:");
+    // console.log(seasons);
 
     const existingSeasons = await getAllSeasons(db.connection);
 
@@ -47,11 +48,26 @@ async function feedSeasonSeedDataToDb(db) {
     // if not, throw an error
     // if yes, then fetch the tasks mongoId and save it
     // in the entry for the season
+
+    // Get All tasks
+    console.log("Fetching all tasks");
+    const tasks = await getAllTasks(db.connection);
     for (let season of seasons) {
       if (!existingSeasons.find((s) => s.number === season.number)) {
         console.log(
           `Season #${season.number} doesnt not exists in DB, saving it`,
         );
+        const tasksToSave = [];
+        for (let task of season.tasks) {
+          const taskToSave = tasks.find((t) => t.seedId === task);
+          if (taskToSave) {
+            tasksToSave.push(taskToSave._id);
+          } else {
+            console.log(`Task with seedId ${task} not found in DB`);
+            throw new Error("CRITICAL");
+          }
+        }
+        season.tasks = tasksToSave;
         await createSeason(season, db.connection);
         console.log(`Season #${season.number} saved`);
       } else {
@@ -60,8 +76,8 @@ async function feedSeasonSeedDataToDb(db) {
     }
 
     // DEBUG PRINT
-    const foo = await getAllSeasons(db.connection);
-    console.log(foo);
+    // const foo = await getAllSeasons(db.connection);
+    // console.log(foo);
 
     // Close connection to DB
     console.log("Closing connection to DB");

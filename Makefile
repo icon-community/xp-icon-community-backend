@@ -71,6 +71,8 @@ test-season-addition:
 	@echo "> Running scraper tests"
 	$(START_DOCKER)
 	$(LINE_BREAK)
+	@echo "Starting task addition"
+	node db-manager/scripts/updateTasks.js
 	@echo "Starting season addition"
 	node db-manager/scripts/updateSeasons.js
 	$(LINE_BREAK)
