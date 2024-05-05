@@ -1,12 +1,13 @@
 // imports
 const { getPRepTerm } = require("./json-rpc-services");
+const config = require("../../utils/config");
 
 // Amount of block from the period end block to fetch all
 // the tasks related information.
 // This value MUST be higher than 43200 which in theory is
 // period length in blocks
 const amountOfBlocksFromLatest = 100;
-const lineBreaker = "\n------------------------------------";
+const lineBreaker = config.misc.lineBreak;
 
 /*
  * Monitor class to monitor the JVM chain for new blocks and transactions.

@@ -5,7 +5,8 @@
     "description": "for depositing collateral, the user will receive 10 XP per USD value of the collateral deposited that day. It will be done daily (per chain period)",
     "criteria": {},
     "title": "deposit collateral",
-    "rewardFormula": ["amount", "return amount * 10"]
+    "rewardFormula": ["amount", "return amount * 10"],
+    "chain": "icon"
   },
   {
     "seedId": "t2",
@@ -13,7 +14,8 @@
     "description": "for minting bnUSD, the user will receive 10 XP per bnUSD loan held per day. It will be done daily (per chain period)",
     "criteria": {},
     "title": "holding a loan",
-    "rewardFormula": ["amount", "return amount * 10"]
+    "rewardFormula": ["amount", "return amount * 10"],
+    "chain": "icon"
   },
   {
     "seedId": "t3",
@@ -21,6 +23,7 @@
     "description": "for locking into the saving rates, the user will receive 10 XP per USD value locked per day. It will be done daily (per chain period)",
     "criteria": {},
     "title": "locking into saving rates",
-    "rewardFormula": ["amount", "return amount * 10"]
+    "rewardFormula": ["amount", "return amount * 10"],
+    "chain": "icon"
   }
 ]

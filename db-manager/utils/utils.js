@@ -2,6 +2,11 @@
 const IconService = require("icon-sdk-js");
 const config = require("../../utils/config");
 const rqst = require("rqst");
+const fs = require("fs");
+const customPath = require("../../utils/customPath");
+const {
+  getAllSeasons,
+} = require("../../rest-server/services/v1/seasonService");
 
 const { HttpProvider, IconBuilder } = IconService.default;
 
@@ -105,6 +110,53 @@ function taskRunner(task, db) {
   return async (input) => await task(input, db);
 }
 
+async function getInitBlock(db) {
+  // This function will try to first fetch the last block from the seed file and if that fails, it will try to fetch it from the database by
+  // looking for the active season and returning the blockStart of that season
+  // If both fail, it will return null
+  try {
+    console.log("> Fetching last block from seed file");
+    // first try to fetch from seed file
+    const mainSeed = JSON.parse(fs.readFileSync(customPath(config.seeds.main)));
+
+    if (mainSeed != null && mainSeed.lastBlock != null) {
+      console.log("> Last block found in seed file. Returning block.");
+      return mainSeed.lastBlock;
+    } else {
+      throw new Error("Seed file is empty");
+    }
+  } catch (err) {
+    console.log("> Error fetching last block from seed file. Error: ");
+    console.log(err);
+  }
+
+  try {
+    console.log("> Trying to recover last block from database");
+    console.log("> Creating connection to database");
+    await db.createConnection();
+
+    console.log("> Fetching all seasons from database");
+    const allSeasons = await getAllSeasons(db.connection);
+
+    console.log("> Searching active season");
+    const activeSeason = allSeasons.find((season) => season.active === true);
+
+    if (activeSeason != null) {
+      // if active season is found, return the blockStart
+      console.log("> Active season found in database. Returning block.");
+      console.log("> Closing connection to database");
+      db.stop();
+      return activeSeason.blockStart;
+    } else {
+      throw new Error("No active season found in database");
+    }
+  } catch (err) {
+    console.log("> Error fetching last block from database. Error: ");
+    console.log(err);
+    console.log("> Closing connection to database");
+    db.stop();
+  }
+}
 module.exports = {
   JVM_SERVICE,
   IconBuilder,
@@ -112,4 +164,5 @@ module.exports = {
   makeJsonRpcCall,
   isValidHex,
   taskRunner,
+  getInitBlock,
 };

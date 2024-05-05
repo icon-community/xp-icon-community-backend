@@ -3,8 +3,14 @@ require("dotenv").config();
 const SELECTED_CHAIN =
   process.env.CHAIN == null ? "mainnet" : process.env.CHAIN;
 const config = {
+  seeds: {
+    seasons: "db-manager/data/seasons-seed.json",
+    tasks: "db-manager/data/tasks-seed.json",
+    main: "db-manager/data/main-seed.json",
+  },
   misc: {
     termPeriod: 43200,
+    lineBreak: "\n------------------------------------",
   },
   ports: {
     backend: process.env.REST_PORT,

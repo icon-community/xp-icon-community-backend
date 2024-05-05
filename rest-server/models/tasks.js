@@ -15,6 +15,7 @@ const taskSchema = new Schema({
   title: { type: String, required: true },
   rewardFormula: { type: [String], required: true },
   createdAt: { type: Date, default: Date.now },
+  chain: { type: String, required: true, enum: ["icon"] },
 });
 
 // const Task = mongoose.model("Task", taskSchema);

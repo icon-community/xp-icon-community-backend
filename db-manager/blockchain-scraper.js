@@ -1,60 +1,113 @@
 //
 const Monitor = require("./utils/monitor");
-const { JVM_SERVICE, IconBuilder, taskRunner } = require("./utils/utils");
+const {
+  JVM_SERVICE,
+  IconBuilder,
+  taskRunner,
+  getInitBlock,
+} = require("./utils/utils");
 const MainDb = require("../utils/mainDb");
 const {
   fetchRegisteredUsersAndUpdateDb,
   fetchCollateralsAndUpdateDb,
   fetchLoansAndUpdateDb,
   fetchLockedSavingsAndUpdateDb,
+  feedTaskSeedDataToDb,
+  feedSeasonSeedDataToDb,
 } = require("./tasks");
-const INIT_BLOCK_HEIGHT = parseInt(process.env.BLOCK);
+const config = require("../utils/config");
+
+const lineBreak = config.misc.lineBreak;
 const RUN_TIME = parseInt(process.env.TIME);
 const NO_TASK_RUN = process.env.NO_TASK == null ? false : true;
 const CHAIN = process.env.CHAIN;
 void CHAIN;
 
-const db = new MainDb();
-
-if (Number.isNaN(INIT_BLOCK_HEIGHT)) {
-  throw new Error("Invalid block height");
-}
-
-// Array of tasks that will be run by the monitor. these
-// task are run in the order they are added to the array
-const tasks = [];
-
-// first run task that fetches registered users and updates the db
-tasks.push(taskRunner(fetchRegisteredUsersAndUpdateDb, db));
-
-// Run task that fetches collateral deposited by each user and updates the db
-
-tasks.push(taskRunner(fetchCollateralsAndUpdateDb, db));
-
-// Run task that fetches loans taken by each user and updates the db
-tasks.push(taskRunner(fetchLoansAndUpdateDb, db));
-
-// Run task that fetches locked savings by each user and updates the db
-tasks.push(taskRunner(fetchLockedSavingsAndUpdateDb, db));
-
-// Create a monitor instance
-const monitor = new Monitor(
-  JVM_SERVICE,
-  tasks,
-  IconBuilder,
-  INIT_BLOCK_HEIGHT,
-  NO_TASK_RUN,
-);
+// instantiate variables
+let monitor = null;
+let db = null;
 
 async function main() {
-  // start monitor
-  monitor.start();
+  try {
+    // initiate db class
+    db = new MainDb();
 
-  if (RUN_TIME != null && !Number.isNaN(RUN_TIME)) {
-    // run monitor for specified time
-    setTimeout(() => {
-      monitor.stop();
-    }, RUN_TIME * 1000);
+    // read task seed data from file and feed it to the db
+    console.log(lineBreak);
+    await feedTaskSeedDataToDb(db);
+
+    // read season seed data from file and feed it to the db
+    console.log(lineBreak);
+    await feedSeasonSeedDataToDb(db);
+
+    // get init block from seed or db
+    console.log(lineBreak);
+    const initBlockFromSeed = await getInitBlock(db);
+
+    // get the initial block height from the environment variable
+    const initBlockFromEnv = process.env.BLOCK;
+
+    // if the block height is define in the env variable
+    // use that value, otherwise try and get the block
+    // from the seed file, if that fails throw an error
+    // of type "CRITICAL"
+
+    let INIT_BLOCK_HEIGHT;
+    if (initBlockFromEnv != null) {
+      console.log(
+        `Using block height from environment variable. block: ${initBlockFromEnv}`,
+      );
+      INIT_BLOCK_HEIGHT = parseInt(initBlockFromEnv);
+    } else {
+      console.log(
+        `Using block height fetched from seed file or database. block: ${initBlockFromSeed}`,
+      );
+      INIT_BLOCK_HEIGHT = initBlockFromSeed;
+    }
+
+    if (Number.isNaN(INIT_BLOCK_HEIGHT)) {
+      console.log("Invalid block height");
+      throw new Error("CRITICAL");
+    }
+    // Array of tasks that will be run by the monitor. these
+    // task are run in the order they are added to the array
+    const tasks = [];
+
+    // first run task that fetches registered users and updates the db
+    tasks.push(taskRunner(fetchRegisteredUsersAndUpdateDb, db));
+
+    // Run task that fetches collateral deposited by each user and updates the db
+
+    tasks.push(taskRunner(fetchCollateralsAndUpdateDb, db));
+
+    // Run task that fetches loans taken by each user and updates the db
+    tasks.push(taskRunner(fetchLoansAndUpdateDb, db));
+
+    // Run task that fetches locked savings by each user and updates the db
+    tasks.push(taskRunner(fetchLockedSavingsAndUpdateDb, db));
+
+    // create monitor instance
+    monitor = new Monitor(
+      JVM_SERVICE,
+      tasks,
+      IconBuilder,
+      INIT_BLOCK_HEIGHT,
+      NO_TASK_RUN,
+    );
+    // start monitor
+    console.log(lineBreak);
+    monitor.start();
+
+    if (RUN_TIME != null && !Number.isNaN(RUN_TIME)) {
+      // run monitor for specified time
+      setTimeout(() => {
+        monitor.stop();
+      }, RUN_TIME * 1000);
+    }
+  } catch (err) {
+    console.log("Error in main function");
+    console.log(err);
+    throw new Error("CRITICAL");
   }
 }
 
@@ -80,22 +133,28 @@ process.on("uncaughtException", (err) => {
   // TODO: this works, but it there might be a better way
   // to implemented this?, maybe?
   if (err.message === "CRITICAL") {
-    db.stop();
-    monitor.stop();
+    if (db != null && monitor != null) {
+      db.stop();
+      monitor.stop();
+    }
     process.exit(1);
   }
 });
 
 // Enable graceful stop
 process.once("SIGINT", () => {
-  db.stop();
-  monitor.stop();
+  if (db != null && monitor != null) {
+    db.stop();
+    monitor.stop();
+  }
   process.exit();
 });
 
 process.once("SIGTERM", () => {
-  db.stop();
-  monitor.stop();
+  if (db != null && monitor != null) {
+    db.stop();
+    monitor.stop();
+  }
   process.exit();
 });
 

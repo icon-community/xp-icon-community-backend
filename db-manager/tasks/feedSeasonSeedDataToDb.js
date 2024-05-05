@@ -12,7 +12,8 @@ const {
 const { getAllTasks } = require("../../rest-server/services/v1/taskService");
 const fs = require("fs");
 const customPath = require("../../utils/customPath");
-const SEASON_SEED = "db-manager/data/seasons-seed.json";
+const config = require("../../utils/config");
+const SEASON_SEED = config.seeds.seasons;
 
 async function feedSeasonSeedDataToDb(db) {
   console.log("> Running feedSeasonSeedDataToDb");

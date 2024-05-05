@@ -12,6 +12,12 @@ const xpEarnedSchema = new Schema({
   block: {
     type: Number,
     required: true,
+    unique: true,
+  },
+  period: {
+    type: Number,
+    required: true,
+    unique: true,
   },
 });
 /*

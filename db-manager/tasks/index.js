@@ -2,10 +2,14 @@ const fetchRegisteredUsersAndUpdateDb = require("./fetchRegisteredUsersAndUpdate
 const fetchCollateralsAndUpdateDb = require("./fetchCollateralsAndUpdateDb");
 const fetchLoansAndUpdateDb = require("./fetchLoansAndUpdateDb");
 const fetchLockedSavingsAndUpdateDb = require("./fetchLockedSavingsAndUpdateDb");
+const feedTaskSeedDataToDb = require("./feedTaskSeedDataToDb");
+const feedSeasonSeedDataToDb = require("./feedSeasonSeedDataToDb");
 
 module.exports = {
   fetchRegisteredUsersAndUpdateDb,
   fetchCollateralsAndUpdateDb,
   fetchLoansAndUpdateDb,
   fetchLockedSavingsAndUpdateDb,
+  feedTaskSeedDataToDb,
+  feedSeasonSeedDataToDb,
 };

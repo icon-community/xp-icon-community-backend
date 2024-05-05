@@ -11,7 +11,8 @@ const {
 } = require("../../rest-server/services/v1/taskService");
 const fs = require("fs");
 const customPath = require("../../utils/customPath");
-const TASK_SEED = "db-manager/data/tasks-seed.json";
+const config = require("../../utils/config");
+const TASK_SEED = config.seeds.tasks;
 
 async function feedTaskSeedDataToDb(db) {
   console.log("> Running feedTaskSeedDataToDb");
