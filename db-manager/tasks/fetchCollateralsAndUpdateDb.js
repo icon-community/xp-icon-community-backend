@@ -1,16 +1,172 @@
-async function fetchCollateralsAndUpdateDb(block, db) {
-  console.log(`> Running fetchCollateralsAndUpdateDb task on block ${block}`);
-  void block, db;
+// This task is defined for the purpose of fetching collaterals from the blockchain and updating the database with the latest collateral amounts.
+// This task is hardcoded to run with a task with a
+// task id in the seed labeled as "t1" (seedId === "t1");
+const SEED_ID = "t1";
+const {
+  userService,
+  taskService,
+  seasonService,
+  userTaskService,
+} = require("../../rest-server/services/v1/");
+const { getAccountPositions } = require("../utils/json-rpc-services");
 
-  // fetch Collateral amount at provided block height
+// const { getTaskBySeedId } = taskService;
+const { getAllUsers } = userService;
+const { getAllSeasons, getActiveSeason } = seasonService;
+const { getTaskBySeedId, getAllTasks } = taskService;
+const { getUserTaskByAllIds, updateOrCreateUserTask } = userTaskService;
 
-  // Fetch users
+async function fetchCollateralsAndUpdateDb(taskInput, db) {
+  const { height, prepTerm } = taskInput;
+  console.log(
+    `\n> Running fetchCollateralsAndUpdateDb task on block ${height}`,
+  );
 
-  // Fetch seasons
+  try {
+    console.log("Creating connection to DB");
+    await db.createConnection();
 
-  // Iterate over tasks in season one by one
-  // fetch each task from the DB
-  //
+    // Fetch active season
+    console.log("Fetching active season");
+    const activeSeason = await getActiveSeason(db.connection);
+    console.log("Fetching active season tasks");
+    const activeTasks = activeSeason.tasks;
+
+    // For each task in the active season find the task with seedId === "t1"
+    console.log(`Find target task with seedId === ${SEED_ID}`);
+    const targetTask = await getTaskBySeedId(SEED_ID, db.connection);
+
+    console.log("Checking if target task is in active tasks");
+    let taskFound = false;
+    for (const seasonTask of activeTasks) {
+      if (seasonTask._id.equals(targetTask._id)) {
+        console.log("Found target task");
+        taskFound = true;
+        break;
+      }
+    }
+
+    if (!taskFound) {
+      console.log(
+        `Target task not found in active tasks. This active season doesnt have a task associated with seedId === ${SEED_ID}`,
+      );
+      console.log("Closing connection to DB");
+      await db.stop();
+      return;
+    }
+
+    console.log("Target task found in active tasks");
+    const rewardFormula = new Function(...targetTask.rewardFormula);
+
+    // FIRST fetch data from the database
+    // Fetch ALL users
+    console.log("Fetching all users");
+    const allUsers = await getAllUsers(db.connection);
+
+    // filter user by their registration block. if the user's registration block is greater than the current block height, skip the user
+    console.log("Filtering users by registration block");
+    const filteredUsers = allUsers.filter(
+      (user) => user.registrationBlock <= height,
+    );
+
+    // for each user, find the userTask document with the
+    // user id, task id and season id
+    // if the userTask document does not exist, create one
+    // if the userTask document exists, fetch the 'xpEarned'
+    // array
+    // find if an entry for the prepTerm exists in the
+    // 'xpEarned' array
+    // if the entry exists, do nothing and continue to the
+    // next user
+    // if the entry does not exist, fetch the collateral
+    // amount for the user at the provided block height
+    // and update the 'xpEarned' array with the new entry
+    // and update the userTask document with the new
+    // 'xpEarned' array
+    //
+    for (const validUser of filteredUsers) {
+      console.log("Search userTask document");
+      const userTaskDoc = await getUserTaskByAllIds(
+        validUser._id,
+        targetTask._id,
+        activeSeason._id,
+        db.connection,
+      );
+
+      const xpArray = [];
+
+      if (userTaskDoc != null && userTaskDoc.xpEarned.length > 0) {
+        const alreadyExists = userTaskDoc.xpEarned.find((xpEarned) => {
+          return xpEarned.period === prepTerm;
+        });
+
+        if (alreadyExists != null) {
+          console.log(
+            `UserTask document for user ${validUser._id} and task ${targetTask._id} and season ${activeSeason._id} already has an entry for prepTerm ${prepTerm}, with marked block height of ${alreadyExists.block}, and earned XP of ${alreadyExists.xp}`,
+          );
+          continue;
+        } else {
+          xpArray.push(...userTaskDoc.xpEarned);
+        }
+      }
+      // fetch collateral amount for user
+      console.log(
+        `\n> Fetching collateral amount for user ${validUser.walletAddress}`,
+      );
+      const accountPosition = await getAccountPositions(
+        validUser.walletAddress,
+        height,
+      );
+
+      let collateralAmount = 0;
+      if (accountPosition == null) {
+        console.log(
+          `No collateral amount found for user ${validUser.walletAddress} at block ${height}`,
+        );
+      } else {
+        // TODO: this requires type and error checking,
+        // first evaluate if the object exists then
+        // do the math operation and evaluate if NaN is
+        // returned, etc
+        console.log("Collateral amount found for user, calculating earned XP");
+        collateralAmount =
+          parseInt(accountPosition.standings.sICX.collateral_in_USD, 16) /
+          10 ** 18;
+        console.log("Collateral value in USD: ", collateralAmount);
+      }
+
+      console.log("Updating userTask document with new xpEarned array");
+      xpArray.push({
+        period: prepTerm,
+        block: height,
+        xp: rewardFormula(collateralAmount),
+      });
+
+      // Update userTask document with new xpEarned array
+      await updateOrCreateUserTask(
+        {
+          userId: validUser._id,
+          taskId: targetTask._id,
+          seasonId: activeSeason._id,
+        },
+        { xpEarned: xpArray },
+        db.connection,
+      );
+      console.log("UserTask document updated");
+    }
+
+    // close connection to DB
+    console.log("Closing connection to DB");
+    await db.stop();
+  } catch (err) {
+    console.log("Error running fetchCollateralsAndUpdateDb task");
+    console.log(err);
+
+    // close connection to DB
+    console.log("Closing connection to DB");
+    await db.stop();
+    throw new Error(err);
+  }
 }
 
 module.exports = fetchCollateralsAndUpdateDb;

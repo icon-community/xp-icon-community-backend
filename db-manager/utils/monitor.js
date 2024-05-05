@@ -92,8 +92,9 @@ class Monitor {
     if (block != null) {
       console.log(`> Block (${height}) available.`);
       const prepTerm = await getPRepTerm(height);
-      console.log(`> Setting latest term to: ${prepTerm.sequence}`);
-      this.latestTerm = prepTerm.sequence;
+      const seq = parseInt(prepTerm.sequence, 16);
+      console.log(`> Setting latest term to: ${seq}`);
+      this.latestTerm = seq;
       console.log(`> Calculating block of interest`);
       const blockOfInterest =
         parseInt(prepTerm.endBlockHeight, 16) - amountOfBlocksFromLatest;
@@ -107,7 +108,11 @@ class Monitor {
           this.tasksRunning = true;
           console.log("> Executing tasks:");
           for (const task of this.tasks) {
-            await task(height);
+            const taskInput = {
+              height: height,
+              prepTerm: this.latestTerm,
+            };
+            await task(taskInput);
           }
           this.tasksRunning = false;
         } else {

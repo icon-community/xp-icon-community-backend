@@ -87,13 +87,13 @@ async function makeJsonRpcCall(data, url, queryMethod = rqst) {
     if (query.error == null) {
       return query.result;
     } else {
-      throw new Error(query.error);
+      throw new Error(JSON.stringify(query.error));
     }
   } catch (err) {
     throw new Error(
       `Error running node request. query: ${JSON.stringify(
         query,
-      )}. Error: ${JSON.stringify(err)}`,
+      )}. Error: ${err}`,
     );
   }
 }
@@ -127,7 +127,7 @@ async function getInitBlock(db) {
     }
   } catch (err) {
     console.log("> Error fetching last block from seed file. Error: ");
-    console.log(err);
+    console.log(err.message);
   }
 
   try {
@@ -152,7 +152,7 @@ async function getInitBlock(db) {
     }
   } catch (err) {
     console.log("> Error fetching last block from database. Error: ");
-    console.log(err);
+    console.log(err.message);
     console.log("> Closing connection to database");
     db.stop();
   }

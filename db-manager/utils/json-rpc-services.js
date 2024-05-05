@@ -46,9 +46,9 @@ async function getAccountPositions(
       height,
     );
     return await makeJsonRpcCall(requestObj, config.jvm.default.rpc);
-  } catch (e) {
+  } catch (err) {
     console.log("Error making getAccountPositions request");
-    console.error(e);
+    console.log(err.message);
   }
 }
 

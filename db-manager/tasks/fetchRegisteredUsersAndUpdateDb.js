@@ -8,7 +8,8 @@ const {
 } = require("../utils/json-rpc-services");
 const { isValidHex } = require("../utils/utils");
 
-async function fetchRegisteredUsersAndUpdateDb(block, db) {
+async function fetchRegisteredUsersAndUpdateDb(taskInput, db) {
+  const { height: block } = taskInput;
   console.log(
     `> Running fetchRegisteredUsersAndUpdateDb task on block ${block}`,
   );
