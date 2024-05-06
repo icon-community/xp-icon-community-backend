@@ -90,11 +90,8 @@ async function makeJsonRpcCall(data, url, queryMethod = rqst) {
       throw new Error(JSON.stringify(query.error));
     }
   } catch (err) {
-    throw new Error(
-      `Error running node request. query: ${JSON.stringify(
-        query,
-      )}. Error: ${err}`,
-    );
+    console.log(`Error running node request. query: ${JSON.stringify(query)}`);
+    throw new Error(err);
   }
 }
 

@@ -49,6 +49,42 @@ async function getAccountPositions(
   } catch (err) {
     console.log("Error making getAccountPositions request");
     console.log(err.message);
+    throw new Error(err.message);
+  }
+}
+
+async function getSicxDebtInUSDValue(wallet, height) {
+  try {
+    const position = await getAccountPositions(wallet, height);
+    // console.log("position");
+    // console.log(position);
+    return parseInt(position.standings.sICX.total_debt_in_USD, 16) / 10 ** 18;
+  } catch (err) {
+    console.log("Error getting sICX debt in USD value");
+    console.log(err.message);
+    const str = "does not have a position in Balanced";
+    if (err.message.includes(str)) {
+      return 0;
+    } else {
+      throw new Error(err.message);
+    }
+  }
+}
+async function getSicxCollateralInUSDValue(wallet, height) {
+  try {
+    const position = await getAccountPositions(wallet, height);
+    // console.log("position");
+    // console.log(position);
+    return parseInt(position.standings.sICX.collateral_in_USD, 16) / 10 ** 18;
+  } catch (err) {
+    console.log("Error getting sICX collateral in USD value");
+    console.log(err.message);
+    const str = "does not have a position in Balanced";
+    if (err.message.includes(str)) {
+      return 0;
+    } else {
+      throw new Error(err.message);
+    }
   }
 }
 
@@ -117,4 +153,6 @@ module.exports = {
   getLockedAmount,
   getUsersList,
   getUserRegistrationBlock,
+  getSicxCollateralInUSDValue,
+  getSicxDebtInUSDValue,
 };
