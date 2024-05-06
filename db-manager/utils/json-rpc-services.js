@@ -102,10 +102,34 @@ async function getLockedAmount(
       contract,
       height,
     );
-    return await makeJsonRpcCall(requestObj, config.jvm.default.rpc);
-  } catch (e) {
+    const response = await makeJsonRpcCall(requestObj, config.jvm.default.rpc);
+    if (response != null) {
+      return response;
+    } else {
+      throw new Error("null response from saving rates contract");
+    }
+  } catch (err) {
     console.log("Error making getLockedAmount request");
-    console.error(e);
+    console.log(err.message);
+    throw new Error(err.message);
+  }
+}
+
+async function getLockedAmountAsDecimal(user, height) {
+  try {
+    const response = await getLockedAmount(user, height);
+    // console.log("response");
+    // console.log(response);
+    return parseInt(response, 16) / 10 ** 18;
+  } catch (err) {
+    console.log("Error getting locked amount in USD value");
+    console.log(err.message);
+    const str = "null response from saving rates contract";
+    if (err.message.includes(str)) {
+      return 0;
+    } else {
+      throw new Error(err.message);
+    }
   }
 }
 
@@ -155,4 +179,5 @@ module.exports = {
   getUserRegistrationBlock,
   getSicxCollateralInUSDValue,
   getSicxDebtInUSDValue,
+  getLockedAmountAsDecimal,
 };
