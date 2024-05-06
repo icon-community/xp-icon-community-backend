@@ -1,20 +1,6 @@
 LINE_BREAK := @echo "************"
-START_DOCKER_NON_PERSISTENT := @echo "Starting mongodb container" && docker compose -f db/docker-compose-non-persistent.yml up -d
-STOP_DOCKER_NON_PERSISTENT := @echo "Stopping mongodb container" && docker compose -f db/docker-compose-non-persistent.yml down
-
-
-start-rest-server:
-	docker compose up -d
-	@echo "Docker containers up"
-
-stop-rest-server:
-	docker compose down
-	@echo "Docker containers down"
-
-rebuild-rest-server:
-	docker compose down
-	docker compose up -d --build
-	@echo "Docker containers up"
+START_DOCKER_NON_PERSISTENT := @echo "Starting mongodb container" && docker compose -f ../db/docker-compose-non-persistent.yml up -d
+STOP_DOCKER_NON_PERSISTENT := @echo "Stopping mongodb container" && docker compose -f ../db/docker-compose-non-persistent.yml down
 
 start-docker-non-persistent:
 	$(START_DOCKER_NON_PERSISTENT)
@@ -27,8 +13,8 @@ test-scraper-mainnet:
 	$(START_DOCKER_NON_PERSISTENT)
 	$(LINE_BREAK)
 	@echo "Starting blockchain scraper"
-	# BLOCK=80670350 TIME=60 node db-manager/blockchain-scraper.js
-	TIME=60 node db-manager/blockchain-scraper.js
+	# BLOCK=80670350 TIME=60 node blockchain-scraper.js
+	TIME=60 node blockchain-scraper.js
 	$(LINE_BREAK)
 	$(STOP_DOCKER_NON_PERSISTENT)
 
@@ -37,7 +23,7 @@ test-scraper-mainnet-no-task:
 	$(START_DOCKER_NON_PERSISTENT)
 	$(LINE_BREAK)
 	@echo "Starting blockchain scraper"
-	BLOCK=80670350 TIME=60 NO_TASK=true node db-manager/blockchain-scraper.js
+	BLOCK=80670350 TIME=60 NO_TASK=true node blockchain-scraper.js
 	$(LINE_BREAK)
 	$(STOP_DOCKER_NON_PERSISTENT)
 
@@ -46,7 +32,7 @@ test-scraper-devnet-no-task:
 	$(START_DOCKER_NON_PERSISTENT)
 	$(LINE_BREAK)
 	@echo "Starting blockchain scraper"
-	BLOCK=8031000 TIME=300 NO_TASK=true CHAIN=devnet node db-manager/blockchain-scraper.js
+	BLOCK=8031000 TIME=300 NO_TASK=true CHAIN=devnet node blockchain-scraper.js
 	$(LINE_BREAK)
 	$(STOP_DOCKER_NON_PERSISTENT)
 
@@ -55,7 +41,7 @@ test-scraper-devnet-no-task-no-time-limit:
 	$(START_DOCKER_NON_PERSISTENT)
 	$(LINE_BREAK)
 	@echo "Starting blockchain scraper"
-	BLOCK=8082000 NO_TASK=true CHAIN=devnet node db-manager/blockchain-scraper.js
+	BLOCK=8082000 NO_TASK=true CHAIN=devnet node blockchain-scraper.js
 	$(LINE_BREAK)
 	$(STOP_DOCKER_NON_PERSISTENT)
 
@@ -64,7 +50,7 @@ test-task-addition:
 	$(START_DOCKER_NON_PERSISTENT)
 	$(LINE_BREAK)
 	@echo "Starting task addition"
-	node db-manager/scripts/updateTasks.js
+	node scripts/updateTasks.js
 	$(LINE_BREAK)
 	$(STOP_DOCKER_NON_PERSISTENT)
 
@@ -73,8 +59,8 @@ test-season-addition:
 	$(START_DOCKER_NON_PERSISTENT)
 	$(LINE_BREAK)
 	@echo "Starting task addition"
-	node db-manager/scripts/updateTasks.js
+	node scripts/updateTasks.js
 	@echo "Starting season addition"
-	node db-manager/scripts/updateSeasons.js
+	node scripts/updateSeasons.js
 	$(LINE_BREAK)
 	$(STOP_DOCKER_NON_PERSISTENT)

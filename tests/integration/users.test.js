@@ -4,7 +4,7 @@ const mockUsers = require("../mockData/users");
 const {
   createUser,
   getAllUsers,
-} = require("../../rest-server/services/v1/userService");
+} = require("../../common/services/v1/userService");
 
 describe("User Collection", () => {
   const db = new MockDb();

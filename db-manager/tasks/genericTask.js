@@ -7,7 +7,7 @@ const {
   taskService,
   seasonService,
   userTaskService,
-} = require("../../rest-server/services/v1/");
+} = require("../../common/services/v1/");
 const { getAllUsers } = userService;
 const { getActiveSeason } = seasonService;
 const { getTaskBySeedId } = taskService;

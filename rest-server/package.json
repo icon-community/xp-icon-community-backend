@@ -1,10 +1,11 @@
 {
-  "name": "xp-icon-community-backend-root",
+  "name": "xp-icon-community-backend-rest-server",
   "version": "1.0.0",
   "description": "Backend for the XP ICON Community project.",
   "main": "index.js",
   "scripts": {
-    "test": "mocha tests/**/*.test.js"
+    "start": "node rest-server/server.js",
+    "dev": "nodemon rest-server/server.js"
   },
   "repository": {
     "type": "git",
@@ -18,15 +19,16 @@
   },
   "homepage": "https://github.com/icon-community/xp-icon-community-backend#readme",
   "devDependencies": {
-    "@eslint/js": "^9.0.0",
-    "eslint": "^9.0.0",
-    "globals": "^15.0.0",
-    "prettier": "^3.2.5"
+    "nodemon": "^3.1.0"
   },
   "dependencies": {
+    "cors": "^2.8.5",
     "dotenv": "^16.4.5",
+    "express": "^4.19.2",
+    "helmet": "^7.1.0",
+    "icon-sdk-js": "^1.5.2",
     "mocha": "^10.4.0",
-    "mongodb-memory-server": "^9.1.8",
-    "mongoose": "^8.3.2"
+    "mongoose": "^8.3.2",
+    "morgan": "^1.10.0"
   }
 }

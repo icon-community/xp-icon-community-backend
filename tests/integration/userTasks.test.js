@@ -4,7 +4,7 @@ const mockUserTasks = require("../mockData/userTasks");
 const {
   createUserTask,
   getAllUserTasks,
-} = require("../../rest-server/services/v1/userTaskService");
+} = require("../../common/services/v1/userTaskService");
 
 describe("User Task Collection", () => {
   const db = new MockDb();

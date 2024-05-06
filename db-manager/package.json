@@ -1,10 +1,12 @@
 {
-  "name": "xp-icon-community-backend-root",
+  "name": "xp-icon-community-backend-scraper",
   "version": "1.0.0",
   "description": "Backend for the XP ICON Community project.",
   "main": "index.js",
   "scripts": {
-    "test": "mocha tests/**/*.test.js"
+    "start": "echo 'not implemented' && exit 1",
+    "dev": "echo 'not implemented' && exit 1",
+    "test": "echo 'not implemented' && exit 1"
   },
   "repository": {
     "type": "git",
@@ -17,16 +19,10 @@
     "url": "https://github.com/icon-community/xp-icon-community-backend/issues"
   },
   "homepage": "https://github.com/icon-community/xp-icon-community-backend#readme",
-  "devDependencies": {
-    "@eslint/js": "^9.0.0",
-    "eslint": "^9.0.0",
-    "globals": "^15.0.0",
-    "prettier": "^3.2.5"
-  },
   "dependencies": {
     "dotenv": "^16.4.5",
-    "mocha": "^10.4.0",
-    "mongodb-memory-server": "^9.1.8",
-    "mongoose": "^8.3.2"
+    "icon-sdk-js": "^1.5.2",
+    "mongoose": "^8.3.2",
+    "rqst": "github:FidelVe/rqst"
   }
 }

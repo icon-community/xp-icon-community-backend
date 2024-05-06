@@ -1,7 +1,7 @@
 const {
   createUser,
   getAllUsers,
-} = require("../../rest-server/services/v1/userService");
+} = require("../../common/services/v1/userService");
 const {
   getUsersList,
   getUserRegistrationBlock,

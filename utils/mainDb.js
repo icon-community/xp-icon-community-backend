@@ -6,7 +6,7 @@ const {
   taskSchema,
   seasonSchema,
   userTasksSchema,
-} = require("../rest-server/models");
+} = require("../common/models");
 
 class MainDb {
   constructor() {

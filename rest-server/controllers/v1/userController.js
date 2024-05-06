@@ -1,4 +1,5 @@
-const { userService } = require("../../services/v1");
+// const { userService } = require("../../services/v1");
+const { userService } = require("../../../common/services/v1");
 
 const getUserAllSeasons = async (req, res) => {
   try {
@@ -13,7 +14,7 @@ const getUserBySeason = async (req, res) => {
   try {
     const data = await userService.getUserBySeason(
       req.params.userWallet,
-      req.params.season
+      req.params.season,
     );
     res.json(data);
   } catch (error) {
@@ -23,5 +24,5 @@ const getUserBySeason = async (req, res) => {
 
 module.exports = {
   getUserAllSeasons,
-  getUserBySeason
+  getUserBySeason,
 };

@@ -1,12 +1,9 @@
-// const fs = require("fs");
 const IconService = require("icon-sdk-js");
 const config = require("../../utils/config");
 const rqst = require("rqst");
 const fs = require("fs");
 const customPath = require("../../utils/customPath");
-const {
-  getAllSeasons,
-} = require("../../rest-server/services/v1/seasonService");
+const { getAllSeasons } = require("../../common/services/v1/seasonService");
 
 const { HttpProvider, IconBuilder } = IconService.default;
 

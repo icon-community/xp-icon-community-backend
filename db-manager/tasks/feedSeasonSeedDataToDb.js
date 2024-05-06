@@ -8,8 +8,8 @@
 const {
   createSeason,
   getAllSeasons,
-} = require("../../rest-server/services/v1/seasonService");
-const { getAllTasks } = require("../../rest-server/services/v1/taskService");
+} = require("../../common/services/v1/seasonService");
+const { getAllTasks } = require("../../common/services/v1/taskService");
 const fs = require("fs");
 const customPath = require("../../utils/customPath");
 const config = require("../../utils/config");

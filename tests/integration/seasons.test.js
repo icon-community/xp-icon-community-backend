@@ -4,7 +4,7 @@ const mockSeasons = require("../mockData/seasons");
 const {
   createSeason,
   getAllSeasons,
-} = require("../../rest-server/services/v1/seasonService");
+} = require("../../common/services/v1/seasonService");
 
 describe("Season Collection", () => {
   const db = new MockDb();

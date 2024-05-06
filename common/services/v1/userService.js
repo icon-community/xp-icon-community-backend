@@ -3,7 +3,7 @@ const config = require("../../../utils/config");
 const USER = config.collections.users;
 const isTestEnv = process.env.USE_MOCK_DB != null ? true : false;
 const { createEntry, getAllEntries } = require("./common");
-const mockData = require("../../utils/mockData");
+const mockData = require("../../../rest-server/utils/mockData");
 
 async function createUser(user, connection) {
   return await createEntry(user, USER, connection);
