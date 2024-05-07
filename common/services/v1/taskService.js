@@ -15,8 +15,17 @@ async function getTaskBySeedId(seedId, connection) {
   return await getEntryByParam({ seedId }, TASK, connection);
 }
 
+async function getTasksByUserAndSeason(userId, seasonId, connection) {
+  return await getEntryByParam(
+    { userId: userId, seasonId: seasonId },
+    TASK,
+    connection,
+  );
+}
+
 module.exports = {
   createTask,
   getAllTasks,
   getTaskBySeedId,
+  getTasksByUserAndSeason,
 };

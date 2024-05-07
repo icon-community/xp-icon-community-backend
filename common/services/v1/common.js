@@ -16,7 +16,7 @@ async function getEntryById(id, collectionId, connection) {
 
 async function getEntryByParam(param, colletionId, connection) {
   const model = connection.model(colletionId);
-  return await model.findOne(param);
+  return await model.find(param);
 }
 
 async function updateOrCreateEntry(query, update, collectionId, connection) {
