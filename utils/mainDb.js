@@ -10,9 +10,9 @@ const {
 const config = require("../utils/config");
 
 class MainDb {
-  constructor() {
+  constructor({ uri: uri } = {}) {
     this.connection = null;
-    this.uri = config.db.uri;
+    this.uri = uri == null ? config.db.uri : uri;
   }
 
   async createConnection() {

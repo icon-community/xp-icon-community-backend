@@ -24,6 +24,8 @@ const config = {
   },
   db: {
     uri: process.env.URI,
+    user: process.env.MONGO_USER,
+    pwd: process.env.MONGO_PASSWORD,
   },
   flags: {
     useMockDb: process.env.USE_MOCK_DB,

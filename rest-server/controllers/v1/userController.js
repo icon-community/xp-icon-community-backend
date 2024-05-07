@@ -1,9 +1,17 @@
-// const { userService } = require("../../services/v1");
-const { userService } = require("../../../common/services/v1");
+const { multi } = require("../../../common/services/v1");
+const mainDb = require("../../../utils/mainDb");
+const config = require("../../../utils/config");
+
+const db = new mainDb({
+  uri: `mongodb://${config.db.user}:${config.db.pwd}@localhost:27017`,
+});
 
 const getUserAllSeasons = async (req, res) => {
   try {
-    const data = await userService.getUserAllSeasons(req.params.userWallet);
+    const data = await dbWrapper(
+      multi.getUserAllSeasons,
+      req.params.userWallet,
+    );
     res.json(data);
   } catch (error) {
     res.status(500).send(error);
@@ -12,7 +20,8 @@ const getUserAllSeasons = async (req, res) => {
 
 const getUserBySeason = async (req, res) => {
   try {
-    const data = await userService.getUserBySeason(
+    const data = await dbWrapper(
+      multi.getUserBySeason,
       req.params.userWallet,
       req.params.season,
     );
@@ -21,6 +30,20 @@ const getUserBySeason = async (req, res) => {
     res.status(500).send(error);
   }
 };
+
+async function dbWrapper(callback, ...args) {
+  try {
+    await db.createConnection();
+    const data = await callback(...args, db.connection);
+    await db.stop();
+    return data;
+  } catch (error) {
+    await db.stop();
+    console.log("error");
+    console.log(error);
+    throw error;
+  }
+}
 
 module.exports = {
   getUserAllSeasons,
