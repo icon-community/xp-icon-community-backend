@@ -7,16 +7,18 @@ const {
   seasonSchema,
   userTasksSchema,
 } = require("../common/models");
+const config = require("../utils/config");
 
 class MainDb {
   constructor() {
     this.connection = null;
-    this.uri = process.env.URI;
+    this.uri = config.db.uri;
   }
 
   async createConnection() {
     try {
       // connect to database
+      console.log(`Connecting to main database at ${this.uri}`);
       this.connection = await mongoose.createConnection(this.uri).asPromise();
 
       // setup models
