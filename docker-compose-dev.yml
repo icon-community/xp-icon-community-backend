@@ -1,8 +1,7 @@
-version: "3"
 services:
   mongodb:
     image: mongo:latest
-    container_name: mongodb
+    container_name: mongodb-dev
     ports:
       - "27017:27017"
     networks:
@@ -10,14 +9,6 @@ services:
     environment:
       MONGO_INITDB_ROOT_USERNAME: ${MONGO_USER}
       MONGO_INITDB_ROOT_PASSWORD: ${MONGO_PASSWORD}
-
-  # test-python:
-  #   build:
-  #     context: ./test-docker
-  #     dockerfile: Dockerfile
-  #   container_name: test-python
-  #   networks:
-  #     - mynetwork
 
   blockchain-scraper:
     build:
@@ -29,6 +20,24 @@ services:
 
     networks:
       - mynetwork
+    command: ["node", "blockchain-scraper.js"]
+    environment:
+      MONGO_CONTAINER: mongodb-dev
+
+  rest-server:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: rest-server
+    ports:
+      - "3500:3500"
+    depends_on:
+      - mongodb
+      - blockchain-scraper
+
+    networks:
+      - mynetwork
+    command: ["node", "../rest-server/server.js"]
 
 networks:
   mynetwork:

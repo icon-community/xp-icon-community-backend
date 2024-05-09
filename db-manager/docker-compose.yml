@@ -1,5 +1,0 @@
-version: "3"
-services:
-  blockchain-scraper:
-    build: ./
-    container_name: blockchain-scraper

@@ -1,8 +1,7 @@
-version: "3"
 services:
   mongodb:
     image: mongo:latest
-    container_name: mongodb
+    container_name: mongodb-prod
     ports:
       - "27017:27017"
     networks:
@@ -23,6 +22,24 @@ services:
 
     networks:
       - mynetwork
+    command: ["node", "blockchain-scraper.js"]
+    environment:
+      MONGO_CONTAINER: mongodb-prod
+
+  rest-server:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: rest-server
+    ports:
+      - "3500:3500"
+    depends_on:
+      - mongodb
+      - blockchain-scraper
+
+    networks:
+      - mynetwork
+    command: ["node", "../rest-server/server.js"]
 
 networks:
   mynetwork:

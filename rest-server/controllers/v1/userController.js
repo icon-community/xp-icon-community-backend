@@ -2,9 +2,11 @@ const { multi } = require("../../../common/services/v1");
 const mainDb = require("../../../utils/mainDb");
 const config = require("../../../utils/config");
 
-const db = new mainDb({
-  uri: `mongodb://${config.db.user}:${config.db.pwd}@localhost:27017`,
-});
+const params = {};
+if (process.env.NODE_ENV === "dev") {
+  params.uri = `mongodb://${config.db.user}:${config.db.pwd}@localhost:27017`;
+}
+const db = new mainDb(params);
 
 const getUserAllSeasons = async (req, res) => {
   try {

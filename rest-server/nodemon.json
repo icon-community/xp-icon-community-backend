@@ -3,8 +3,9 @@
   "ignore": [".git", "node_modules/**/node_modules"],
   "verbose": true,
   "env": {
-    "NODE_ENV": "development"
+    "NODE_ENV": "dev"
   },
   "ext": "js,json,html,css",
-  "delay": "2500"
+  "delay": "2500",
+  "watch": ["../common"]
 }

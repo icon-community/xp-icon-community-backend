@@ -22,6 +22,8 @@ const RUN_TIME = parseInt(process.env.TIME);
 const NO_TASK_RUN = process.env.NO_TASK == null ? false : true;
 const CHAIN = process.env.CHAIN;
 void CHAIN;
+const MONGO_CONTAINER =
+  process.env.MONGO_CONTAINER == null ? "mongodb" : process.env.MONGO_CONTAINER;
 
 // instantiate variables
 let monitor = null;
@@ -30,7 +32,13 @@ let db = null;
 async function main() {
   try {
     // initiate db class
-    db = new MainDb();
+    const params = {};
+    if (process.env.NODE_ENV === "dev") {
+      params.uri = `mongodb://${config.db.user}:${config.db.pwd}@localhost:27017`;
+    } else {
+      params.uri = `mongodb://${config.db.user}:${config.db.pwd}@${MONGO_CONTAINER}:27017`;
+    }
+    db = new MainDb(params);
 
     // read task seed data from file and feed it to the db
     console.log(lineBreak);

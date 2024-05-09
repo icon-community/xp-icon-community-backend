@@ -24,18 +24,21 @@ async function genericTask(taskInput, db, seedId, callback) {
 
     // Fetch active season
     console.log("Fetching active season");
-    const activeSeason = await getActiveSeason(db.connection);
+    const activeSeasonArr = await getActiveSeason(db.connection);
+    const activeSeason = activeSeasonArr[0];
+
     console.log("Fetching active season tasks");
     const activeTasks = activeSeason.tasks;
 
     // For each task in the active season find the task with seedId === "t1"
     console.log(`Find target task with seedId === ${SEED_ID}`);
-    const targetTask = await getTaskBySeedId(SEED_ID, db.connection);
+    const targetTaskArr = await getTaskBySeedId(SEED_ID, db.connection);
+    const targetTask = targetTaskArr[0];
 
     console.log("Checking if target task is in active tasks");
     let taskFound = false;
-    for (const seasonTask of activeTasks) {
-      if (seasonTask._id.equals(targetTask._id)) {
+    for (const taskId of activeTasks) {
+      if (taskId.equals(targetTask._id)) {
         console.log("Found target task");
         taskFound = true;
         break;
@@ -82,34 +85,39 @@ async function genericTask(taskInput, db, seedId, callback) {
     //
     for (const validUser of filteredUsers) {
       console.log("Search userTask document");
-      const userTaskDoc = await getUserTaskByAllIds(
+      const userTaskDocArr = await getUserTaskByAllIds(
         validUser._id,
         targetTask._id,
         activeSeason._id,
         db.connection,
       );
+      const userTaskDoc = userTaskDocArr[0];
 
       const xpArray = [];
 
+      // if userTask document exists, fetch the xpEarned array
       if (userTaskDoc != null && userTaskDoc.xpEarned.length > 0) {
+        // find if an entry for the prepTerm exists in the 'xpEarned' array
+        // in other words check if the user has already earned XP for the current term
         const alreadyExists = userTaskDoc.xpEarned.find((xpEarned) => {
           return xpEarned.period === prepTerm;
         });
 
         if (alreadyExists != null) {
+          // if the entry exists, do nothing and continue to the next user
           console.log(
             `UserTask document for user ${validUser._id} and task ${targetTask._id} and season ${activeSeason._id} already has an entry for prepTerm ${prepTerm}, with marked block height of ${alreadyExists.block}, and earned XP of ${alreadyExists.xp}`,
           );
           continue;
         } else {
+          // if the entry does not exist, fetch all the existing entries (these are for the previous terms)
           xpArray.push(...userTaskDoc.xpEarned);
         }
       }
-      // fetch amount for user
+
+      // fetch amount for user for this current term
       console.log(`\n> Fetching amount for user ${validUser.walletAddress}`);
       const callbackResponse = await callback(validUser.walletAddress, height);
-      console.log("foo");
-      console.log(callbackResponse);
 
       let amount = 0;
       if (callbackResponse == null) {
@@ -127,6 +135,7 @@ async function genericTask(taskInput, db, seedId, callback) {
       }
 
       console.log("Updating userTask document with new xpEarned array");
+      // here we are adding the new entry for the current term to the xpEarned array. At this point the xpEarned array contains all the previous terms and we are adding the current term to it
       xpArray.push({
         period: prepTerm,
         block: height,
@@ -134,6 +143,7 @@ async function genericTask(taskInput, db, seedId, callback) {
       });
 
       // Update userTask document with new xpEarned array
+      // at this point we got the xpEarned array with all the previous terms and we added the current term to it
       await updateOrCreateUserTask(
         {
           userId: validUser._id,
