@@ -6,6 +6,10 @@ const params = {};
 if (process.env.NODE_ENV === "dev") {
   params.uri = `mongodb://${config.db.user}:${config.db.pwd}@localhost:27017`;
 }
+
+if (process.env.MONGO_CONTAINER != null) {
+  params.uri = `mongodb://${config.db.user}:${config.db.pwd}@${process.env.MONGO_CONTAINER}:27017`;
+}
 const db = new mainDb(params);
 
 const getUserAllSeasons = async (req, res) => {

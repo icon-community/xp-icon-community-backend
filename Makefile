@@ -1,8 +1,8 @@
-run-production:
+run-prod:
 	@echo "Running production server"
 	@docker compose -f docker-compose-prod.yml up -d
 
-stop-production:
+stop-prod:
 	@echo "Stopping production server"
 	@docker compose -f docker-compose-prod.yml down
 
