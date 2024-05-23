@@ -32,9 +32,14 @@ async function getUserAllSeasons(userWallet, connection) {
         seasons[i]._id,
         connection,
       );
+      const formattedUserTask = getFormattedUserTask(userTask);
+      const taskTotalXp = formattedUserTask.xpEarned.reduce((a, b) => a + b, 0);
       tasks.push({
-        task: formattedTask,
-        xp: getFormattedUserTask(userTask),
+        task: {
+          ...formattedTask,
+          totalXp: taskTotalXp,
+        },
+        xp: formattedUserTask,
       });
     }
     seasonsFormatted[i].tasks = tasks;
@@ -64,8 +69,16 @@ async function getUserBySeason(userWallet, userSeason, connection) {
       season[0]._id,
       connection,
     );
+    const formattedUserTask = getFormattedUserTask(userTask);
+    const taskTotalXp = formattedUserTask.xpEarned.reduce(
+      (a, b) => a + Number(b.xp),
+      0,
+    );
     tasks.push({
-      task: formattedTask,
+      task: {
+        ...formattedTask,
+        totalXp: taskTotalXp,
+      },
       xp: getFormattedUserTask(userTask),
     });
   }

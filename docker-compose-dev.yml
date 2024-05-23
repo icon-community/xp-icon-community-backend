@@ -37,9 +37,14 @@ services:
 
     networks:
       - mynetwork
-    command: ["node", "../rest-server/server.js"]
+
+    command: sh -c "cd ../rest-server && npm run dev"
+
     environment:
       MONGO_CONTAINER: mongodb-dev
+
+    volumes:
+      - .:/app
 
 networks:
   mynetwork:
