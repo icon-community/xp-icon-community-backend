@@ -37,7 +37,7 @@ async function getUserAllSeasons(userWallet, connection) {
       tasks.push({
         task: {
           ...formattedTask,
-          totalXp: taskTotalXp,
+          XPEarned_total_task: taskTotalXp,
         },
         xp: formattedUserTask,
       });
@@ -77,7 +77,7 @@ async function getUserBySeason(userWallet, userSeason, connection) {
     tasks.push({
       task: {
         ...formattedTask,
-        totalXp: taskTotalXp,
+        XPEarned_total_task: taskTotalXp,
       },
       xp: getFormattedUserTask(userTask),
     });

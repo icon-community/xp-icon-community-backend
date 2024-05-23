@@ -35,6 +35,11 @@ function getFormattedSeason(season) {
     blockEnd: season.blockEnd,
     active: season.active,
     tasks: season.tasks,
+    XPEarned_total: null,
+    XPEarned_24hrs: null,
+    Rank: null,
+    Address_above: null,
+    Address_below: null,
   };
 }
 
