@@ -1,7 +1,6 @@
-const {
-  createUser,
-  getAllUsers,
-} = require("../../common/services/v1/userService");
+const { userService, seasonService } = require("../../common/services/v1");
+const { createUser, getAllUsers } = userService;
+const { getActiveSeason } = seasonService;
 const {
   getUsersList,
   getUserRegistrationBlock,
@@ -18,31 +17,46 @@ async function fetchRegisteredUsersAndUpdateDb(taskInput, db) {
     console.log("Creating connection to DB");
     await db.createConnection();
 
-    // Fetch users from RPC API.
-    console.log("Fetching users from RPC API");
-    const usersFromRpc = await getUsersList();
-    const usersDict = {};
+    const activeSeasonArr = await getActiveSeason(db.connection);
 
-    console.log("Fetching registration block for each user");
-    for (const user of usersFromRpc) {
-      console.log("Fetching registration block for user: ", user);
-      const registrationBlock = await getUserRegistrationBlock(user);
-      if (isValidHex(registrationBlock)) {
-        usersDict[user] = {
-          walletAddress: user,
-          registrationBlock: parseInt(registrationBlock, 16),
-          updatedAtBlock: parseInt(registrationBlock, 16),
-        };
+    if (activeSeasonArr.length === 0) {
+      throw new Error("No active season found");
+    }
+
+    // Fetch users in DB
+    console.log("Fetching users from DB");
+    const usersInDb = await getAllUsers(db.connection);
+
+    const usersDict = {};
+    for (const season of activeSeasonArr) {
+      // TODO: fetch users from all the smart contracts
+      // and create an array with non repeating users
+      // Fetch users from RPC API.
+      // if season has ended bypass that season
+      console.log("Fetching users from RPC API");
+      const usersFromRpc = await getUsersList(null, season.contract);
+
+      console.log("Fetching registration block for each user");
+      for (const user of usersFromRpc) {
+        console.log("Fetching registration block for user: ", user);
+        const registrationBlock = await getUserRegistrationBlock(
+          user,
+          null,
+          season.contract,
+        );
+        if (isValidHex(registrationBlock)) {
+          usersDict[user] = {
+            walletAddress: user,
+            registrationBlock: parseInt(registrationBlock, 16),
+            updatedAtBlock: parseInt(registrationBlock, 16),
+          };
+        }
       }
     }
 
     // DEBUG PRINT
     // console.log("users from rpc");
     // console.log(usersDict);
-
-    // Fetch users in DB
-    console.log("Fetching users from DB");
-    const usersInDb = await getAllUsers(db.connection);
 
     // DEBUG PRINT
     // const usersInDbFiltered = usersInDb.map((user) => {

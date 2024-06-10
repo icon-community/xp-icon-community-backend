@@ -38,7 +38,11 @@ const seasonSchema = new Schema({
   active: {
     type: Boolean,
     required: true,
-    default: false,
+    default: true,
+  },
+  contract: {
+    type: String,
+    required: true,
   },
   tasks: [
     {
@@ -49,16 +53,19 @@ const seasonSchema = new Schema({
   ],
 });
 
-seasonSchema.pre("save", async function (next) {
-  if (this.isModified("active") && this.active === true) {
-    const existingDoc = await this.constructor.findOne({ active: true });
-    if (existingDoc) {
-      throw new Error("Only one season can be active at a time");
-    }
-  }
+//NOTE: the following code block restricts the number
+//of active seasons to 1
 
-  next();
-});
+// seasonSchema.pre("save", async function (next) {
+//   if (this.isModified("active") && this.active === true) {
+//     const existingDoc = await this.constructor.findOne({ active: true });
+//     if (existingDoc) {
+//       throw new Error("Only one season can be active at a time");
+//     }
+//   }
+
+//   next();
+// });
 
 // const Season = mongoose.model("Season", seasonSchema);
 module.exports = seasonSchema;

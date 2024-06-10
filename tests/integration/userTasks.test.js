@@ -18,7 +18,7 @@ describe("User Task Collection", () => {
 
   it("should create a user task", async () => {
     const userTask = await createUserTask(mockUserTasks[0], db.connection);
-    assert.equal(userTask.xpEarned, mockUserTasks[0].xpEarned);
+    assert.equal(userTask.updatedAtBlock, mockUserTasks[0].updatedAtBlock);
   });
 
   it("should get all user task added in the collection", async () => {
