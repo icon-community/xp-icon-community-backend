@@ -2,11 +2,15 @@
 const feedTaskSeedDataToDb = require("../tasks/feedTaskSeedDataToDb");
 const MainDb = require("../../utils/mainDb");
 const config = require("../../utils/config");
+const MONGO_CONTAINER =
+  process.env.MONGO_CONTAINER == null ? "mongodb" : process.env.MONGO_CONTAINER;
 
 const params = {};
 
-if (process.env.MONGO_CONTAINER != null) {
-  params.uri = `mongodb://${process.db.user}:${config.db.pwd}@${process.env.MONGO_CONTAINER}:27017`;
+if (process.env.NODE_ENV === "dev") {
+  params.uri = `mongodb://${config.db.user}:${config.db.pwd}@localhost:27017`;
+} else {
+  params.uri = `mongodb://${config.db.user}:${config.db.pwd}@${MONGO_CONTAINER}:27017`;
 }
 
 const db = new MainDb(params);
