@@ -1,5 +1,5 @@
 const { userService, seasonService } = require("../../common/services/v1");
-const { createUser, getAllUsers } = userService;
+const { createUser, getAllUsers, addSeasonToUser } = userService;
 const { getActiveSeason } = seasonService;
 const {
   getUsersList,
@@ -26,58 +26,62 @@ async function fetchRegisteredUsersAndUpdateDb(taskInput, db) {
     // Fetch users in DB
     console.log("Fetching users from DB");
     const usersInDb = await getAllUsers(db.connection);
+    const walletsOfUsersInDb = usersInDb.map((user) => user.walletAddress);
 
-    const usersDict = {};
     for (const season of activeSeasonArr) {
-      // TODO: fetch users from all the smart contracts
-      // and create an array with non repeating users
-      // Fetch users from RPC API.
-      // if season has ended bypass that season
       console.log("Fetching users from RPC API");
       const usersFromRpc = await getUsersList(null, season.contract);
 
-      console.log("Fetching registration block for each user");
       for (const user of usersFromRpc) {
-        console.log("Fetching registration block for user: ", user);
-        const registrationBlock = await getUserRegistrationBlock(
-          user,
-          null,
-          season.contract,
-        );
-        if (isValidHex(registrationBlock)) {
-          usersDict[user] = {
-            walletAddress: user,
-            registrationBlock: parseInt(registrationBlock, 16),
-            updatedAtBlock: parseInt(registrationBlock, 16),
-          };
+        if (walletsOfUsersInDb.includes(user)) {
+          const rpcUserInDb = usersInDb.find((u) => u.walletAddress === user);
+          const seasonsOfUser = rpcUserInDb.seasons.map((s) => s.seasonId);
+          if (seasonsOfUser.includes(season._id)) {
+            console.log(
+              `User already registered in season ${season._id}. User: ${user}`,
+            );
+            continue;
+          } else {
+            console.log("Fetching registration block for user: ", user);
+            const registrationBlock = await getUserRegistrationBlock(
+              user,
+              null,
+              season.contract,
+            );
+            if (isValidHex(registrationBlock)) {
+              const newSeason = {
+                seasonId: season._id,
+                registrationBlock: parseInt(registrationBlock, 16),
+              };
+
+              console.log(`Adding season ${season._id} to user ${user} in DB`);
+              await addSeasonToUser(user, newSeason, db.connection);
+            }
+          }
+        } else {
+          // User is not in DB.
+          console.log("Fetching registration block for user: ", user);
+          const registrationBlock = await getUserRegistrationBlock(
+            user,
+            null,
+            season.contract,
+          );
+          if (isValidHex(registrationBlock)) {
+            const newUser = {
+              walletAddress: user,
+              updatedAtBlock: parseInt(registrationBlock, 16),
+              seasons: [
+                {
+                  seasonId: season._id,
+                  registrationBlock: parseInt(registrationBlock, 16),
+                },
+              ],
+            };
+
+            console.log(`Creating user ${user} in DB`);
+            await createUser(newUser, db.connection);
+          }
         }
-      }
-    }
-
-    // DEBUG PRINT
-    // console.log("users from rpc");
-    // console.log(usersDict);
-
-    // DEBUG PRINT
-    // const usersInDbFiltered = usersInDb.map((user) => {
-    //   return {
-    //     walletAddress: user.walletAddress,
-    //     registrationBlock: user.registrationBlock,
-    //   };
-    // });
-    // console.log("users in db");
-    // console.log(usersInDbFiltered);
-
-    // Compare users from RPC API and DB.
-    // If user is not in DB, insert user into DB.
-    console.log("Comparing users from RPC API and DB");
-    for (const wallet of usersFromRpc) {
-      if (!usersInDb.find((user) => user.walletAddress === wallet)) {
-        console.log(`User not in DB, inserting user into DB. User: ${wallet}`);
-        const user = usersDict[wallet];
-        await createUser(user, db.connection);
-      } else {
-        console.log(`User already in DB. User: ${wallet}`);
       }
     }
 

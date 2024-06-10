@@ -65,3 +65,16 @@ test-season-addition:
 	NODE_ENV=dev node scripts/updateSeasons.js
 	$(LINE_BREAK)
 	$(STOP_DOCKER_NON_PERSISTENT)
+
+test-user-addition:
+	@echo "> Running scraper tests"
+	$(START_DOCKER_NON_PERSISTENT)
+	$(LINE_BREAK)
+	@echo "Starting task addition"
+	NODE_ENV=dev node scripts/updateTasks.js
+	@echo "Starting season addition"
+	NODE_ENV=dev node scripts/updateSeasons.js
+	@echo "Starting users addition"
+	NODE_ENV=dev node scripts/updateUsers.js
+	$(LINE_BREAK)
+	$(STOP_DOCKER_NON_PERSISTENT)
