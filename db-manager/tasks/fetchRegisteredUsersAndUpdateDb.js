@@ -23,13 +23,15 @@ async function fetchRegisteredUsersAndUpdateDb(taskInput, db) {
       throw new Error("No active season found");
     }
 
-    // Fetch users in DB
-    console.log("Fetching users from DB");
-    const usersInDb = await getAllUsers(db.connection);
-    const walletsOfUsersInDb = usersInDb.map((user) => user.walletAddress);
-
     for (const season of activeSeasonArr) {
-      console.log("Fetching users from RPC API");
+      // Fetch users in DB
+      console.log("Fetching users from DB");
+      const usersInDb = await getAllUsers(db.connection);
+      const walletsOfUsersInDb = usersInDb.map((user) => user.walletAddress);
+
+      console.log(
+        `Fetching users from RPC API, for season defined by contract: ${season.contract}`,
+      );
       const usersFromRpc = await getUsersList(null, season.contract);
 
       for (const user of usersFromRpc) {
@@ -84,6 +86,12 @@ async function fetchRegisteredUsersAndUpdateDb(taskInput, db) {
         }
       }
     }
+
+    // TEST: Print users in DB after update.
+    // const testPrint = await getAllUsers(db.connection);
+    // console.log("Users in DB after update: ", testPrint);
+    // console.log(JSON.stringify(testPrint, null, 2));
+    //
 
     // Close connection to DB.
     console.log("Closing connection to DB");

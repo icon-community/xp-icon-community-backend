@@ -15,7 +15,7 @@ const customPath = require("../../utils/customPath");
 const config = require("../../utils/config");
 const SEASON_SEED = config.seeds.seasons;
 
-async function feedSeasonSeedDataToDb(db) {
+async function feedSeasonSeedDataToDb(db, seed = SEASON_SEED) {
   console.log("> Running feedSeasonSeedDataToDb");
   try {
     console.log("Creating connection to DB");
@@ -23,12 +23,10 @@ async function feedSeasonSeedDataToDb(db) {
 
     console.log("Reading seasons seed file");
     // const seasons = JSON.parse(
-    //   fs.readFileSync(customPath(SEASON_SEED)),
+    //   fs.readFileSync(customPath(seed)),
     //   "utf8",
     // );
-    const seasons = JSON.parse(
-      fs.readFileSync(customPath(SEASON_SEED), "utf8"),
-    );
+    const seasons = JSON.parse(fs.readFileSync(customPath(seed), "utf8"));
 
     // DEBUG PRINT
     // console.log("Seasons seed data:");
