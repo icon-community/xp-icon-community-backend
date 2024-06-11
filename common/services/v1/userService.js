@@ -1,7 +1,12 @@
 //
 const config = require("../../../utils/config");
 const USER = config.collections.users;
-const { createEntry, getAllEntries, getEntryByParam } = require("./common");
+const {
+  createEntry,
+  getAllEntries,
+  getEntryByParam,
+  updateOrCreateEntry,
+} = require("./common");
 
 async function createUser(user, connection) {
   return await createEntry(user, USER, connection);
@@ -15,6 +20,23 @@ async function getUserByAddress(userWallet, connection) {
   return await getEntryByParam({ walletAddress: userWallet }, USER, connection);
 }
 
+async function addSeasonToUser(userWallet, season, connection) {
+  return await updateOrCreateEntry(
+    { walletAddress: userWallet },
+    { $push: { seasons: season } },
+    USER,
+    connection,
+    false,
+  );
+}
+
+async function getUsersBySeason(season, connection) {
+  return await getEntryByParam(
+    { "seasons.seasonId": season },
+    USER,
+    connection,
+  );
+}
 // async function getUserAllSeasons(userWallet, connection) {
 //   // TODO: the following logic is pulling static data from
 //   // a mock file. the entire section inside the if block
@@ -86,4 +108,6 @@ module.exports = {
   createUser,
   getAllUsers,
   getUserByAddress,
+  addSeasonToUser,
+  getUsersBySeason,
 };

@@ -19,12 +19,18 @@ async function getEntryByParam(param, colletionId, connection) {
   return await model.find(param);
 }
 
-async function updateOrCreateEntry(query, update, collectionId, connection) {
+async function updateOrCreateEntry(
+  query,
+  update,
+  collectionId,
+  connection,
+  upsert = true,
+) {
   try {
     const model = connection.model(collectionId);
     const result = await model.findOneAndUpdate(query, update, {
       new: true,
-      upsert: true,
+      upsert: upsert,
     });
 
     return result;

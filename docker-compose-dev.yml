@@ -38,11 +38,15 @@ services:
     networks:
       - mynetwork
 
+    # move into the rest-server folder, and run the
+    # rest-server in development mode
     command: sh -c "cd ../rest-server && npm run dev"
 
     environment:
       MONGO_CONTAINER: mongodb-dev
 
+    # mount the current directory into the container
+    # to allow for hot-reloading
     volumes:
       - .:/app
 

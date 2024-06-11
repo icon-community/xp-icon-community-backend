@@ -7,8 +7,15 @@ const userTasks = [
     taskId: new mongoose.Types.ObjectId(),
     seasonId: new mongoose.Types.ObjectId(),
     status: "pending",
-    xpEarned: 11,
+    xpEarned: [
+      {
+        xp: 11,
+        block: 1,
+        period: 1,
+      },
+    ],
     createdAt: new Date(),
+    updatedAtBlock: 0,
   },
 ];
 

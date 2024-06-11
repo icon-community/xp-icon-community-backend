@@ -8,9 +8,12 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import score.UserRevertedException;
 import scorex.util.ArrayList;
+import score.Address;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+
+import java.util.List;
 
 class RegistrationBookTest extends TestBase {
     private static final ServiceManager sm = getServiceManager();
@@ -32,10 +35,10 @@ class RegistrationBookTest extends TestBase {
         zoro = sm.createAccount();
         nami = sm.createAccount();
         sanji = sm.createAccount();
-        registrationBookScore.invoke(luffy, "registerUser", luffy.getAddress());
-        registrationBookScore.invoke(zoro, "registerUser", zoro.getAddress());
-        registrationBookScore.invoke(sanji, "registerUser", sanji.getAddress());
-        registrationBookScore.invoke(nami, "registerUser", nami.getAddress());
+        registrationBookScore.invoke(owner, "registerUser", luffy.getAddress());
+        registrationBookScore.invoke(owner, "registerUser", zoro.getAddress());
+        registrationBookScore.invoke(owner, "registerUser", sanji.getAddress());
+        registrationBookScore.invoke(owner, "registerUser", nami.getAddress());
     }
 
     @Test
@@ -66,8 +69,17 @@ class RegistrationBookTest extends TestBase {
     // }
 
     @Test
-    void registerUserByUser() {
-        registrationBookScore2.invoke(nami, "registerUser", nami.getAddress());
+    void registerAdmin() {
+        registrationBookScore2.invoke(owner, "addAdmin", luffy.getAddress());
+        @SuppressWarnings("unchecked")
+        List<Address> admins = (List<Address>) registrationBookScore2.call("getAdmins");
+        assertEquals(2, admins.size());
+        assertEquals(luffy.getAddress().toString(), admins.get(1).toString());
+    }
+
+    @Test
+    void registerUserByAdmin() {
+        registrationBookScore2.invoke(luffy, "registerUser", nami.getAddress());
         Object isUserRegistered = registrationBookScore2.call( 
             "isUserRegistered", nami.getAddress());
         assertEquals(trueString, isUserRegistered);
@@ -75,9 +87,9 @@ class RegistrationBookTest extends TestBase {
 
     @Test
     void registerUserByOwner() {
-        registrationBookScore2.invoke(owner, "registerUser", nami.getAddress());
+        registrationBookScore2.invoke(owner, "registerUser", sanji.getAddress());
         Object isUserRegistered = registrationBookScore2.call( 
-            "isUserRegistered", nami.getAddress());
+            "isUserRegistered", sanji.getAddress());
         assertEquals(trueString, isUserRegistered);
     }
 

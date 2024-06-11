@@ -74,3 +74,79 @@ Individual scripts can be run to update tasks and seasons in the database. These
 
 * `updateSeasons.js` - Updates the seasons in the database by reading the seed file in the `db-manager/data` directory.
 * `updateTasks.js` - Updates the tasks in the database by reading the seed file in the `db-manager/data` directory.
+
+## MongoDB
+To enter the docker container running the mongodb database, run the following command:
+
+```bash
+# for the production database
+docker exec -it mongodb-prod /bin/bash
+
+# for the development database
+docker exec -it mongodb-dev /bin/bash
+```
+
+After entering the container in an interactive shell, you can access the mongo shell by running the following command:
+
+```bash
+mongosh
+```
+
+Once in the mongo shell, you can need to first authenticate with the database by running the following command:
+
+```bash
+use admin
+#use the username and password defined in the .env file
+db.auth("username", "password")
+```
+
+After authenticating, you can use the following list of commands to examine the database
+
+```bash
+# show all databases
+test> show dbs
+admin   100.00 KiB
+config   60.00 KiB
+local    72.00 KiB
+test    264.00 KiB # this is the database for the project
+
+# use the project database
+test> use test
+
+# show all collections in the database
+test> show collections
+seasons
+tasks
+user_tasks
+users
+
+# show one document from the users collection
+# this command can be used to see the structure of
+# the documents in the collection
+# you can replace `users` with any other collection name
+# ie: db.tasks.findOne()
+test> db.users.findOne()
+{
+  _id: ObjectId('ID_STRING'),
+  walletAddress: 'hxcb1...741c8',
+  registrationBlock: 80884702,
+  dailyCheckInStreak: 0,
+  referrals: [],
+  updatedAtBlock: 80884702,
+  createdAt: ISODate('2024-05-23T14:43:02.522Z'),
+  updatedAt: ISODate('2024-05-23T14:43:02.522Z'),
+  __v: 0,
+  seasons: [
+    {
+      seasonId: ObjectId('ID_STRING'),
+      registrationBlock: 80884702,
+      referrals: [],
+      _id: ObjectId('ID_STRING')
+    }
+  ]
+}
+
+# show the amount of documents in a collection
+test> db.users.countDocuments()
+6
+```
