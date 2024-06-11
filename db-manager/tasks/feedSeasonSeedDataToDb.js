@@ -1,9 +1,12 @@
-//
+//NOTE:
 // Information about the seasons is saved in a seed file,
 // this script reads the seed file and saves the data to the database.
-// This file can be run multiple times without duplicating the data.
-// The script will check if the data already exists in the database and will not save it again.
-// If new data is added to the seed file, the script will save the new data to the database.
+// This file can be run multiple times without duplicating the seasons
+// The script will check if the season already exists in the database and will not save it again.
+// If new seasons are added to the seed file, the script will save the new season to the database.
+// IMPORTANT: The script will not check if the tasks in the season already exist in the database.
+// If the tasks do not exist in the database, the script will throw an error and will not save the season.
+// New tasks cannot be added to the season after the season has been saved to the database. This means all tasks must be defined in the seed file before running the script.
 
 const {
   createSeason,
@@ -50,23 +53,23 @@ async function feedSeasonSeedDataToDb(db, seed = SEASON_SEED) {
 
     // Get All tasks
     console.log("Fetching all tasks");
-    const tasks = await getAllTasks(db.connection);
+    const tasksFromDb = await getAllTasks(db.connection);
     for (let season of seasons) {
       if (!existingSeasons.find((s) => s.number === season.number)) {
         console.log(
-          `Season #${season.number} doesnt not exists in DB, saving it`,
+          `Season #${season.number} does not exists in DB, saving it`,
         );
-        const tasksToSave = [];
+        const arrOfTasksToSave = [];
         for (let task of season.tasks) {
-          const taskToSave = tasks.find((t) => t.seedId === task);
+          const taskToSave = tasksFromDb.find((t) => t.seedId === task);
           if (taskToSave) {
-            tasksToSave.push(taskToSave._id);
+            arrOfTasksToSave.push(taskToSave._id);
           } else {
             console.log(`Task with seedId ${task} not found in DB`);
             throw new Error("CRITICAL");
           }
         }
-        season.tasks = tasksToSave;
+        season.tasks = [...arrOfTasksToSave];
         await createSeason(season, db.connection);
         console.log(`Season #${season.number} saved`);
       } else {
