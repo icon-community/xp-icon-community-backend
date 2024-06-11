@@ -7,6 +7,9 @@ const config = {
     seasons: "db-manager/data/seasons-seed.json",
     tasks: "db-manager/data/tasks-seed.json",
     main: "db-manager/data/main-seed.json",
+    test: {
+      season1: "db-manager/data/test-seeds/seasons-seed-test-1.json",
+    },
   },
   misc: {
     termPeriod: 43200,
