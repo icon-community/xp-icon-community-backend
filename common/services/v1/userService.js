@@ -29,6 +29,14 @@ async function addSeasonToUser(userWallet, season, connection) {
     false,
   );
 }
+
+async function getUsersBySeason(season, connection) {
+  return await getEntryByParam(
+    { "seasons.seasonId": season },
+    USER,
+    connection,
+  );
+}
 // async function getUserAllSeasons(userWallet, connection) {
 //   // TODO: the following logic is pulling static data from
 //   // a mock file. the entire section inside the if block
@@ -101,4 +109,5 @@ module.exports = {
   getAllUsers,
   getUserByAddress,
   addSeasonToUser,
+  getUsersBySeason,
 };

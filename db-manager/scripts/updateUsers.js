@@ -17,7 +17,7 @@ const db = new MainDb(params);
 
 async function main() {
   try {
-    await fetchRegisteredUsersAndUpdateDb(1, db);
+    await fetchRegisteredUsersAndUpdateDb({ height: 1 }, db);
   } catch (err) {
     console.log("Error in updateUsers.js:");
     console.log(err);

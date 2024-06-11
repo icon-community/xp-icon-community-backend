@@ -9,7 +9,7 @@ const {
   userTaskService,
 } = require("../../common/services/v1/");
 const { getUsersList } = require("../utils/json-rpc-services");
-const { getAllUsers } = userService;
+const { getAllUsers, getUsersBySeason } = userService;
 const { getActiveSeason } = seasonService;
 const { getTaskBySeedId } = taskService;
 const { getUserTaskByAllIds, updateOrCreateUserTask } = userTaskService;
@@ -73,24 +73,29 @@ async function genericTask(taskInput, db, seedId, callback) {
       const rewardFormula = new Function(...targetTask.rewardFormula);
 
       // FIRST fetch data from the database
-      // Fetch ALL users
+      // Fetch all the users with a defined seasonId
       console.log("Fetching users from DB");
-      const usersFromDB = await getAllUsers(db.connection);
+      const usersFromDb = await getUsersBySeason(
+        activeSeason._id,
+        db.connection,
+      );
 
-      //TODO: get the users from the smart contract associated
-      //with the season. create an array with the users that are
-      //on both the smart contract and the database
-      //TODO: from the database get the users that have
-      //a defined seasonId
-      //create a new method usersFromDBBySeasonId(seasonId)
-      //this method will return the users that have the seasonId
-      console.log("Fetching users from contract");
-      const usersFromContract = await getUsersList(null, activeSeasonContract);
-
-      const allUsers = usersFromDB;
       // filter user by their registration block. if the user's registration block is greater than the current block height, skip the user
+      //
+      if (usersFromDb.length === 0) {
+        console.log("No users found in DB with specified seasonId");
+        // no user found in the database with the
+        // specified seasonId, this means no user has
+        // yet registered for this season, we skip the
+        // season and continue with the other seasons
+        continue;
+      }
+
+      // we filter the users by their registration block
+      // if the user's registration block is greater than
+      // the current block height, we skip the user
       console.log("Filtering users by registration block");
-      const filteredUsers = allUsers.filter(
+      const filteredUsers = usersFromDb.filter(
         (user) => user.registrationBlock <= height,
       );
 
