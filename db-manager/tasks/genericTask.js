@@ -8,8 +8,7 @@ const {
   seasonService,
   userTaskService,
 } = require("../../common/services/v1/");
-const { getUsersList } = require("../utils/json-rpc-services");
-const { getAllUsers, getUsersBySeason } = userService;
+const { getUsersBySeason } = userService;
 const { getActiveSeason } = seasonService;
 const { getTaskBySeedId } = taskService;
 const { getUserTaskByAllIds, updateOrCreateUserTask } = userTaskService;

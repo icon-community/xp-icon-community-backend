@@ -7,5 +7,5 @@
   },
   "ext": "js,json,html,css",
   "delay": "2500",
-  "watch": ["../common"]
+  "watch": ["../common", "../rest-server"]
 }

@@ -74,6 +74,11 @@ const config = {
       },
     },
   },
+  seasonsRoutes: {
+    foo: "1",
+    1: "1",
+    2: "2",
+  },
 };
 
 config.jvm.default = config.jvm[SELECTED_CHAIN];

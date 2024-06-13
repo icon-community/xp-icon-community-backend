@@ -1,6 +1,6 @@
 //
-const { getUserByAddress, getAllUsers } = require("./userService");
-const { getActiveSeason, getAllSeasons } = require("./seasonService");
+const { getAllUsers, getUsersBySeason } = require("./userService");
+const { getAllSeasons, getSeasonByNumberId } = require("./seasonService");
 const { getUserTaskByAllIds } = require("./userTaskService");
 const { getTaskById } = require("./taskService");
 const {
@@ -9,6 +9,44 @@ const {
   getFormattedSeason,
   getFormattedUserTask,
 } = require("./utils");
+const config = require("../../../utils/config");
+
+async function getRankingOfSeason(seasonNumber, connection) {
+  const seasonArr = await getSeasonByNumberId(seasonNumber, connection);
+  const season = seasonArr[0];
+  const allUsers = await getUsersBySeason(season, connection);
+  const ranked = [];
+
+  for (let i = 0; i < allUsers.length; i++) {
+    const tempData = {
+      _id: allUsers[i]._id,
+      address: allUsers[i].walletAddress,
+      total: 0,
+      tasks: [],
+    };
+    for (let ii = 0; ii < season.tasks.length; ii++) {
+      const userTask = await getUserTaskByAllIds(
+        allUsers[i]._id,
+        season.tasks[ii]._id,
+        season._id,
+        connection,
+      );
+      const formattedUserTask = getFormattedUserTask(userTask);
+      const taskTotalXp = formattedUserTask.xpEarned.reduce(
+        (a, b) => a + Number(b.xp),
+        0,
+      );
+      tempData.total = tempData.total + taskTotalXp;
+      tempData.tasks.push({
+        task: season.tasks[ii]._id,
+        xp: taskTotalXp,
+      });
+    }
+    ranked.push(tempData);
+  }
+  ranked.sort((a, b) => b.total - a.total);
+  return ranked;
+}
 
 async function getRankings(allUsers, seasons, connection) {
   const rankData = {};
@@ -50,6 +88,8 @@ async function getRankings(allUsers, seasons, connection) {
   return rankData;
 }
 
+//TODO: This function havent been updated to work with
+//the latest changes that have been made to the code
 async function getUserAllSeasons(userWallet, connection) {
   const allUsers = await getAllUsers(connection);
   const user = allUsers.filter((user) => user.walletAddress === userWallet);
@@ -57,10 +97,10 @@ async function getUserAllSeasons(userWallet, connection) {
   const seasons = await getAllSeasons(connection);
   const seasonsFormatted = seasons.map((season) => getFormattedSeason(season));
 
-  const rankings = await getRankings(allUsers, seasons, connection);
-  console.log("rankings");
-  console.log(JSON.stringify(rankings));
-  console.log(rankings);
+  // const rankings = await getRankings(allUsers, seasons, connection);
+  // console.log("rankings");
+  // console.log(JSON.stringify(rankings));
+  // console.log(rankings);
   for (let i = 0; i < seasonsFormatted.length; i++) {
     // for (const season of seasonsFormatted) {
     const tasks = [];
@@ -100,38 +140,85 @@ async function getUserAllSeasons(userWallet, connection) {
 }
 
 async function getUserBySeason(userWallet, userSeason, connection) {
+  const seasonDbNumber = config.seasonsRoutes[userSeason];
+
+  if (seasonDbNumber == null) {
+    throw new Error("Invalid season");
+  }
+
   const allUsers = await getAllUsers(connection);
   const user = allUsers.filter((user) => user.walletAddress === userWallet);
   const userFormatted = getFormattedUser(user);
-  const season = await getActiveSeason(connection);
+
+  const season = await getSeasonByNumberId(seasonDbNumber, connection);
   const seasonFormatted = getFormattedSeason(season[0]);
   const tasks = [];
+  const userAboveTasks = [];
+  const userBelowTasks = [];
 
-  const rankings = await getRankings(allUsers, season, connection);
-  const thisUserIndex = rankings[season[0]._id].findIndex(
-    (userIndex) => userIndex._id === user[0]._id,
+  const rankings = await getRankingOfSeason(seasonDbNumber, connection);
+  const thisUserIndex = rankings.findIndex((userIndex) =>
+    userIndex._id.equals(user[0]._id),
   );
   const userAbove =
-    thisUserIndex - 1 < 0
-      ? null
-      : rankings[season[0]._id][thisUserIndex - 1].address;
+    thisUserIndex - 1 < 0 ? null : rankings[thisUserIndex - 1].address;
   const userBelow =
-    thisUserIndex + 1 >= rankings[season[0]._id].length
+    thisUserIndex + 1 >= rankings.length
       ? null
-      : rankings[season[0]._id][thisUserIndex + 1].address;
+      : rankings[thisUserIndex + 1].address;
 
-  console.log("rankings");
-  console.log(thisUserIndex);
   for (let i = 0; i < seasonFormatted.tasks.length; i++) {
     //
     const taskFromDb = await getTaskById(season[0].tasks[i]._id, connection);
     const formattedTask = getFormattedTask(taskFromDb);
+
+    let userAboveTask = null;
+    let userBelowTask = null;
+    if (userAbove != null) {
+      userAboveTask = await getUserTaskByAllIds(
+        rankings[thisUserIndex - 1]._id,
+        season[0].tasks[i]._id,
+        season[0]._id,
+        connection,
+      );
+      const formattedUserTask = getFormattedUserTask(userAboveTask);
+      const taskTotalXp = formattedUserTask.xpEarned.reduce(
+        (a, b) => a + Number(b.xp),
+        0,
+      );
+      userAboveTasks.push({
+        task: {
+          XPEarned_total_task: taskTotalXp,
+        },
+      });
+    }
+
+    if (userBelow != null) {
+      userBelowTask = await getUserTaskByAllIds(
+        rankings[thisUserIndex + 1]._id,
+        season[0].tasks[i]._id,
+        season[0]._id,
+        connection,
+      );
+      const formattedUserTask = getFormattedUserTask(userBelowTask);
+      const taskTotalXp = formattedUserTask.xpEarned.reduce(
+        (a, b) => a + Number(b.xp),
+        0,
+      );
+      userBelowTasks.push({
+        task: {
+          XPEarned_total_task: taskTotalXp,
+        },
+      });
+    }
+
     const userTask = await getUserTaskByAllIds(
       user[0]._id,
       season[0].tasks[i]._id,
       season[0]._id,
       connection,
     );
+
     const formattedUserTask = getFormattedUserTask(userTask);
     const taskTotalXp = formattedUserTask.xpEarned.reduce(
       (a, b) => a + Number(b.xp),
