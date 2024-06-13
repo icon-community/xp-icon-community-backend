@@ -95,9 +95,24 @@ async function genericTask(taskInput, db, seedId, callback) {
       // if the user's registration block is greater than
       // the current block height, we skip the user
       console.log("Filtering users by registration block");
-      const filteredUsers = usersFromDb.filter(
-        (user) => user.registrationBlock <= height,
-      );
+
+      const filteredUsers = [];
+
+      for (const user of usersFromDb) {
+        const targetSeason = user.seasons.find((season) =>
+          season.seasonId.equals(activeSeason._id),
+        );
+        const registrationBlock =
+          targetSeason == null ? null : targetSeason.registrationBlock;
+
+        if (registrationBlock == null) {
+          throw new Error("registrationBlock is null");
+        }
+
+        if (registrationBlock <= height) {
+          filteredUsers.push(user);
+        }
+      }
 
       // for each user, find the userTask document with the
       // user id, task id and season id
