@@ -9,84 +9,8 @@ const {
   getFormattedSeason,
   getFormattedUserTask,
 } = require("./utils");
+const { getRankingOfSeason, getTaskTotalXp, sumXpTotal } = require("./utils2");
 const config = require("../../../utils/config");
-
-async function getRankingOfSeason(seasonNumber, connection) {
-  const seasonArr = await getSeasonByNumberId(seasonNumber, connection);
-  const season = seasonArr[0];
-  const allUsers = await getUsersBySeason(season, connection);
-  const ranked = [];
-
-  for (let i = 0; i < allUsers.length; i++) {
-    const tempData = {
-      _id: allUsers[i]._id,
-      address: allUsers[i].walletAddress,
-      total: 0,
-      tasks: [],
-    };
-    for (let ii = 0; ii < season.tasks.length; ii++) {
-      const userTask = await getUserTaskByAllIds(
-        allUsers[i]._id,
-        season.tasks[ii]._id,
-        season._id,
-        connection,
-      );
-      const formattedUserTask = getFormattedUserTask(userTask);
-      const taskTotalXp = formattedUserTask.xpEarned.reduce(
-        (a, b) => a + Number(b.xp),
-        0,
-      );
-      tempData.total = tempData.total + taskTotalXp;
-      tempData.tasks.push({
-        task: season.tasks[ii]._id,
-        xp: taskTotalXp,
-      });
-    }
-    ranked.push(tempData);
-  }
-  ranked.sort((a, b) => b.total - a.total);
-  return ranked;
-}
-
-async function getRankings(allUsers, seasons, connection) {
-  const rankData = {};
-  for (let i = 0; i < seasons.length; i++) {
-    rankData[seasons[i]._id] = [];
-    for (let ii = 0; ii < allUsers.length; ii++) {
-      const tempData = {
-        _id: allUsers[ii]._id,
-        address: allUsers[ii].walletAddress,
-        total: 0,
-        tasks: [],
-      };
-      for (let iii = 0; iii < seasons[i].tasks.length; iii++) {
-        const userTask = await getUserTaskByAllIds(
-          allUsers[ii]._id,
-          seasons[i].tasks[iii]._id,
-          seasons[i]._id,
-          connection,
-        );
-        const formattedUserTask = getFormattedUserTask(userTask);
-        const taskTotalXp = formattedUserTask.xpEarned.reduce(
-          (a, b) => a + Number(b.xp),
-          0,
-        );
-        tempData.total = tempData.total + taskTotalXp;
-        tempData.tasks.push({
-          task: seasons[i].tasks[iii]._id,
-          xp: taskTotalXp,
-        });
-      }
-      rankData[seasons[i]._id].push(tempData);
-    }
-  }
-
-  for (const key in rankData) {
-    rankData[key].sort((a, b) => b.total - a.total);
-  }
-
-  return rankData;
-}
 
 //TODO: This function havent been updated to work with
 //the latest changes that have been made to the code
@@ -172,42 +96,30 @@ async function getUserBySeason(userWallet, userSeason, connection) {
     const taskFromDb = await getTaskById(season[0].tasks[i]._id, connection);
     const formattedTask = getFormattedTask(taskFromDb);
 
-    let userAboveTask = null;
-    let userBelowTask = null;
     if (userAbove != null) {
-      userAboveTask = await getUserTaskByAllIds(
+      const totalXp = await getTaskTotalXp(
         rankings[thisUserIndex - 1]._id,
         season[0].tasks[i]._id,
         season[0]._id,
         connection,
       );
-      const formattedUserTask = getFormattedUserTask(userAboveTask);
-      const taskTotalXp = formattedUserTask.xpEarned.reduce(
-        (a, b) => a + Number(b.xp),
-        0,
-      );
       userAboveTasks.push({
         task: {
-          XPEarned_total_task: taskTotalXp,
+          XPEarned_total_task: totalXp,
         },
       });
     }
 
     if (userBelow != null) {
-      userBelowTask = await getUserTaskByAllIds(
+      const totalXp = await getTaskTotalXp(
         rankings[thisUserIndex + 1]._id,
         season[0].tasks[i]._id,
         season[0]._id,
         connection,
       );
-      const formattedUserTask = getFormattedUserTask(userBelowTask);
-      const taskTotalXp = formattedUserTask.xpEarned.reduce(
-        (a, b) => a + Number(b.xp),
-        0,
-      );
       userBelowTasks.push({
         task: {
-          XPEarned_total_task: taskTotalXp,
+          XPEarned_total_task: totalXp,
         },
       });
     }
@@ -229,9 +141,10 @@ async function getUserBySeason(userWallet, userSeason, connection) {
         ...formattedTask,
         XPEarned_total_task: taskTotalXp,
       },
-      xp: getFormattedUserTask(userTask),
+      xp: formattedUserTask,
     });
   }
+
   const response = {
     user: userFormatted,
     season: {
@@ -239,7 +152,9 @@ async function getUserBySeason(userWallet, userSeason, connection) {
       Rank: thisUserIndex + 1,
       Address_above: userAbove,
       Address_below: userBelow,
-      XPEarned_total: tasks.reduce((a, b) => a + b.task.XPEarned_total_task, 0),
+      Address_above_XP: sumXpTotal(userAboveTasks),
+      Address_below_XP: sumXpTotal(userBelowTasks),
+      XPEarned_total: sumXpTotal(tasks),
       XPEarned_24hrs: tasks.reduce(
         (a, b) => a + b.xp.xpEarned[b.xp.xpEarned.length - 1].xp,
         0,
