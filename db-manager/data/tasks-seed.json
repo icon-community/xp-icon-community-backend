@@ -25,5 +25,14 @@
     "title": "locking into saving rates",
     "rewardFormula": ["amount", "return amount * 10"],
     "chain": "icon"
+  },
+  {
+    "seedId": "t4",
+    "type": "non-recursive",
+    "description": "One time reward for registering",
+    "criteria": {},
+    "title": "registration",
+    "rewardFormula": ["amount", "return 40"],
+    "chain": "icon"
   }
 ]

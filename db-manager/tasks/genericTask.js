@@ -13,6 +13,14 @@ const { getActiveSeason } = seasonService;
 const { getTaskBySeedId } = taskService;
 const { getUserTaskByAllIds, updateOrCreateUserTask } = userTaskService;
 
+async function genericRecursiveTask() {
+  //
+}
+
+async function genericNonRecursiveTask() {
+  //
+}
+
 async function genericTask(taskInput, db, seedId, callback) {
   const { height, prepTerm } = taskInput;
   const SEED_ID = seedId;
@@ -142,6 +150,14 @@ async function genericTask(taskInput, db, seedId, callback) {
 
         // if userTask document exists, fetch the xpEarned array
         if (userTaskDoc != null && userTaskDoc.xpEarned.length > 0) {
+          if (targetTask.type === "non-recursive") {
+            console.log("non-recursive task");
+            // if the task is non-recursive, do nothing
+            // and continue to the next user being in this
+            // step in the logic means that the user has
+            // already earned XP for this task
+            continue;
+          }
           // find if an entry for the prepTerm exists in the 'xpEarned' array
           // in other words check if the user has already earned XP for the current term
           const alreadyExists = userTaskDoc.xpEarned.find((xpEarned) => {

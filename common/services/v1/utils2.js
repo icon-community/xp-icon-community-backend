@@ -24,6 +24,9 @@ async function getRankingOfSeason(seasonNumber, connection) {
         connection,
       );
       const formattedUserTask = getFormattedUserTask(userTask);
+      if (formattedUserTask == null) {
+        continue;
+      }
       const taskTotalXp = formattedUserTask.xpEarned.reduce(
         (a, b) => a + Number(b.xp),
         0,
@@ -59,6 +62,10 @@ async function getRankings(allUsers, seasons, connection) {
           connection,
         );
         const formattedUserTask = getFormattedUserTask(userTask);
+        if (formattedUserTask == null) {
+          continue;
+        }
+
         const taskTotalXp = formattedUserTask.xpEarned.reduce(
           (a, b) => a + Number(b.xp),
           0,
@@ -88,6 +95,10 @@ async function getTaskTotalXp(userId, taskId, seasonId, connection) {
     connection,
   );
   const formattedUserTask = getFormattedUserTask(userTask);
+
+  if (formattedUserTask == null) {
+    return 0;
+  }
   const taskTotalXp = formattedUserTask.xpEarned.reduce(
     (a, b) => a + Number(b.xp),
     0,
@@ -102,9 +113,20 @@ function sumXpTotal(arrayOfTasks) {
   return arrayOfTasks.reduce((a, b) => a + b.task.XPEarned_total_task, 0);
 }
 
+function sumXp24hrs(arrayOfTasks) {
+  if (arrayOfTasks.length === 0) {
+    return 0;
+  }
+  return arrayOfTasks.reduce(
+    (a, b) => a + b.xp.xpEarned[b.xp.xpEarned.length - 1].xp,
+    0,
+  );
+}
+
 module.exports = {
   getRankingOfSeason,
   getRankings,
   getTaskTotalXp,
   sumXpTotal,
+  sumXp24hrs,
 };

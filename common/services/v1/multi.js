@@ -9,7 +9,12 @@ const {
   getFormattedSeason,
   getFormattedUserTask,
 } = require("./utils");
-const { getRankingOfSeason, getTaskTotalXp, sumXpTotal } = require("./utils2");
+const {
+  getRankingOfSeason,
+  getTaskTotalXp,
+  sumXpTotal,
+  sumXp24hrs,
+} = require("./utils2");
 const config = require("../../../utils/config");
 
 //TODO: This function havent been updated to work with
@@ -73,9 +78,16 @@ async function getUserBySeason(userWallet, userSeason, connection) {
   const allUsers = await getAllUsers(connection);
   const user = allUsers.filter((user) => user.walletAddress === userWallet);
   const userFormatted = getFormattedUser(user);
+  if (userFormatted == null) {
+    throw new Error("User not found");
+  }
 
   const season = await getSeasonByNumberId(seasonDbNumber, connection);
   const seasonFormatted = getFormattedSeason(season[0]);
+  if (seasonFormatted == null) {
+    throw new Error("Season not found");
+  }
+
   const tasks = [];
   const userAboveTasks = [];
   const userBelowTasks = [];
@@ -95,6 +107,10 @@ async function getUserBySeason(userWallet, userSeason, connection) {
     //
     const taskFromDb = await getTaskById(season[0].tasks[i]._id, connection);
     const formattedTask = getFormattedTask(taskFromDb);
+    if (formattedTask == null) {
+      console.log("Task not found");
+      continue;
+    }
 
     if (userAbove != null) {
       const totalXp = await getTaskTotalXp(
@@ -132,6 +148,10 @@ async function getUserBySeason(userWallet, userSeason, connection) {
     );
 
     const formattedUserTask = getFormattedUserTask(userTask);
+    if (formattedUserTask == null) {
+      console.log("User task not found");
+      continue;
+    }
     const taskTotalXp = formattedUserTask.xpEarned.reduce(
       (a, b) => a + Number(b.xp),
       0,
@@ -155,10 +175,7 @@ async function getUserBySeason(userWallet, userSeason, connection) {
       Address_above_XP: sumXpTotal(userAboveTasks),
       Address_below_XP: sumXpTotal(userBelowTasks),
       XPEarned_total: sumXpTotal(tasks),
-      XPEarned_24hrs: tasks.reduce(
-        (a, b) => a + b.xp.xpEarned[b.xp.xpEarned.length - 1].xp,
-        0,
-      ),
+      XPEarned_24hrs: sumXp24hrs(tasks),
       tasks: tasks,
     },
   };

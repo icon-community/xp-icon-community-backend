@@ -14,6 +14,7 @@ const {
   fetchLockedSavingsAndUpdateDb,
   feedTaskSeedDataToDb,
   feedSeasonSeedDataToDb,
+  fetchNewUsersAndGiveRegistrationReward,
 } = require("./tasks");
 const config = require("../utils/config");
 
@@ -83,6 +84,9 @@ async function main() {
 
     // first run task that fetches registered users and updates the db
     tasks.push(taskRunner(fetchRegisteredUsersAndUpdateDb, db));
+
+    // run task that gives reward for newly registered users
+    tasks.push(taskRunner(fetchNewUsersAndGiveRegistrationReward, db));
 
     // Run task that fetches collateral deposited by each user and updates the db
 

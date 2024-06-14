@@ -1,4 +1,7 @@
 function getFormattedUser(user) {
+  if (user.length === 0) {
+    return null;
+  }
   return {
     // _id: user[0]._id,
     walletAddress: user[0].walletAddress,
@@ -6,7 +9,11 @@ function getFormattedUser(user) {
   };
 }
 
+//TODO: handle when 'task' is an empty array
 function getFormattedUserTask(task) {
+  if (task.length === 0) {
+    return null;
+  }
   return {
     // _id: task[0]._id,
     // taskId: task[0].taskId,
@@ -17,6 +24,9 @@ function getFormattedUserTask(task) {
   };
 }
 function getFormattedTask(task) {
+  if (task.length === 0) {
+    return null;
+  }
   return {
     // _id: task[0]._id,
     type: task[0].type,
@@ -28,6 +38,9 @@ function getFormattedTask(task) {
 }
 
 function getFormattedSeason(season) {
+  if (season.length === 0) {
+    return null;
+  }
   return {
     // _id: season[0]._id,
     number: season.number,
