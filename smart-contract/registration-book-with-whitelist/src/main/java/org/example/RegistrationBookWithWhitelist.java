@@ -5,9 +5,9 @@ import score.Context;
 import score.ArrayDB;
 import score.annotation.EventLog;
 import score.annotation.External;
-import scorex.util.HashMap;
+// import scorex.util.HashMap;
 
-import java.util.Map;
+// import java.util.Map;
 import java.math.BigInteger;
 import java.util.List;
 
@@ -29,7 +29,7 @@ public class RegistrationBookWithWhitelist
      * Constructs a new RegistrationBook object.
      * This constructor is intentionally left empty.
      */
-    public void RegistrationBookWithWhitelist() {
+    public RegistrationBookWithWhitelist() {
         Address owner = Context.getOwner();
         this.contractAdmins.add(owner);
     }

@@ -7,7 +7,7 @@ import com.iconloop.score.test.TestBase;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import score.UserRevertedException;
-import scorex.util.ArrayList;
+// import scorex.util.ArrayList;
 import score.Address;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -35,7 +35,6 @@ class RegistrationBookWithWhitelistTest extends TestBase {
         zoro = sm.createAccount();
         nami = sm.createAccount();
         sanji = sm.createAccount();
-        System.out.println("RegistrationBookWithWhitelist Address: " + registrationBookScore.getAddress());
         registrationBookScore.invoke(owner, "registerUser", luffy.getAddress());
         registrationBookScore.invoke(owner, "registerUser", zoro.getAddress());
         registrationBookScore.invoke(owner, "registerUser", sanji.getAddress());
