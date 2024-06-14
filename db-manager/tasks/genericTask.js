@@ -13,14 +13,6 @@ const { getActiveSeason } = seasonService;
 const { getTaskBySeedId } = taskService;
 const { getUserTaskByAllIds, updateOrCreateUserTask } = userTaskService;
 
-async function genericRecursiveTask() {
-  //
-}
-
-async function genericNonRecursiveTask() {
-  //
-}
-
 async function genericTask(taskInput, db, seedId, callback) {
   const { height, prepTerm } = taskInput;
   const SEED_ID = seedId;
@@ -219,16 +211,16 @@ async function genericTask(taskInput, db, seedId, callback) {
         );
         console.log("UserTask document updated");
       }
-
-      // close connection to DB
-      console.log("Closing connection to DB");
-      await db.stop();
     }
+    // close connection to DB here at the end
+    // of the code logic if the code runs successfully
+    console.log("Closing connection to DB");
+    await db.stop();
   } catch (err) {
     console.log("Error running genericTask ");
-    console.log(err);
+    console.log(err.message);
 
-    // close connection to DB
+    // close connection to DB here if an error occurs
     console.log("Closing connection to DB");
     await db.stop();
     throw new Error(err);
