@@ -1,2 +1,3 @@
 rootProject.name = 'smart-contract'
-include('registration-book')
+include('registration-book-no-whitelist')
+include('registration-book-with-whitelist')
