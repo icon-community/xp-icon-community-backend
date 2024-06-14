@@ -15,8 +15,13 @@ async function getActiveSeason(connection) {
   return await getEntryByParam({ active: true }, SEASON, connection);
 }
 
+async function getSeasonByNumberId(numberId, connection) {
+  return await getEntryByParam({ number: numberId }, SEASON, connection);
+}
+
 module.exports = {
   createSeason,
   getAllSeasons,
   getActiveSeason,
+  getSeasonByNumberId,
 };

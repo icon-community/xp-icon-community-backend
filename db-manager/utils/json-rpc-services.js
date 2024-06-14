@@ -52,40 +52,41 @@ async function getAccountPositions(
     throw new Error(err.message);
   }
 }
-
-async function getSicxDebtInUSDValue(wallet, height) {
+async function getDataFromStandings(wallet, token, data, height) {
   try {
     const position = await getAccountPositions(wallet, height);
-    // console.log("position");
-    // console.log(position);
-    return parseInt(position.standings.sICX.total_debt_in_USD, 16) / 10 ** 18;
-  } catch (err) {
-    console.log("Error getting sICX debt in USD value");
-    console.log(err.message);
-    const str = "does not have a position in Balanced";
-    if (err.message.includes(str)) {
-      return 0;
-    } else {
-      throw new Error(err.message);
+
+    if (position.standings[token] == null) {
+      throw new Error(
+        `token ${token} not found in standings at height ${height}`,
+      );
     }
+    return parseInt(position.standings[token][data], 16) / 10 ** 18;
+  } catch (err) {
+    console.log(`Error getting ${data} value for ${token}`);
+    console.log(err.message);
+    const str = [
+      "does not have a position in Balanced",
+      "not found in standings",
+    ];
+    for (let i = 0; i < str.length; i++) {
+      if (err.message.includes(str[i])) {
+        return 0;
+      }
+    }
+    throw new Error(err.message);
   }
 }
-async function getSicxCollateralInUSDValue(wallet, height) {
-  try {
-    const position = await getAccountPositions(wallet, height);
-    // console.log("position");
-    // console.log(position);
-    return parseInt(position.standings.sICX.collateral_in_USD, 16) / 10 ** 18;
-  } catch (err) {
-    console.log("Error getting sICX collateral in USD value");
-    console.log(err.message);
-    const str = "does not have a position in Balanced";
-    if (err.message.includes(str)) {
-      return 0;
-    } else {
-      throw new Error(err.message);
-    }
-  }
+async function getSicxDebtInUSDValue(wallet, height) {
+  return getDataFromStandings(wallet, "sICX", "total_debt_in_USD", height);
+}
+
+async function getAVAXCollateralInUSDValue(wallet, height) {
+  return getDataFromStandings(wallet, "AVAX", "collateral_in_USD", height);
+}
+
+async function getSICXCollateralInUSDValue(wallet, height) {
+  return getDataFromStandings(wallet, "sICX", "collateral_in_USD", height);
 }
 
 async function getLockedAmount(
@@ -177,7 +178,8 @@ module.exports = {
   getLockedAmount,
   getUsersList,
   getUserRegistrationBlock,
-  getSicxCollateralInUSDValue,
+  getSICXCollateralInUSDValue,
   getSicxDebtInUSDValue,
   getLockedAmountAsDecimal,
+  getAVAXCollateralInUSDValue,
 };

@@ -8,8 +8,7 @@ const {
   seasonService,
   userTaskService,
 } = require("../../common/services/v1/");
-const { getUsersList } = require("../utils/json-rpc-services");
-const { getAllUsers, getUsersBySeason } = userService;
+const { getUsersBySeason } = userService;
 const { getActiveSeason } = seasonService;
 const { getTaskBySeedId } = taskService;
 const { getUserTaskByAllIds, updateOrCreateUserTask } = userTaskService;
@@ -95,9 +94,24 @@ async function genericTask(taskInput, db, seedId, callback) {
       // if the user's registration block is greater than
       // the current block height, we skip the user
       console.log("Filtering users by registration block");
-      const filteredUsers = usersFromDb.filter(
-        (user) => user.registrationBlock <= height,
-      );
+
+      const filteredUsers = [];
+
+      for (const user of usersFromDb) {
+        const targetSeason = user.seasons.find((season) =>
+          season.seasonId.equals(activeSeason._id),
+        );
+        const registrationBlock =
+          targetSeason == null ? null : targetSeason.registrationBlock;
+
+        if (registrationBlock == null) {
+          throw new Error("registrationBlock is null");
+        }
+
+        if (registrationBlock <= height) {
+          filteredUsers.push(user);
+        }
+      }
 
       // for each user, find the userTask document with the
       // user id, task id and season id
@@ -128,6 +142,14 @@ async function genericTask(taskInput, db, seedId, callback) {
 
         // if userTask document exists, fetch the xpEarned array
         if (userTaskDoc != null && userTaskDoc.xpEarned.length > 0) {
+          if (targetTask.type === "non-recursive") {
+            console.log("non-recursive task");
+            // if the task is non-recursive, do nothing
+            // and continue to the next user being in this
+            // step in the logic means that the user has
+            // already earned XP for this task
+            continue;
+          }
           // find if an entry for the prepTerm exists in the 'xpEarned' array
           // in other words check if the user has already earned XP for the current term
           const alreadyExists = userTaskDoc.xpEarned.find((xpEarned) => {
@@ -189,16 +211,16 @@ async function genericTask(taskInput, db, seedId, callback) {
         );
         console.log("UserTask document updated");
       }
-
-      // close connection to DB
-      console.log("Closing connection to DB");
-      await db.stop();
     }
+    // close connection to DB here at the end
+    // of the code logic if the code runs successfully
+    console.log("Closing connection to DB");
+    await db.stop();
   } catch (err) {
     console.log("Error running genericTask ");
-    console.log(err);
+    console.log(err.message);
 
-    // close connection to DB
+    // close connection to DB here if an error occurs
     console.log("Closing connection to DB");
     await db.stop();
     throw new Error(err);

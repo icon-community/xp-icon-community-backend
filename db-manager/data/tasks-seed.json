@@ -2,9 +2,9 @@
   {
     "seedId": "t1",
     "type": "onchain",
-    "description": "for depositing collateral, the user will receive 10 XP per USD value of the collateral deposited that day. It will be done daily (per chain period)",
+    "description": "for depositing SICX collateral, the user will receive 10 XP per USD value of the collateral deposited that day. It will be done daily (per chain period)",
     "criteria": {},
-    "title": "deposit collateral",
+    "title": "deposit sICX collateral",
     "rewardFormula": ["amount", "return amount * 10"],
     "chain": "icon"
   },
@@ -23,6 +23,24 @@
     "description": "for locking into the saving rates, the user will receive 10 XP per USD value locked per day. It will be done daily (per chain period)",
     "criteria": {},
     "title": "locking into saving rates",
+    "rewardFormula": ["amount", "return amount * 10"],
+    "chain": "icon"
+  },
+  {
+    "seedId": "t4",
+    "type": "non-recursive",
+    "description": "One time reward for registering",
+    "criteria": {},
+    "title": "registration",
+    "rewardFormula": ["amount", "return 40"],
+    "chain": "icon"
+  },
+  {
+    "seedId": "t5",
+    "type": "onchain",
+    "description": "for depositing AVAX collateral, the user will receive 10 XP per USD value of the collateral deposited that day. It will be done daily (per chain period)",
+    "criteria": {},
+    "title": "deposit AVAX collateral",
     "rewardFormula": ["amount", "return amount * 10"],
     "chain": "icon"
   }

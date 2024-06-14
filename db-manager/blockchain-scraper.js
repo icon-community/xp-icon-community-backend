@@ -9,11 +9,13 @@ const {
 const MainDb = require("../utils/mainDb");
 const {
   fetchRegisteredUsersAndUpdateDb,
-  fetchCollateralsAndUpdateDb,
+  fetchSICXCollateralsAndUpdateDb,
+  fetchAVAXCollateralsAndUpdateDb,
   fetchLoansAndUpdateDb,
   fetchLockedSavingsAndUpdateDb,
   feedTaskSeedDataToDb,
   feedSeasonSeedDataToDb,
+  fetchNewUsersAndGiveRegistrationReward,
 } = require("./tasks");
 const config = require("../utils/config");
 
@@ -84,9 +86,13 @@ async function main() {
     // first run task that fetches registered users and updates the db
     tasks.push(taskRunner(fetchRegisteredUsersAndUpdateDb, db));
 
+    // run task that gives reward for newly registered users
+    tasks.push(taskRunner(fetchNewUsersAndGiveRegistrationReward, db));
+
     // Run task that fetches collateral deposited by each user and updates the db
 
-    tasks.push(taskRunner(fetchCollateralsAndUpdateDb, db));
+    tasks.push(taskRunner(fetchSICXCollateralsAndUpdateDb, db));
+    tasks.push(taskRunner(fetchAVAXCollateralsAndUpdateDb, db));
 
     // Run task that fetches loans taken by each user and updates the db
     tasks.push(taskRunner(fetchLoansAndUpdateDb, db));

@@ -3,22 +3,22 @@
 // task id in the seed labeled as "t1" (seedId === "t1");
 const SEED_ID = "t1";
 const genericTask = require("./genericTask");
-const { getSicxCollateralInUSDValue } = require("../utils/json-rpc-services");
+const { getSICXCollateralInUSDValue } = require("../utils/json-rpc-services");
 
-async function fetchCollateralsAndUpdateDb(taskInput, db) {
+async function fetchSICXCollateralsAndUpdateDb(taskInput, db) {
   try {
     console.log("========");
-    console.log("> Running fetchCollateralsAndUpdateDb task");
+    console.log("> Running fetchSICXCollateralsAndUpdateDb task");
     return await genericTask(
       taskInput,
       db,
       SEED_ID,
-      getSicxCollateralInUSDValue,
+      getSICXCollateralInUSDValue,
     );
   } catch (err) {
-    console.log("Error running fetchCollateralsAndUpdateDb task");
+    console.log("Error running fetchSICXCollateralsAndUpdateDb task");
     console.log(err);
   }
 }
 
-module.exports = fetchCollateralsAndUpdateDb;
+module.exports = fetchSICXCollateralsAndUpdateDb;

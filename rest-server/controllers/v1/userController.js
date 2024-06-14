@@ -10,6 +10,7 @@ if (process.env.NODE_ENV === "dev") {
 if (process.env.MONGO_CONTAINER != null) {
   params.uri = `mongodb://${config.db.user}:${config.db.pwd}@${process.env.MONGO_CONTAINER}:27017`;
 }
+
 const db = new mainDb(params);
 
 const getUserAllSeasons = async (req, res) => {
@@ -20,7 +21,7 @@ const getUserAllSeasons = async (req, res) => {
     );
     res.json(data);
   } catch (error) {
-    res.status(500).send(error);
+    res.status(500).send({ error: error.message });
   }
 };
 
@@ -33,7 +34,7 @@ const getUserBySeason = async (req, res) => {
     );
     res.json(data);
   } catch (error) {
-    res.status(500).send(error);
+    res.status(500).send({ error: error.message });
   }
 };
 

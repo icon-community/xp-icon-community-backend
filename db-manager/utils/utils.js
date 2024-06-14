@@ -132,12 +132,18 @@ async function getInitBlock(db) {
     console.log("> Fetching all seasons from database");
     const allSeasons = await getAllSeasons(db.connection);
 
-    console.log("> Searching active season");
-    const activeSeason = allSeasons.find((season) => season.active === true);
+    console.log("> Searching active seasons");
+    const activeSeason = allSeasons
+      .filter((season) => season.active === true)
+      .reduce((lowest, current) => {
+        return lowest.blockStart < current.blockStart ? lowest : current;
+      });
 
     if (activeSeason != null) {
       // if active season is found, return the blockStart
-      console.log("> Active season found in database. Returning block.");
+      console.log(
+        "> Active seasons found in database. Returning block from season with lowest blockStart.",
+      );
       console.log("> Closing connection to database");
       db.stop();
       return activeSeason.blockStart;
