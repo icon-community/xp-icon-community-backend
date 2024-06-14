@@ -15,7 +15,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import java.util.List;
 
-class RegistrationBookTest extends TestBase {
+class RegistrationBookWithWhitelistTest extends TestBase {
     private static final ServiceManager sm = getServiceManager();
     private static final Account owner = sm.createAccount();
     private static final String trueString = "true";
@@ -29,12 +29,13 @@ class RegistrationBookTest extends TestBase {
 
     @BeforeAll
     public static void setup() throws Exception {
-        registrationBookScore = sm.deploy(owner, RegistrationBook.class);
-        registrationBookScore2 = sm.deploy(owner, RegistrationBook.class);
+        registrationBookScore = sm.deploy(owner, RegistrationBookWithWhitelist.class);
+        registrationBookScore2 = sm.deploy(owner, RegistrationBookWithWhitelist.class);
         luffy = sm.createAccount();
         zoro = sm.createAccount();
         nami = sm.createAccount();
         sanji = sm.createAccount();
+        System.out.println("RegistrationBookWithWhitelist Address: " + registrationBookScore.getAddress());
         registrationBookScore.invoke(owner, "registerUser", luffy.getAddress());
         registrationBookScore.invoke(owner, "registerUser", zoro.getAddress());
         registrationBookScore.invoke(owner, "registerUser", sanji.getAddress());

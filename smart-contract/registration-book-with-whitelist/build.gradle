@@ -13,10 +13,10 @@ dependencies {
 }
 
 optimizedJar {
-    mainClassName = 'org.example.RegistrationBook'
+    mainClassName = 'org.example.RegistrationBookWithWhitelist'
     duplicatesStrategy = DuplicatesStrategy.EXCLUDE
     from { configurations.runtimeClasspath.collect { it.isDirectory() ? it : zipTree(it) } }
-    archivesBaseName = 'registration-book'
+    archivesBaseName = 'registration-book-with-whitelist'
 
     // enableDebug = true
 }

@@ -2,23 +2,21 @@ package org.example;
 
 import score.Address;
 import score.Context;
-import score.ArrayDB;
 import score.annotation.EventLog;
 import score.annotation.External;
 import scorex.util.HashMap;
 
 import java.util.Map;
+// import java.util.HashMap;
 import java.math.BigInteger;
 import java.util.List;
 
-public class RegistrationBook
+public class RegistrationBookNoWhitelist
 {
     /**
      *
      */
     private static final String BOOK_STRING = "book";
-    private static final String ADMINS = "admins";
-    private final ArrayDB<Address> contractAdmins = Context.newArrayDB(ADMINS, Address.class);
     private static final IterableDictDB<Address, BigInteger> book = new IterableDictDB<>(BOOK_STRING, BigInteger.class, Address.class, false);
 
     /**
@@ -29,36 +27,9 @@ public class RegistrationBook
      * Constructs a new RegistrationBook object.
      * This constructor is intentionally left empty.
      */
-    public RegistrationBook() {
-        Address owner = Context.getOwner();
-        this.contractAdmins.add(owner);
+    public void RegistrationBookNoWhiteList() {
     }
 
-    /**
-     * Adds an admin to the list of admins.
-     * Only the owner can add an admin.
-     * @param admin the address of the admin to add
-     * @throws RevertException if the caller is not the owner
-     */
-    @External
-    public void addAdmin(Address admin) {
-        Address caller = Context.getCaller();
-        if (caller.equals(Context.getOwner())) {
-            this.contractAdmins.add(admin);
-        } else {
-            Context.revert("Only the owner can add an admin.");
-        }
-    }
-
-    @External(readonly=true)
-    public List<Address> getAdmins() {
-        int size = this.contractAdmins.size();
-        Address[] admins = new Address[size];
-        for (int i = 0; i < size; i++) {
-            admins[i] = this.contractAdmins.get(i);
-        }
-        return List.of(admins);
-    }
     /**
      * Checks if a user is registered in the registration book.
      *
@@ -108,21 +79,14 @@ public class RegistrationBook
     @External
     public void registerUser(Address user) {
         Address caller = Context.getCaller();
-        Boolean isAdmin = false;
-        int size = this.contractAdmins.size();
-        for (int i = 0; i < size; i++) {
-            if (caller.equals(this.contractAdmins.get(i))) {
-                isAdmin = true;
-                break;
-            }
+        if (caller.equals(user) || caller.equals(Context.getOwner())) {
+            long block = Context.getBlockHeight();
+            BigInteger blockBigInt = BigInteger.valueOf(block);
+            book.set(user, blockBigInt);
+            UserRegistered(user, blockBigInt);
+        } else {
+            Context.revert("Only the owner or the user can register the user.");
         }
-        if (isAdmin == false) {
-            Context.revert("Only the owner or an admin can register the user.");
-        }
-        long block = Context.getBlockHeight();
-        BigInteger blockBigInt = BigInteger.valueOf(block);
-        book.set(user, blockBigInt);
-        UserRegistered(user, blockBigInt);
     }
 
     @EventLog(indexed=2)
