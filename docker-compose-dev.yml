@@ -5,7 +5,7 @@ services:
     ports:
       - "27017:27017"
     networks:
-      - mynetwork
+      - mynetworkdev
     environment:
       MONGO_INITDB_ROOT_USERNAME: ${MONGO_USER}
       MONGO_INITDB_ROOT_PASSWORD: ${MONGO_PASSWORD}
@@ -19,7 +19,7 @@ services:
       - mongodb
 
     networks:
-      - mynetwork
+      - mynetworkdev
     command: ["node", "blockchain-scraper.js"]
     environment:
       MONGO_CONTAINER: mongodb-dev
@@ -36,7 +36,7 @@ services:
       - blockchain-scraper
 
     networks:
-      - mynetwork
+      - mynetworkdev
 
     # move into the rest-server folder, and run the
     # rest-server in development mode
@@ -51,5 +51,5 @@ services:
       - .:/app
 
 networks:
-  mynetwork:
+  mynetworkdev:
     driver: bridge

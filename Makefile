@@ -2,6 +2,10 @@ run-prod:
 	@echo "Running production server"
 	@docker compose -f docker-compose-prod.yml up -d
 
+run-prod-rebuild:
+	@echo "Running production server"
+	@docker compose -f docker-compose-prod.yml up -d --build
+
 stop-prod:
 	@echo "Stopping production server"
 	@docker compose -f docker-compose-prod.yml down
