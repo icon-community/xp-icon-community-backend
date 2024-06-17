@@ -11,10 +11,10 @@
   {
     "seedId": "t2",
     "type": "onchain",
-    "description": "for minting bnUSD, the user will receive 10 XP per bnUSD loan held per day. It will be done daily (per chain period)",
+    "description": "for minting bnUSD, the user will receive 30 XP per bnUSD loan held per day. It will be done daily (per chain period)",
     "criteria": {},
     "title": "holding a loan",
-    "rewardFormula": ["amount", "return amount * 10"],
+    "rewardFormula": ["amount", "return amount * 30"],
     "chain": "icon"
   },
   {
@@ -32,7 +32,7 @@
     "description": "One time reward for registering",
     "criteria": {},
     "title": "registration",
-    "rewardFormula": ["amount", "return 40"],
+    "rewardFormula": ["amount", "return 1420"],
     "chain": "icon"
   },
   {
