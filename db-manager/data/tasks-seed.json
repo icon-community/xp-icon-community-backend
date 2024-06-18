@@ -2,28 +2,28 @@
   {
     "seedId": "t1",
     "type": "onchain",
-    "description": "for depositing SICX collateral, the user will receive 10 XP per USD value of the collateral deposited that day. It will be done daily (per chain period)",
+    "description": "for depositing SICX collateral, the user will receive 1 XP per USD value of the collateral deposited that day. It will be done daily (per chain period)",
     "criteria": {},
     "title": "deposit sICX collateral",
-    "rewardFormula": ["amount", "return amount * 10"],
+    "rewardFormula": ["amount", "return amount * 1"],
     "chain": "icon"
   },
   {
     "seedId": "t2",
     "type": "onchain",
-    "description": "for minting bnUSD, the user will receive 30 XP per bnUSD loan held per day. It will be done daily (per chain period)",
+    "description": "for minting bnUSD, the user will receive 3 XP per bnUSD loan held per day. It will be done daily (per chain period)",
     "criteria": {},
     "title": "holding a loan",
-    "rewardFormula": ["amount", "return amount * 30"],
+    "rewardFormula": ["amount", "return amount * 3"],
     "chain": "icon"
   },
   {
     "seedId": "t3",
     "type": "onchain",
-    "description": "for locking into the saving rates, the user will receive 10 XP per USD value locked per day. It will be done daily (per chain period)",
+    "description": "for locking into the saving rates, the user will receive 1 XP per USD value locked per day. It will be done daily (per chain period)",
     "criteria": {},
     "title": "locking into saving rates",
-    "rewardFormula": ["amount", "return amount * 10"],
+    "rewardFormula": ["amount", "return amount * 1"],
     "chain": "icon"
   },
   {
@@ -32,16 +32,16 @@
     "description": "One time reward for registering",
     "criteria": {},
     "title": "registration",
-    "rewardFormula": ["amount", "return 1420"],
+    "rewardFormula": ["amount", "return 420"],
     "chain": "icon"
   },
   {
     "seedId": "t5",
     "type": "onchain",
-    "description": "for depositing AVAX collateral, the user will receive 10 XP per USD value of the collateral deposited that day. It will be done daily (per chain period)",
+    "description": "for depositing AVAX collateral, the user will receive 1 XP per USD value of the collateral deposited that day. It will be done daily (per chain period)",
     "criteria": {},
     "title": "deposit AVAX collateral",
-    "rewardFormula": ["amount", "return amount * 10"],
+    "rewardFormula": ["amount", "return amount * 1"],
     "chain": "icon"
   }
 ]
