@@ -23,6 +23,7 @@ services:
     command: ["node", "blockchain-scraper.js"]
     environment:
       MONGO_CONTAINER: mongodb-dev
+      USE_TEST_SEASON: true # set to true to use the test season
 
   rest-server:
     build:

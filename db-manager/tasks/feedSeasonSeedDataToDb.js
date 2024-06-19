@@ -20,6 +20,7 @@ const SEASON_SEED = config.seeds.seasons;
 
 async function feedSeasonSeedDataToDb(db, seed = SEASON_SEED) {
   console.log("> Running feedSeasonSeedDataToDb");
+  console.log(`> Seed file: ${seed}`);
   try {
     console.log("Creating connection to DB");
     await db.createConnection();

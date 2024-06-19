@@ -22,8 +22,8 @@ const config = require("../utils/config");
 const lineBreak = config.misc.lineBreak;
 const RUN_TIME = parseInt(process.env.TIME);
 const NO_TASK_RUN = process.env.NO_TASK == null ? false : true;
-const CHAIN = process.env.CHAIN;
-void CHAIN;
+// const CHAIN = process.env.CHAIN;
+// void CHAIN;
 const MONGO_CONTAINER =
   process.env.MONGO_CONTAINER == null ? "mongodb" : process.env.MONGO_CONTAINER;
 
@@ -35,6 +35,18 @@ async function main() {
   try {
     // initiate db class
     const params = {};
+
+    // use the season seed data from the seed file.
+    // this param can be customized in the file:
+    // docker-compose-dev.yml
+    // set the environment variable USE_PROD_SEASON to true
+    // to use the same seed file as production, or set it
+    // to false to use the test seed file
+    const seasonSeed =
+      process.env.USE_TEST_SEASON === "true"
+        ? config.seeds.test.season
+        : config.seeds.seasons;
+
     if (process.env.NODE_ENV === "dev") {
       params.uri = `mongodb://${config.db.user}:${config.db.pwd}@localhost:27017`;
     } else {
@@ -48,7 +60,7 @@ async function main() {
 
     // read season seed data from file and feed it to the db
     console.log(lineBreak);
-    await feedSeasonSeedDataToDb(db);
+    await feedSeasonSeedDataToDb(db, seasonSeed);
 
     // get init block from seed or db
     console.log(lineBreak);

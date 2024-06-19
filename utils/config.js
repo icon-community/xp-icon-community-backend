@@ -8,7 +8,7 @@ const config = {
     tasks: "db-manager/data/tasks-seed.json",
     main: "db-manager/data/main-seed.json",
     test: {
-      season1: "db-manager/data/test-seeds/seasons-seed-test-1.json",
+      season: "db-manager/data/test-seeds/seasons-seed-test-1.json",
     },
   },
   misc: {
@@ -76,6 +76,13 @@ const config = {
   },
   seasonsRoutes: {
     iconteam: "1",
+    ripdao: "2",
+    vybzdao: "3",
+    // uncomment these during testing
+    // test1: "1",
+    // test2: "2",
+    // test3: "3",
+    // test4: "4",
   },
 };
 

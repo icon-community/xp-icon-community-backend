@@ -15,11 +15,12 @@ const db = new mainDb(params);
 
 const getUserAllSeasons = async (req, res) => {
   try {
-    const data = await dbWrapper(
-      multi.getUserAllSeasons,
-      req.params.userWallet,
-    );
-    res.json(data);
+    // const data = await dbWrapper(
+    //   multi.getUserAllSeasons,
+    //   req.params.userWallet,
+    // );
+    // res.json(data);
+    res.json({ message: "Not implemented" });
   } catch (error) {
     res.status(500).send({ error: error.message });
   }

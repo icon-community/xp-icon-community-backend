@@ -19,41 +19,48 @@ async function genericTask(taskInput, db, seedId, callback) {
   console.log(`> Running genericTask on block ${height}`);
 
   try {
-    console.log("Creating connection to DB");
+    console.log("- Creating connection to DB");
     await db.createConnection();
 
     // Fetch active season
-    console.log("Fetching active seasons");
+    console.log("- Fetching active seasons");
     const activeSeasonArr = await getActiveSeason(db.connection);
 
     if (activeSeasonArr.length === 0) {
-      console.log("No active season found");
-      console.log("Closing connection to DB");
+      console.log("- No active season found");
+      console.log("- Closing connection to DB");
       await db.stop();
       return;
     }
 
     for (const activeSeason of activeSeasonArr) {
-      console.log(`Active season: ${activeSeason._id}`);
+      console.log(`-- Active season: ${activeSeason._id}`);
 
       // fetch activeSeason contract
       const activeSeasonContract = activeSeason.contract;
-      console.log(`Active season contract: ${activeSeasonContract}`);
+      console.log(`-- Active season contract: ${activeSeasonContract}`);
+
+      if (height < activeSeason.blockStart || height > activeSeason.blockEnd) {
+        console.log(
+          `-- Current block height ${height} is not within the range of active season ${activeSeason._id} with start block height ${activeSeason.blockStart} and end block height ${activeSeason.blockEnd}`,
+        );
+        continue;
+      }
 
       // Fetch active season tasks
-      console.log("Fetching active season tasks");
+      console.log("-- Fetching active season tasks");
       const activeTasks = activeSeason.tasks;
 
       // For each task in the active season find the task with seedId === "t1"
-      console.log(`Find target task with seedId === ${SEED_ID}`);
+      console.log(`-- Find target task with seedId === ${SEED_ID}`);
       const targetTaskArr = await getTaskBySeedId(SEED_ID, db.connection);
       const targetTask = targetTaskArr[0];
 
-      console.log("Checking if target task is in active tasks");
+      console.log("-- Checking if target task is in active tasks");
       let taskFound = false;
       for (const taskId of activeTasks) {
         if (taskId.equals(targetTask._id)) {
-          console.log("Found target task");
+          console.log("--- Target task found in active tasks");
           taskFound = true;
           break;
         }
@@ -61,19 +68,16 @@ async function genericTask(taskInput, db, seedId, callback) {
 
       if (!taskFound) {
         console.log(
-          `Target task not found in active tasks. This active season doesnt have a task associated with seedId === ${SEED_ID}`,
+          `--- Target task not found in active tasks. This active season doesnt have a task associated with seedId === ${SEED_ID}, continue querying the next active season`,
         );
-        console.log("Closing connection to DB");
-        await db.stop();
-        return;
+        continue;
       }
 
-      console.log("Target task found in active tasks");
       const rewardFormula = new Function(...targetTask.rewardFormula);
 
       // FIRST fetch data from the database
       // Fetch all the users with a defined seasonId
-      console.log("Fetching users from DB");
+      console.log("-- Fetching users from DB");
       const usersFromDb = await getUsersBySeason(
         activeSeason._id,
         db.connection,
@@ -82,7 +86,7 @@ async function genericTask(taskInput, db, seedId, callback) {
       // filter user by their registration block. if the user's registration block is greater than the current block height, skip the user
       //
       if (usersFromDb.length === 0) {
-        console.log("No users found in DB with specified seasonId");
+        console.log("--- No users found in DB with specified seasonId");
         // no user found in the database with the
         // specified seasonId, this means no user has
         // yet registered for this season, we skip the
@@ -93,7 +97,7 @@ async function genericTask(taskInput, db, seedId, callback) {
       // we filter the users by their registration block
       // if the user's registration block is greater than
       // the current block height, we skip the user
-      console.log("Filtering users by registration block");
+      console.log("-- Filtering users by registration block");
 
       const filteredUsers = [];
 
@@ -105,7 +109,7 @@ async function genericTask(taskInput, db, seedId, callback) {
           targetSeason == null ? null : targetSeason.registrationBlock;
 
         if (registrationBlock == null) {
-          throw new Error("registrationBlock is null");
+          throw new Error("---- registrationBlock is null");
         }
 
         if (registrationBlock <= height) {
@@ -129,7 +133,7 @@ async function genericTask(taskInput, db, seedId, callback) {
       // 'xpEarned' array
       //
       for (const validUser of filteredUsers) {
-        console.log("Search userTask document");
+        console.log("-- Search userTask document");
         const userTaskDocArr = await getUserTaskByAllIds(
           validUser._id,
           targetTask._id,
@@ -143,7 +147,7 @@ async function genericTask(taskInput, db, seedId, callback) {
         // if userTask document exists, fetch the xpEarned array
         if (userTaskDoc != null && userTaskDoc.xpEarned.length > 0) {
           if (targetTask.type === "non-recursive") {
-            console.log("non-recursive task");
+            console.log("--- non-recursive task");
             // if the task is non-recursive, do nothing
             // and continue to the next user being in this
             // step in the logic means that the user has
@@ -159,7 +163,7 @@ async function genericTask(taskInput, db, seedId, callback) {
           if (alreadyExists != null) {
             // if the entry exists, do nothing and continue to the next user
             console.log(
-              `UserTask document for user ${validUser._id} and task ${targetTask._id} and season ${activeSeason._id} already has an entry for prepTerm ${prepTerm}, with marked block height of ${alreadyExists.block}, and earned XP of ${alreadyExists.xp}`,
+              `--- UserTask document for user ${validUser._id} and task ${targetTask._id} and season ${activeSeason._id} already has an entry for prepTerm ${prepTerm}, with marked block height of ${alreadyExists.block}, and earned XP of ${alreadyExists.xp}`,
             );
             continue;
           } else {
@@ -169,7 +173,7 @@ async function genericTask(taskInput, db, seedId, callback) {
         }
 
         // fetch amount for user for this current term
-        console.log(`\n> Fetching amount for user ${validUser.walletAddress}`);
+        console.log(`-- Fetching amount for user ${validUser.walletAddress}`);
         const callbackResponse = await callback(
           validUser.walletAddress,
           height,
@@ -178,19 +182,19 @@ async function genericTask(taskInput, db, seedId, callback) {
         let amount = 0;
         if (callbackResponse == null) {
           console.log(
-            `No amount found for user ${validUser.walletAddress} at block ${height}`,
+            `--- No amount found for user ${validUser.walletAddress} at block ${height}`,
           );
         } else {
           // TODO: this requires type and error checking,
           // first evaluate if the object exists then
           // do the math operation and evaluate if NaN is
           // returned, etc
-          console.log("amount found for user, calculating earned XP");
+          console.log("--- amount found for user, calculating earned XP");
           amount = callbackResponse;
-          console.log("value in USD: ", amount);
+          console.log("--- value in USD: ", amount);
         }
 
-        console.log("Updating userTask document with new xpEarned array");
+        console.log("-- Updating userTask document with new xpEarned array");
         // here we are adding the new entry for the current term to the xpEarned array. At this point the xpEarned array contains all the previous terms and we are adding the current term to it
         xpArray.push({
           period: prepTerm,
@@ -209,19 +213,19 @@ async function genericTask(taskInput, db, seedId, callback) {
           { xpEarned: xpArray },
           db.connection,
         );
-        console.log("UserTask document updated");
+        console.log("--- UserTask document updated");
       }
     }
     // close connection to DB here at the end
     // of the code logic if the code runs successfully
-    console.log("Closing connection to DB");
+    console.log("- Closing connection to DB");
     await db.stop();
   } catch (err) {
-    console.log("Error running genericTask ");
+    console.log("> Error running genericTask ");
     console.log(err.message);
 
     // close connection to DB here if an error occurs
-    console.log("Closing connection to DB");
+    console.log("> Closing connection to DB");
     await db.stop();
     throw new Error(err);
   }
