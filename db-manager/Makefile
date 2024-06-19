@@ -14,7 +14,7 @@ test-scraper-mainnet:
 	$(START_DOCKER_NON_PERSISTENT)
 	$(LINE_BREAK)
 	@echo "Starting blockchain scraper"
-	BLOCK=82070542 TIME=20 NODE_ENV=dev node blockchain-scraper.js
+	BLOCK=82070542 TIME=20 NODE_ENV=dev USE_TEST_SEASON=true node blockchain-scraper.js
 	$(LINE_BREAK)
 	$(STOP_DOCKER_NON_PERSISTENT)
 
@@ -23,7 +23,7 @@ test-scraper-mainnet-no-block:
 	$(START_DOCKER_NON_PERSISTENT)
 	$(LINE_BREAK)
 	@echo "Starting blockchain scraper"
-	TIME=60 NODE_ENV=dev node blockchain-scraper.js
+	TIME=60 NODE_ENV=dev USE_TEST_SEASON=true node blockchain-scraper.js
 	$(LINE_BREAK)
 	$(STOP_DOCKER_NON_PERSISTENT)
 

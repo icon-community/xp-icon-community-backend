@@ -10,7 +10,7 @@ const params = {};
 let seed = null;
 if (process.env.NODE_ENV === "dev") {
   params.uri = `mongodb://${config.db.user}:${config.db.pwd}@localhost:27017`;
-  seed = config.seeds.test.season1;
+  seed = config.seeds.test.season;
 } else {
   params.uri = `mongodb://${config.db.user}:${config.db.pwd}@${MONGO_CONTAINER}:27017`;
 }
