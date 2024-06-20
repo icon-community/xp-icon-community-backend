@@ -1,10 +1,5 @@
 const { multi } = require("../../../common/services/v1");
-const mainDb = require("../../../utils/mainDb");
-const config = require("../../../utils/config");
-
-const params = { ...config.mongoParams };
-
-const db = new mainDb(params);
+const { dbWrapper } = require("./utils");
 
 const getUserAllSeasons = async (req, res) => {
   try {
@@ -13,7 +8,7 @@ const getUserAllSeasons = async (req, res) => {
     //   req.params.userWallet,
     // );
     // res.json(data);
-    res.json({ message: "Not implemented" });
+    throw new Error("Not implemented");
   } catch (error) {
     res.status(500).send({ error: error.message });
   }
@@ -31,20 +26,6 @@ const getUserBySeason = async (req, res) => {
     res.status(500).send({ error: error.message });
   }
 };
-
-async function dbWrapper(callback, ...args) {
-  try {
-    await db.createConnection();
-    const data = await callback(...args, db.connection);
-    await db.stop();
-    return data;
-  } catch (error) {
-    await db.stop();
-    console.log("error");
-    console.log(error);
-    throw error;
-  }
-}
 
 module.exports = {
   getUserAllSeasons,
