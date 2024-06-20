@@ -47,6 +47,11 @@ app.use(express.static(path.join(__dirname, "www")));
 // routes
 app.use("/v1", require("./routes/v1"));
 
+/* eslint-disable-next-line no-unused-vars */
+app.use((req, res, next) => {
+  res.status(404).json({ error: "Path not found" });
+});
+
 async function start() {
   app.listen(PORT, () => {
     console.log(`Server is listening on port ${PORT}`);
