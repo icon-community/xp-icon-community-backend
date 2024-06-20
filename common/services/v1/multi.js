@@ -1,5 +1,5 @@
 //
-const { getAllUsers, getUsersBySeason } = require("./userService");
+const { getAllUsers, getUserCountBySeason } = require("./userService");
 const { getAllSeasons, getSeasonByNumberId } = require("./seasonService");
 const { getUserTaskByAllIds } = require("./userTaskService");
 const { getTaskById } = require("./taskService");
@@ -68,10 +68,10 @@ async function getUserAllSeasons(userWallet, connection) {
   return response;
 }
 
-async function getUserBySeason(userWallet, userSeason, connection) {
-  const seasonDbNumber = config.seasonsRoutes[userSeason];
+async function getUserBySeason(userWallet, seasonLabel, connection) {
+  const seasonDbLabel = config.seasonsRoutes[seasonLabel];
 
-  if (seasonDbNumber == null) {
+  if (seasonDbLabel == null) {
     throw new Error("Invalid season");
   }
 
@@ -82,7 +82,7 @@ async function getUserBySeason(userWallet, userSeason, connection) {
     throw new Error("User not found");
   }
 
-  const season = await getSeasonByNumberId(seasonDbNumber, connection);
+  const season = await getSeasonByNumberId(seasonDbLabel, connection);
   const seasonFormatted = getFormattedSeason(season[0]);
   if (seasonFormatted == null) {
     throw new Error("Season not found");
@@ -92,7 +92,7 @@ async function getUserBySeason(userWallet, userSeason, connection) {
   const userAboveTasks = [];
   const userBelowTasks = [];
 
-  const rankings = await getRankingOfSeason(seasonDbNumber, connection);
+  const rankings = await getRankingOfSeason(seasonDbLabel, connection);
   const thisUserIndex = rankings.findIndex((userIndex) =>
     userIndex._id.equals(user[0]._id),
   );
@@ -182,7 +182,33 @@ async function getUserBySeason(userWallet, userSeason, connection) {
   return response;
 }
 
+async function getCustomSeasonData(seasonLabel, connection) {
+  const seasonDbLabel = config.seasonsRoutes[seasonLabel];
+
+  if (seasonDbLabel == null) {
+    throw new Error("Invalid season");
+  }
+
+  const season = await getSeasonByNumberId(seasonDbLabel, connection);
+  const seasonFormatted = getFormattedSeason(season[0]);
+  if (seasonFormatted == null) {
+    throw new Error("Season not found");
+  }
+
+  const userCount = await getUserCountBySeason(season[0]._id, connection);
+  const response = {
+    season: {
+      number: seasonFormatted.number,
+      blockStart: seasonFormatted.blockStart,
+      blockEnd: seasonFormatted.blockEnd,
+      userCount: userCount,
+    },
+  };
+  return response;
+}
+
 module.exports = {
   getUserAllSeasons,
   getUserBySeason,
+  getCustomSeasonData,
 };

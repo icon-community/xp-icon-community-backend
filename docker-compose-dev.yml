@@ -41,7 +41,7 @@ services:
 
     # move into the rest-server folder, and run the
     # rest-server in development mode
-    command: sh -c "cd ../rest-server && npm run dev"
+    command: sh -c "cd ../rest-server && npm run dev-mongo"
 
     environment:
       MONGO_CONTAINER: mongodb-dev
