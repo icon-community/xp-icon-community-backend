@@ -2,14 +2,7 @@ const { multi } = require("../../../common/services/v1");
 const mainDb = require("../../../utils/mainDb");
 const config = require("../../../utils/config");
 
-const params = {};
-if (process.env.NODE_ENV === "dev") {
-  params.uri = `mongodb://${config.db.user}:${config.db.pwd}@localhost:27017`;
-}
-
-if (process.env.MONGO_CONTAINER != null) {
-  params.uri = `mongodb://${config.db.user}:${config.db.pwd}@${process.env.MONGO_CONTAINER}:27017`;
-}
+const params = { ...config.mongoParams };
 
 const db = new mainDb(params);
 
