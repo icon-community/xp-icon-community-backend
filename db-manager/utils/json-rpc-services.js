@@ -171,6 +171,10 @@ async function getUserRegistrationBlock(
   }
 }
 
+async function getIcxBalance(wallet) {
+  return 0;
+}
+
 module.exports = {
   getNetworkInfo,
   getPRepTerm,
@@ -182,4 +186,5 @@ module.exports = {
   getSicxDebtInUSDValue,
   getLockedAmountAsDecimal,
   getAVAXCollateralInUSDValue,
+  getIcxBalance,
 };
