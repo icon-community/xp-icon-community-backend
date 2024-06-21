@@ -1,5 +1,5 @@
 // imports
-const { getPRepTerm } = require("./json-rpc-services");
+const { getPRepTerm } = require("../../utils/json-rpc-services");
 const config = require("../../utils/config");
 
 // Amount of block from the period end block to fetch all

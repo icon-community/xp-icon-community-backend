@@ -3,7 +3,9 @@
 // task id in the seed labeled as "t1" (seedId === "t1");
 const SEED_ID = "t1";
 const genericTask = require("./genericTask");
-const { getSICXCollateralInUSDValue } = require("../utils/json-rpc-services");
+const {
+  getSICXCollateralInUSDValue,
+} = require("../../utils/json-rpc-services");
 
 async function fetchSICXCollateralsAndUpdateDb(taskInput, db) {
   try {

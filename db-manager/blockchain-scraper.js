@@ -5,7 +5,7 @@ const {
   IconBuilder,
   taskRunner,
   getInitBlock,
-} = require("./utils/utils");
+} = require("../utils/utils");
 const MainDb = require("../utils/mainDb");
 const {
   fetchRegisteredUsersAndUpdateDb,

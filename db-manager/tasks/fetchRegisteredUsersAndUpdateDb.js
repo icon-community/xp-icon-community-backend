@@ -4,8 +4,8 @@ const { getActiveSeason } = seasonService;
 const {
   getUsersList,
   getUserRegistrationBlock,
-} = require("../utils/json-rpc-services");
-const { isValidHex } = require("../utils/utils");
+} = require("../../utils/json-rpc-services");
+const { isValidHex } = require("../../utils/utils");
 
 async function fetchRegisteredUsersAndUpdateDb(taskInput, db) {
   const { height: block } = taskInput;
