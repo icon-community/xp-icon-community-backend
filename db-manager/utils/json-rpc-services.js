@@ -77,6 +77,36 @@ async function getDataFromStandings(wallet, token, data, height) {
     throw new Error(err.message);
   }
 }
+
+async function getTotalDebtInUSDValue(wallet, height) {
+  try {
+    const position = await getAccountPositions(wallet, height);
+
+    const tokens = Object.keys(position.standings);
+    let totalDebt = 0;
+    for (let i = 0; i < tokens.length; i++) {
+      totalDebt +=
+        parseInt(position.standings[tokens[i]]["total_debt_in_USD"], 16) /
+        10 ** 18;
+    }
+
+    return totalDebt;
+  } catch (err) {
+    console.log(`Error getting total debt value in USD for ${wallet}`);
+    console.log(err.message);
+    const str = [
+      "does not have a position in Balanced",
+      "not found in standings",
+    ];
+    for (let i = 0; i < str.length; i++) {
+      if (err.message.includes(str[i])) {
+        return 0;
+      }
+    }
+    throw new Error(err.message);
+  }
+}
+
 async function getSicxDebtInUSDValue(wallet, height) {
   return getDataFromStandings(wallet, "sICX", "total_debt_in_USD", height);
 }
@@ -172,14 +202,15 @@ async function getUserRegistrationBlock(
 }
 
 module.exports = {
-  getNetworkInfo,
-  getPRepTerm,
+  getAVAXCollateralInUSDValue,
   getAccountPositions,
   getLockedAmount,
-  getUsersList,
-  getUserRegistrationBlock,
+  getLockedAmountAsDecimal,
+  getNetworkInfo,
+  getPRepTerm,
   getSICXCollateralInUSDValue,
   getSicxDebtInUSDValue,
-  getLockedAmountAsDecimal,
-  getAVAXCollateralInUSDValue,
+  getTotalDebtInUSDValue,
+  getUserRegistrationBlock,
+  getUsersList,
 };
