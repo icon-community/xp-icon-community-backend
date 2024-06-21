@@ -19,7 +19,7 @@ const getUserBySeason = async (req, res) => {
     const data = await dbWrapper(
       multi.getUserBySeason,
       req.params.userWallet,
-      req.params.season,
+      req.params.seasonId,
     );
     res.json(data);
   } catch (error) {
