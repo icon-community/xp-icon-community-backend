@@ -211,7 +211,9 @@ async function getIcxBalance(wallet, height = null) {
       "icx_getBalance",
       { address: wallet },
     );
-    return await makeJsonRpcCall(requestObj, config.jvm.default.rpc);
+    const response = makeJsonRpcCall(requestObj, config.jvm.default.rpc);
+
+    return response;
   } catch (e) {
     console.log("Error making icx_getBalance request");
     console.error(e);
