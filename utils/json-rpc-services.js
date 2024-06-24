@@ -1,5 +1,5 @@
 const { makeJsonRpcRequestObject, makeJsonRpcCall } = require("./utils");
-const config = require("../../utils/config");
+const config = require("./config");
 
 async function getNetworkInfo(height = null) {
   try {
@@ -201,9 +201,29 @@ async function getUserRegistrationBlock(
   }
 }
 
+async function getIcxBalance(wallet, height = null) {
+  try {
+    const requestObj = makeJsonRpcRequestObject(
+      null,
+      null,
+      null,
+      height,
+      "icx_getBalance",
+      { address: wallet },
+    );
+    const response = makeJsonRpcCall(requestObj, config.jvm.default.rpc);
+
+    return response;
+  } catch (e) {
+    console.log("Error making icx_getBalance request");
+    console.error(e);
+  }
+}
+
 module.exports = {
   getAVAXCollateralInUSDValue,
   getAccountPositions,
+  getIcxBalance,
   getLockedAmount,
   getLockedAmountAsDecimal,
   getNetworkInfo,

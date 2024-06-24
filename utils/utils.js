@@ -1,9 +1,9 @@
 const IconService = require("icon-sdk-js");
-const config = require("../../utils/config");
+const config = require("./config");
 const rqst = require("rqst");
 const fs = require("fs");
-const customPath = require("../../utils/customPath");
-const { getAllSeasons } = require("../../common/services/v1/seasonService");
+const customPath = require("./customPath");
+const { getAllSeasons } = require("../common/services/v1/seasonService");
 
 const { HttpProvider, IconBuilder } = IconService.default;
 
@@ -16,22 +16,30 @@ function makeJsonRpcRequestObject(
   to = "cx0000000000000000000000000000000000000000",
   height = null,
   jsonRpcMethod = "icx_call",
+  params2 = null,
 ) {
   const obj = {
     jsonrpc: "2.0",
     method: jsonRpcMethod,
     id: Math.ceil(Math.random() * 1000),
-    params: {
+  };
+
+  if (to == null) {
+    if (params2 == null) {
+      throw new Error("To and params2 cannot be null at the same time");
+    }
+    obj.params = { ...params2 };
+  } else {
+    obj.params = {
       to: to,
       dataType: "call",
       data: {
         method,
       },
-    },
-  };
-
-  if (params !== null) {
-    obj.params.data.params = params;
+    };
+    if (params !== null) {
+      obj.params.data.params = params;
+    }
   }
 
   if (height !== null) {

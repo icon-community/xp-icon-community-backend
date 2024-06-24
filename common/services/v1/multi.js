@@ -15,6 +15,8 @@ const {
   sumXpTotal,
   sumXp24hrs,
 } = require("./utils2");
+const { getIcxBalance } = require("../../../utils/json-rpc-services");
+const { isValidHex } = require("../../../utils/utils");
 const config = require("../../../utils/config");
 
 //TODO: This function havent been updated to work with
@@ -68,10 +70,10 @@ async function getUserAllSeasons(userWallet, connection) {
   return response;
 }
 
-async function getUserBySeason(userWallet, userSeason, connection) {
-  const seasonDbNumber = config.seasonsRoutes[userSeason];
+async function getUserBySeason(userWallet, seasonLabel, connection) {
+  const seasonDbLabel = config.seasonsRoutes[seasonLabel];
 
-  if (seasonDbNumber == null) {
+  if (seasonDbLabel == null) {
     throw new Error("Invalid season");
   }
 
@@ -82,7 +84,7 @@ async function getUserBySeason(userWallet, userSeason, connection) {
     throw new Error("User not found");
   }
 
-  const season = await getSeasonByNumberId(seasonDbNumber, connection);
+  const season = await getSeasonByNumberId(seasonDbLabel, connection);
   const seasonFormatted = getFormattedSeason(season[0]);
   if (seasonFormatted == null) {
     throw new Error("Season not found");
@@ -92,7 +94,7 @@ async function getUserBySeason(userWallet, userSeason, connection) {
   const userAboveTasks = [];
   const userBelowTasks = [];
 
-  const rankings = await getRankingOfSeason(seasonDbNumber, connection);
+  const rankings = await getRankingOfSeason(seasonDbLabel, connection);
   const thisUserIndex = rankings.findIndex((userIndex) =>
     userIndex._id.equals(user[0]._id),
   );
@@ -182,7 +184,90 @@ async function getUserBySeason(userWallet, userSeason, connection) {
   return response;
 }
 
+async function getCustomSeasonData(seasonLabel, connection) {
+  const seasonDbLabel = config.seasonsRoutes[seasonLabel];
+
+  if (seasonDbLabel == null) {
+    throw new Error("Invalid season");
+  }
+
+  const season = await getSeasonByNumberId(seasonDbLabel, connection);
+  const seasonFormatted = getFormattedSeason(season[0]);
+  if (seasonFormatted == null) {
+    throw new Error("Season not found");
+  }
+
+  const users = await getUsersBySeason(season[0]._id, connection);
+  const userCount = users.length;
+
+  let icxBalance = 0;
+
+  const tasks = [];
+  for (const task of season[0].tasks) {
+    const taskFromDb = await getTaskById(task._id, connection);
+    const taskObj = {
+      description: taskFromDb[0].description,
+      title: taskFromDb[0].title,
+    };
+
+    if (taskObj.title === "registration") {
+      continue;
+    }
+
+    let ammount = 0;
+    const formula = new Function(...taskFromDb[0].rewardFormula);
+    const divider = formula(1);
+    for (let i = 0; i < userCount; i++) {
+      // this will only run once, for the first task
+      // that way we dont duplicate the icx balance
+      const user = users[i];
+      if (tasks.length == 0) {
+        const icxBalanceUserAsHex = await getIcxBalance(user.walletAddress);
+
+        if (!isValidHex(icxBalanceUserAsHex)) {
+          // if the response is not a valid hex, skip this user
+          continue;
+        }
+        icxBalance += parseInt(icxBalanceUserAsHex, 16) / 10 ** 18;
+      }
+
+      const userTask = await getUserTaskByAllIds(
+        user._id,
+        task._id,
+        season[0]._id,
+        connection,
+      );
+
+      const lastXp =
+        userTask[0].xpEarned[userTask[0].xpEarned.length - 1].xp / divider;
+
+      if (!Number.isNaN(lastXp)) {
+        ammount += lastXp;
+      }
+    }
+
+    taskObj.totalLastDay = ammount;
+
+    tasks.push(taskObj);
+  }
+
+  const response = {
+    season: {
+      number: seasonFormatted.number,
+      blockStart: seasonFormatted.blockStart,
+      blockEnd: seasonFormatted.blockEnd,
+      userCount: userCount,
+      balance_in_wallets: {
+        icx: icxBalance,
+      },
+      task: tasks,
+    },
+  };
+  return response;
+}
+
 module.exports = {
   getUserAllSeasons,
   getUserBySeason,
+  getCustomSeasonData,
 };

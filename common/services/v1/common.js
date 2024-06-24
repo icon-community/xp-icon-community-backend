@@ -41,10 +41,16 @@ async function updateOrCreateEntry(
   }
 }
 
+async function getDocumentCount(filter, collectionId, connection) {
+  const model = connection.model(collectionId);
+  return await model.where(filter).countDocuments();
+}
+
 module.exports = {
   createEntry,
   getAllEntries,
   getEntryById,
   getEntryByParam,
   updateOrCreateEntry,
+  getDocumentCount,
 };

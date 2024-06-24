@@ -3,7 +3,7 @@
 // task id in the seed labeled as "t2" (seedId === "t2");
 const SEED_ID = "t2";
 const genericTask = require("./genericTask");
-const { getTotalDebtInUSDValue } = require("../utils/json-rpc-services");
+const { getTotalDebtInUSDValue } = require("../../utils/json-rpc-services");
 
 async function fetchLoansAndUpdateDb(taskInput, db) {
   try {

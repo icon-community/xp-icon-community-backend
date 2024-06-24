@@ -48,8 +48,11 @@ For prettier  we are using V3 this should be easier to setup in your editor.
 
 The following routes are available:
 
-- `/v1/user/:userWallet` - GET - Get all season data for a user
 - `/v1/user/:userWallet/season/:seasonId` - GET - Get season data for a user
+- `/v1/user/:userWallet/` - GET - **Not implemented** Get all seasons for a user
+- `/v1/season/:seasonId/` - GET - **Not implemented**
+- `/v1/season/:seasonId/task/:taskId` - GET - **Not implemented**
+
 
 ## Blockchain scraper
 The blockchain scraper is a script that fetches data from the ICON blockchain and stores it in the database. The script is located in the `db-manager` directory.

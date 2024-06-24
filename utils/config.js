@@ -84,8 +84,18 @@ const config = {
     // test3: "3",
     // test4: "4",
   },
+  mongoParams: {},
 };
 
 config.jvm.default = config.jvm[SELECTED_CHAIN];
+
+const mongoContainer =
+  process.env.MONGO_CONTAINER == null ? "mongodb" : process.env.MONGO_CONTAINER;
+
+if (process.env.NODE_ENV === "dev") {
+  config.mongoParams.uri = `mongodb://${config.db.user}:${config.db.pwd}@localhost:27017`;
+} else {
+  config.mongoParams.uri = `mongodb://${config.db.user}:${config.db.pwd}@${mongoContainer}:27017`;
+}
 
 module.exports = config;
