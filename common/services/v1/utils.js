@@ -37,10 +37,11 @@ function getFormattedTask(task) {
   };
 }
 
-function getFormattedSeason(season) {
-  if (season.length === 0) {
+function getFormattedSeason(seasons) {
+  if (seasons.length === 0) {
     return null;
   }
+  const season = seasons[0];
   return {
     // _id: season[0]._id,
     number: season.number,

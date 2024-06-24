@@ -1,6 +1,6 @@
 //
 const { getAllUsers, getUsersBySeason } = require("./userService");
-const { getAllSeasons, getSeasonByNumberId } = require("./seasonService");
+const { getSeasonByNumberId } = require("./seasonService");
 const { getUserTaskByAllIds } = require("./userTaskService");
 const { getTaskById } = require("./taskService");
 const {
@@ -22,52 +22,9 @@ const config = require("../../../utils/config");
 //TODO: This function havent been updated to work with
 //the latest changes that have been made to the code
 async function getUserAllSeasons(userWallet, connection) {
-  const allUsers = await getAllUsers(connection);
-  const user = allUsers.filter((user) => user.walletAddress === userWallet);
-  const userFormatted = getFormattedUser(user);
-  const seasons = await getAllSeasons(connection);
-  const seasonsFormatted = seasons.map((season) => getFormattedSeason(season));
-
-  // const rankings = await getRankings(allUsers, seasons, connection);
-  // console.log("rankings");
-  // console.log(JSON.stringify(rankings));
-  // console.log(rankings);
-  for (let i = 0; i < seasonsFormatted.length; i++) {
-    // for (const season of seasonsFormatted) {
-    const tasks = [];
-    for (let ii = 0; ii < seasonsFormatted[i].tasks.length; ii++) {
-      // for (const task of seasonsFormatted[i].tasks) {
-      const taskFromDb = await getTaskById(
-        seasons[i].tasks[ii]._id,
-        connection,
-      );
-      const formattedTask = getFormattedTask(taskFromDb);
-      const userTask = await getUserTaskByAllIds(
-        user[0]._id,
-        seasons[i].tasks[ii]._id,
-        seasons[i]._id,
-        connection,
-      );
-      const formattedUserTask = getFormattedUserTask(userTask);
-      const taskTotalXp = formattedUserTask.xpEarned.reduce(
-        (a, b) => a + Number(b.xp),
-        0,
-      );
-      tasks.push({
-        task: {
-          ...formattedTask,
-          XPEarned_total_task: taskTotalXp,
-        },
-        xp: formattedUserTask,
-      });
-    }
-    seasonsFormatted[i].tasks = tasks;
-  }
-  const response = {
-    user: userFormatted,
-    seasons: seasonsFormatted,
-  };
-  return response;
+  //
+  void userWallet, connection;
+  return null;
 }
 
 async function getUserBySeason(userWallet, seasonLabel, connection) {
@@ -85,7 +42,7 @@ async function getUserBySeason(userWallet, seasonLabel, connection) {
   }
 
   const season = await getSeasonByNumberId(seasonDbLabel, connection);
-  const seasonFormatted = getFormattedSeason(season[0]);
+  const seasonFormatted = getFormattedSeason(season);
   if (seasonFormatted == null) {
     throw new Error("Season not found");
   }
@@ -192,7 +149,7 @@ async function getCustomSeasonData(seasonLabel, connection) {
   }
 
   const season = await getSeasonByNumberId(seasonDbLabel, connection);
-  const seasonFormatted = getFormattedSeason(season[0]);
+  const seasonFormatted = getFormattedSeason(season);
   if (seasonFormatted == null) {
     throw new Error("Season not found");
   }
@@ -238,6 +195,9 @@ async function getCustomSeasonData(seasonLabel, connection) {
         connection,
       );
 
+      if (userTask.length == 0) {
+        continue;
+      }
       const lastXp =
         userTask[0].xpEarned[userTask[0].xpEarned.length - 1].xp / divider;
 
