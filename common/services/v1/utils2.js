@@ -16,10 +16,11 @@ async function getRankingOfSeason(seasonNumber, connection) {
       total: 0,
       tasks: [],
     };
+
     for (let ii = 0; ii < season.tasks.length; ii++) {
       const userTask = await getUserTaskByAllIds(
         allUsers[i]._id,
-        season.tasks[ii]._id,
+        season.tasks[ii],
         season._id,
         connection,
       );
