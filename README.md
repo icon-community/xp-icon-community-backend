@@ -50,7 +50,7 @@ The following routes are available:
 
 - `/v1/user/:userWallet/season/:seasonId` - GET - Get season data for a user
 - `/v1/user/:userWallet/` - GET - **Not implemented** Get all seasons for a user
-- `/v1/season/:seasonId/` - GET - **Not implemented**
+- `/v1/season/:seasonId/` - GET - Return data related to the season
 - `/v1/season/:seasonId/task/:taskId` - GET - **Not implemented**
 
 
