@@ -5,7 +5,7 @@ const express = require("express");
 const helmet = require("helmet");
 const morgan = require("morgan");
 const path = require("path");
-// const cors = require("cors");
+const cors = require("cors");
 const config = require("../utils/config");
 const PORT = config.ports.backend;
 
@@ -23,17 +23,18 @@ morgan.token("body", (req, res) => {
   }
 });
 
-// const corsOptions = {
-//   origin: "*",
-//   methods: "GET,HEAD,PUT,PATCH,POST,DELETE",
-//   preflightContinue: false,
-//   optionsSuccessStatus: 204,
-// };
+const corsOptions = {
+  origin: "*",
+  methods: "GET,HEAD,PUT,PATCH,POST,DELETE",
+  preflightContinue: false,
+  optionsSuccessStatus: 204,
+};
 
 // Create the express app
 const app = express();
 
 // Use middlewares
+app.use(cors(corsOptions));
 app.use(express.json());
 app.use(helmet());
 app.use(
