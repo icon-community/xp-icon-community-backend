@@ -44,6 +44,17 @@ async function getRankingOfSeason(seasonNumber, connection) {
   return ranked;
 }
 
+function getRankingOfSeasonReduced(rankData) {
+  const reducedData = [];
+  for (let i = 0; i < rankData.length; i++) {
+    reducedData.push({
+      address: rankData[i].address,
+      total: rankData[i].total,
+    });
+  }
+  return reducedData;
+}
+
 async function getRankings(allUsers, seasons, connection) {
   const rankData = {};
   for (let i = 0; i < seasons.length; i++) {
@@ -126,8 +137,9 @@ function sumXp24hrs(arrayOfTasks) {
 
 module.exports = {
   getRankingOfSeason,
+  getRankingOfSeasonReduced,
   getRankings,
   getTaskTotalXp,
-  sumXpTotal,
   sumXp24hrs,
+  sumXpTotal,
 };

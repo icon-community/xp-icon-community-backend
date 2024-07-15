@@ -11,9 +11,10 @@ const {
 } = require("./utils");
 const {
   getRankingOfSeason,
+  getRankingOfSeasonReduced,
   getTaskTotalXp,
-  sumXpTotal,
   sumXp24hrs,
+  sumXpTotal,
 } = require("./utils2");
 const { getIcxBalance } = require("../../../utils/json-rpc-services");
 const { isValidHex } = require("../../../utils/utils");
@@ -211,6 +212,8 @@ async function getCustomSeasonData(seasonLabel, connection) {
     tasks.push(taskObj);
   }
 
+  const rankings = await getRankingOfSeason(seasonDbLabel, connection);
+  const rankingsReduced = getRankingOfSeasonReduced(rankings);
   const response = {
     season: {
       number: seasonFormatted.number,
@@ -221,6 +224,7 @@ async function getCustomSeasonData(seasonLabel, connection) {
         icx: icxBalance,
       },
       task: tasks,
+      rank: rankingsReduced,
     },
   };
   return response;
