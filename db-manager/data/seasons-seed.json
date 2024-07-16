@@ -22,5 +22,13 @@
     "active": true,
     "tasks": ["t5", "t2", "t3", "t4"],
     "contract": "cx70d646796a3c57ff04ef96a39eb1a888a0997748"
+  },
+  {
+    "number": 4,
+    "blockStart": 84490156,
+    "blockEnd": 85094955,
+    "active": true,
+    "tasks": ["t5", "t2", "t3", "t4"],
+    "contract": "cxaf04a2eba3f28f519c0290db46d37833161f7e19"
   }
 ]
