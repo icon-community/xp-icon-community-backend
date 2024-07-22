@@ -26,7 +26,31 @@ const getTaskBySeason = async (req, res) => {
   }
 };
 
+const calculateSeason = async (req, res) => {
+  try {
+    const { seasonLabel } = req.params;
+    const { total, baseline, filter } = req.body;
+
+    if (total == null || baseline == null) {
+      throw new Error("Invalid request");
+    }
+
+    const data = await dbWrapper(
+      multi.calculateSeason,
+      seasonLabel,
+      total,
+      baseline,
+      filter,
+    );
+
+    res.json(data);
+  } catch (err) {
+    res.status(500).send({ error: err.message });
+  }
+};
+
 module.exports = {
   getSeason,
   getTaskBySeason,
+  calculateSeason,
 };

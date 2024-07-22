@@ -51,6 +51,16 @@ The following routes are available:
 - `/v1/user/:userWallet/season/:seasonId` - GET - Get season data for a user
 - `/v1/user/:userWallet/` - GET - **Not implemented** Get all seasons for a user
 - `/v1/season/:seasonId/` - GET - Return data related to the season
+- `/v1/season/:seasonId/` - POST - { baseline: number, total: number, filter: { omit(?): Address[] } } - Receives data for calculation of season rewards to each user. Examples:
+
+``` bash
+# with filter
+curl -X POST -H "Content-Type: application/json" --data '{"total": "10000", "baseline": "10","filter":{"omit":["hxd4eb0a6c591b5e7a76e9a6677da055ebfdd897da","hxd83405d540ac959c2921be4ef735a5ab7114a748","hxad77420520a8dfe69ce3c4a8055cfcf0fa3e3c2c"]}}' http://localhost:3500/v1/season/seasonLabel
+
+# without filter
+curl -X POST -H "Content-Type: application/json" --data '{"total": "10000", "baseline": "10"}' http://localhost:3500/v1/season/seasonLabel
+```
+
 - `/v1/season/:seasonId/task/:taskId` - GET - **Not implemented**
 
 

@@ -230,8 +230,97 @@ async function getCustomSeasonData(seasonLabel, connection) {
   return response;
 }
 
+async function calculateSeason(
+  seasonLabel,
+  total,
+  baseline,
+  filter,
+  connection,
+) {
+  const totalAsNumber = Number(total);
+  const baselineAsNumber = Number(baseline);
+  if (
+    typeof totalAsNumber !== "number" ||
+    typeof baselineAsNumber !== "number" ||
+    isNaN(totalAsNumber) ||
+    isNaN(baselineAsNumber)
+  ) {
+    throw new Error("Invalid input");
+  }
+
+  const filterData = filter == null ? {} : filter;
+
+  const omitFilter = filterData.omit == null ? [] : filterData.omit;
+  const seasonDbLabel = config.seasonsRoutes[seasonLabel];
+  const rankings = await getRankingOfSeason(seasonDbLabel, connection);
+  const rankingsReduced = getRankingOfSeasonReduced(rankings);
+  const rankData = [...rankingsReduced];
+
+  if (!Array.isArray(rankData)) {
+    throw new Error("Invalid rankings");
+  }
+
+  if (
+    rankData.length === 0 ||
+    !rankData.every((obj) => obj && typeof obj === "object" && "total" in obj)
+  ) {
+    throw new Error(
+      "Rank must be an array of objects with at least one key 'total'",
+    );
+  }
+
+  const totalPoints = rankData.reduce((acc, obj) => {
+    if (omitFilter.includes(obj.address)) {
+      return acc;
+    }
+    return acc + obj.total;
+  }, 0);
+
+  let participants = 0;
+  for (let key in rankData) {
+    if (!omitFilter.includes(rankData[key].address)) {
+      participants++;
+    }
+  }
+
+  if (baselineAsNumber * participants >= totalAsNumber) {
+    throw new Error("Baseline is too high");
+  }
+
+  const totalWithoutBaseline = totalAsNumber - baselineAsNumber * participants;
+
+  const rewards = rankData.map((obj) => {
+    const { total, address } = obj;
+
+    if (omitFilter.includes(address)) {
+      return {
+        ...obj,
+        amount: 0,
+      };
+    }
+
+    if (typeof total !== "number" || total === 0) {
+      return {
+        ...obj,
+        amount: baselineAsNumber,
+      };
+    }
+
+    const amount =
+      (total / totalPoints) * totalWithoutBaseline + baselineAsNumber;
+
+    return {
+      ...obj,
+      amount: amount,
+    };
+  });
+
+  return rewards;
+}
+
 module.exports = {
   getUserAllSeasons,
   getUserBySeason,
   getCustomSeasonData,
+  calculateSeason,
 };
