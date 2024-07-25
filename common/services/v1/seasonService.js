@@ -1,10 +1,19 @@
 //
 const config = require("../../../utils/config");
 const SEASON = config.collections.season;
-const { createEntry, getAllEntries, getEntryByParam } = require("./common");
+const {
+  createEntry,
+  getAllEntries,
+  getEntryByParam,
+  updateOrCreateEntry,
+} = require("./common");
 
 async function createSeason(season, connection) {
   return await createEntry(season, SEASON, connection);
+}
+
+async function updateSeason(query, season, connection) {
+  return await updateOrCreateEntry(query, season, SEASON, connection);
 }
 
 async function getAllSeasons(connection) {
@@ -24,4 +33,5 @@ module.exports = {
   getAllSeasons,
   getActiveSeason,
   getSeasonByNumberId,
+  updateSeason,
 };
