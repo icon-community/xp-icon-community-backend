@@ -57,10 +57,21 @@ async function feedSeasonSeedDataToDb(db, useSeed = null, update = false) {
     console.log("Fetching all tasks");
     const tasksFromDb = await getAllTasks(db.connection);
     for (let season of seasons) {
-      if (!existingSeasons.find((s) => s.number === season.number) && !update) {
-        console.log(
-          `Season #${season.number} does not exists in DB, saving it`,
-        );
+      const seasonDoesNotExist = !existingSeasons.find(
+        (s) => s.number === season.number,
+      );
+      if (seasonDoesNotExist || update) {
+        if (seasonDoesNotExist) {
+          console.log(
+            `Season #${season.number} does not exists in DB, saving it`,
+          );
+        }
+
+        if (update) {
+          console.log(
+            `Season #${season.number} exists in DB but command to update was send, updating it`,
+          );
+        }
         const arrOfTasksToSave = [];
         for (let task of season.tasks) {
           const taskToSave = tasksFromDb.find((t) => t.seedId === task);
