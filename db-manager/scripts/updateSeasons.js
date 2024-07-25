@@ -11,9 +11,9 @@ const db = new MainDb(params);
 async function main() {
   try {
     if (seed === null) {
-      await feedSeasonSeedDataToDb(db);
+      await feedSeasonSeedDataToDb(db, null, true);
     } else {
-      await feedSeasonSeedDataToDb(db, seed);
+      await feedSeasonSeedDataToDb(db, seed, true);
     }
   } catch (err) {
     console.log("Error in updateSeasons.js:");

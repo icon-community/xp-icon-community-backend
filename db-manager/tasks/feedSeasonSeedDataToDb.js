@@ -18,7 +18,8 @@ const customPath = require("../../utils/customPath");
 const config = require("../../utils/config");
 const SEASON_SEED = config.seeds.seasons;
 
-async function feedSeasonSeedDataToDb(db, seed = SEASON_SEED) {
+async function feedSeasonSeedDataToDb(db, useSeed = null, update = false) {
+  const seed = useSeed == null ? SEASON_SEED : useSeed;
   console.log("> Running feedSeasonSeedDataToDb");
   console.log(`> Seed file: ${seed}`);
   try {
@@ -56,7 +57,7 @@ async function feedSeasonSeedDataToDb(db, seed = SEASON_SEED) {
     console.log("Fetching all tasks");
     const tasksFromDb = await getAllTasks(db.connection);
     for (let season of seasons) {
-      if (!existingSeasons.find((s) => s.number === season.number)) {
+      if (!existingSeasons.find((s) => s.number === season.number) && !update) {
         console.log(
           `Season #${season.number} does not exists in DB, saving it`,
         );

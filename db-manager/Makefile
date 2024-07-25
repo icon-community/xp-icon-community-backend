@@ -9,6 +9,14 @@ start-docker-non-persistent:
 stop-docker-non-persistent:
 	$(STOP_DOCKER_NON_PERSISTENT)
 
+## Production commands
+update-tasks-and-seasons:
+	@echo "> Running script to update tasks"
+	MONGO_CONTAINER=mongodb-prod node scripts/updateTasks.js
+	@echo "Starting script to update seasons"
+	MONGO_CONTAINER=mongodb-prod node scripts/updateSeasons.js
+
+## development commands
 test-scraper-mainnet:
 	@echo "> Running scraper tests"
 	$(START_DOCKER_NON_PERSISTENT)
