@@ -11,6 +11,7 @@
 const {
   createSeason,
   getAllSeasons,
+  updateSeason,
 } = require("../../common/services/v1/seasonService");
 const { getAllTasks } = require("../../common/services/v1/taskService");
 const fs = require("fs");
@@ -61,17 +62,6 @@ async function feedSeasonSeedDataToDb(db, useSeed = null, update = false) {
         (s) => s.number === season.number,
       );
       if (seasonDoesNotExist || update) {
-        if (seasonDoesNotExist) {
-          console.log(
-            `Season #${season.number} does not exists in DB, saving it`,
-          );
-        }
-
-        if (update) {
-          console.log(
-            `Season #${season.number} exists in DB but command to update was send, updating it`,
-          );
-        }
         const arrOfTasksToSave = [];
         for (let task of season.tasks) {
           const taskToSave = tasksFromDb.find((t) => t.seedId === task);
@@ -83,8 +73,27 @@ async function feedSeasonSeedDataToDb(db, useSeed = null, update = false) {
           }
         }
         season.tasks = [...arrOfTasksToSave];
-        await createSeason(season, db.connection);
-        console.log(`Season #${season.number} saved`);
+
+        if (seasonDoesNotExist) {
+          console.log(
+            `Season #${season.number} does not exists in DB, saving it`,
+          );
+          await createSeason(season, db.connection);
+          console.log(`Season #${season.number} saved`);
+        }
+
+        if (update) {
+          console.log(
+            `Season #${season.number} exists in DB but command to update was send, updating it`,
+          );
+
+          const seasonToUpdate = existingSeasons.find(
+            (s) => s.number === season.number,
+          );
+
+          await updateSeason(seasonToUpdate._id, season, db.connection);
+          console.log(`Season #${season.number} updated`);
+        }
       } else {
         console.log(`Season #${season.number} already exists in DB`);
       }
