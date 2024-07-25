@@ -12,9 +12,9 @@ stop-docker-non-persistent:
 ## Production commands
 update-tasks-and-seasons:
 	@echo "> Running script to update tasks"
-	MONGO_CONTAINER=mongodb-prod node scripts/updateTasks.js
+	docker exec -e MONGO_CONTAINER=mongodb-prod blockchain-scraper node scripts/updateTasks.js
 	@echo "Starting script to update seasons"
-	MONGO_CONTAINER=mongodb-prod node scripts/updateSeasons.js
+	docker exec -e MONGO_CONTAINER=mongodb-prod blockchain-scraper node scripts/updateSeasons.js
 
 ## development commands
 test-scraper-mainnet:
