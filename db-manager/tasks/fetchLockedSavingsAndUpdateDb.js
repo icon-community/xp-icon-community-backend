@@ -3,7 +3,7 @@
 // task id in the seed labeled as "t3" (seedId === "t3");
 const SEED_ID = "t3";
 const genericTask = require("./genericTask");
-const { getLockedAmountAsDecimal } = require("../../utils/json-rpc-services");
+const { getLockedAmountAsDecimal } = require("../common/utils/json-rpc-services");
 
 async function fetchLockedSavingsAndUpdateDb(taskInput, db) {
   try {

@@ -5,7 +5,7 @@ const SEED_ID = "t1";
 const genericTask = require("./genericTask");
 const {
   getSICXCollateralInUSDValue,
-} = require("../../utils/json-rpc-services");
+} = require("../common/utils/json-rpc-services");
 
 async function fetchSICXCollateralsAndUpdateDb(taskInput, db) {
   try {

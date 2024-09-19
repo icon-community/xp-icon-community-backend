@@ -1,11 +1,11 @@
-const { userService, seasonService } = require("../../common/services/v1");
+const { userService, seasonService } = require("../common/services/v1");
 const { createUser, getAllUsers, addSeasonToUser } = userService;
 const { getActiveSeason } = seasonService;
 const {
   getUsersList,
   getUserRegistrationBlock,
-} = require("../../utils/json-rpc-services");
-const { isValidHex } = require("../../utils/utils");
+} = require("../common/utils/json-rpc-services");
+const { isValidHex } = require("../common/utils/utils");
 
 async function fetchRegisteredUsersAndUpdateDb(taskInput, db) {
   const { height: block } = taskInput;

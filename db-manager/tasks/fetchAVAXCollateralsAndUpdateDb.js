@@ -3,7 +3,7 @@
 // task id in the seed labeled as "t5" (seedId === "t5");
 const SEED_ID = "t5";
 const genericTask = require("./genericTask");
-const { getAVAXCollateralInUSDValue } = require("../../utils/json-rpc-services");
+const { getAVAXCollateralInUSDValue } = require("../common/utils/json-rpc-services");
 
 async function fetchAVAXCollateralsAndUpdateDb(taskInput, db) {
   try {

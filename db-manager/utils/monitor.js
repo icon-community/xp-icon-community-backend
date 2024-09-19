@@ -1,6 +1,6 @@
 // imports
-const { getPRepTerm } = require("../../utils/json-rpc-services");
-const config = require("../../utils/config");
+const { getPRepTerm } = require("../common/utils/json-rpc-services");
+const config = require("../common/utils/config");
 
 // Amount of block from the period end block to fetch all
 // the tasks related information.

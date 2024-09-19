@@ -1,7 +1,7 @@
 //
 const feedTaskSeedDataToDb = require("../tasks/feedTaskSeedDataToDb");
-const MainDb = require("../../utils/mainDb");
-const config = require("../../utils/config");
+const MainDb = require("../common/utils/mainDb");
+const config = require("../common/utils/config");
 const params = { ...config.mongoParams };
 
 const db = new MainDb(params);

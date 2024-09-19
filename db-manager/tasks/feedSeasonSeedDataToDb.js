@@ -12,11 +12,11 @@ const {
   createSeason,
   getAllSeasons,
   updateSeason,
-} = require("../../common/services/v1/seasonService");
-const { getAllTasks } = require("../../common/services/v1/taskService");
+} = require("../common/services/v1/seasonService");
+const { getAllTasks } = require("../common/services/v1/taskService");
 const fs = require("fs");
-const customPath = require("../../utils/customPath");
-const config = require("../../utils/config");
+const customPath = require("../common/utils/customPath");
+const config = require("../common/utils/config");
 const SEASON_SEED = config.seeds.seasons;
 
 async function feedSeasonSeedDataToDb(db, useSeed = null, update = false) {

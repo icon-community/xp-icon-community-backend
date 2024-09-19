@@ -1,7 +1,7 @@
 //
 const fetchRegisteredUsersAndUpdateDb = require("../tasks/fetchRegisteredUsersAndUpdateDb");
-const MainDb = require("../../utils/mainDb");
-const config = require("../../utils/config");
+const MainDb = require("../common/utils/mainDb");
+const config = require("../common/utils/config");
 
 const params = { ...config.mongoParams };
 
