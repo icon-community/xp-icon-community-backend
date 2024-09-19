@@ -5,8 +5,8 @@ const {
   IconBuilder,
   taskRunner,
   getInitBlock,
-} = require("../utils/utils");
-const MainDb = require("../utils/mainDb");
+} = require("./common/utils/utils");
+const MainDb = require("./common/utils/mainDb");
 const {
   fetchRegisteredUsersAndUpdateDb,
   fetchSICXCollateralsAndUpdateDb,
@@ -17,7 +17,7 @@ const {
   feedSeasonSeedDataToDb,
   fetchNewUsersAndGiveRegistrationReward,
 } = require("./tasks");
-const config = require("../utils/config");
+const config = require("./common/utils/config");
 
 const lineBreak = config.misc.lineBreak;
 const RUN_TIME = parseInt(process.env.TIME);
