@@ -1,9 +1,16 @@
-import { Injectable, InternalServerErrorException } from "@nestjs/common";
+import {
+  BadRequestException,
+  Injectable,
+  InternalServerErrorException,
+  Logger,
+  NotFoundException,
+} from "@nestjs/common";
 import { seasonsConfig } from "../config/configuration";
 import { SeasonLabel } from "../shared/models/enum/SeasonLabel";
 import { UsersDbService } from "../db/services/users-db/users-db.service";
 import { SeasonDbService } from "../db/services/users-db/season-db.service";
 import { UsersTaskDbService } from "../db/services/users-db/user-task-db.service";
+import { sha3_256 } from "js-sha3";
 import { Types } from "mongoose";
 import { TaskDbService } from "../db/services/users-db/task-db.service";
 import {
@@ -15,19 +22,26 @@ import {
 import { sumXp24hrs, sumXpTotal } from "../shared/utils/xp-util";
 import { RankingService } from "../ranking/service/ranking.service";
 import { FormattedUserBySeasonTask, FormattedUserSeason } from "../shared/models/types/FormattedTypes";
+import { REFERRAL_CODE_LENGTH } from "../constants";
+import { CreateUserDto } from "../db/db-models";
+import { MongoDbErrorCode } from "../shared/models/enum/MongoDbErrorCode";
+import { ReferralService } from "../referral/referral.service";
 
 @Injectable()
 export class UserService {
+  private readonly logger = new Logger(UserService.name);
+
   constructor(
     private userDb: UsersDbService,
     private seasonDb: SeasonDbService,
     private userTaskDb: UsersTaskDbService,
     private taskDb: TaskDbService,
     private rankingService: RankingService,
+    private referralService: ReferralService,
   ) {}
 
-  getUserAllSeasons(): InternalServerErrorException {
-    return new InternalServerErrorException({
+  getUserAllSeasons(): void {
+    throw new InternalServerErrorException({
       message: "Not implemented",
     });
   }
@@ -133,5 +147,58 @@ export class UserService {
     }
 
     return userTask.xpEarned.reduce((a, b) => a + Number(b.xp), 0);
+  }
+
+  async getUserReferralCode(publicAddress: string): Promise<string> {
+    const referralCode = await this.userDb.getUserReferralCode(publicAddress);
+
+    if (!referralCode) {
+      throw new NotFoundException(`User ${publicAddress} not found`);
+    }
+
+    return referralCode;
+  }
+
+  async registerUser(publicAddress: string, referralCode?: string): Promise<void> {
+    // handle referral first
+    if (referralCode) {
+      // find referrer user
+      const referrerUser = await this.userDb.getUsersByReferralCode(referralCode);
+
+      if (!referrerUser) {
+        throw new BadRequestException(`Failed to find referral user for ${referralCode} code.`);
+      }
+
+      try {
+        await this.referralService.createReferral({
+          referrerUserAddress: referrerUser.walletAddress,
+          referralCode: referralCode,
+          referredUserAddress: publicAddress,
+        });
+      } catch {
+        throw new InternalServerErrorException("Failed to create referral");
+      }
+    }
+
+    try {
+      const createUserDto: CreateUserDto = {
+        walletAddress: publicAddress,
+        seasons: [],
+        referralCode: this.generateReferralCode(publicAddress),
+      };
+
+      await this.userDb.createUser(createUserDto);
+    } catch (e) {
+      if (e?.code === MongoDbErrorCode.DUPLICATE) {
+        throw new BadRequestException("User already exists");
+      }
+
+      this.logger.error(`Failed to register user: ${JSON.stringify(e, null, 2)}`);
+      throw new InternalServerErrorException(`Failed to save user`);
+    }
+  }
+
+  private generateReferralCode(publicAddress: string): string {
+    return `${sha3_256(publicAddress.toLowerCase()).slice(0, REFERRAL_CODE_LENGTH)}`;
   }
 }

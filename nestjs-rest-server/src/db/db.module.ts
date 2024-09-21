@@ -9,6 +9,8 @@ import { SeasonDbService } from "./services/users-db/season-db.service";
 import { TaskDbService } from "./services/users-db/task-db.service";
 import { UsersTaskDbService } from "./services/users-db/user-task-db.service";
 import { UsersDbService } from "./services/users-db/users-db.service";
+import { ReferralDbService } from "./services/users-db/referral-db.service";
+import { Referral, ReferralSchema } from "./schemas/Referral.schema";
 
 @Module({
   imports: [
@@ -30,9 +32,13 @@ import { UsersDbService } from "./services/users-db/users-db.service";
         name: Task.name,
         schema: TaskSchema,
       },
+      {
+        name: Referral.name,
+        schema: ReferralSchema,
+      },
     ]),
   ],
-  providers: [SeasonDbService, TaskDbService, UsersTaskDbService, UsersDbService],
-  exports: [SeasonDbService, TaskDbService, UsersTaskDbService, UsersDbService],
+  providers: [SeasonDbService, TaskDbService, UsersTaskDbService, UsersDbService, ReferralDbService],
+  exports: [SeasonDbService, TaskDbService, UsersTaskDbService, UsersDbService, ReferralDbService],
 })
 export class DbModule {}

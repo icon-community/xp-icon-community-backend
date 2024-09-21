@@ -1,6 +1,7 @@
 import { Prop, Schema, SchemaFactory } from "@nestjs/mongoose";
 import { HydratedDocument, SchemaTypes, Types } from "mongoose";
 import { Collections } from "../../shared/models/enum/Collections";
+import { REFERRAL_CODE_LENGTH } from "../../constants";
 
 @Schema({
   _id: false,
@@ -14,10 +15,10 @@ export class UserSeason {
   seasonId: Types.ObjectId;
 
   @Prop({
-    type: Number,
+    type: () => Date,
     required: true,
   })
-  registrationBlock: number;
+  registrationDate: Date;
 }
 
 export type UserSeasonDocument = HydratedDocument<UserSeason>;
@@ -42,22 +43,17 @@ export class User {
   walletAddress: string;
 
   @Prop({
-    type: Number,
-    default: 0,
-  })
-  dailyCheckInStreak: number;
-
-  @Prop({
     type: [UserSeasonSchema],
     default: [],
   })
   seasons: UserSeason[];
 
   @Prop({
-    type: Number,
-    required: true,
+    isRequired: true,
+    immutable: true,
+    maxlength: REFERRAL_CODE_LENGTH,
   })
-  updatedAtBlock: number;
+  referralCode: string;
 }
 
 export type UserDocument = HydratedDocument<User>;

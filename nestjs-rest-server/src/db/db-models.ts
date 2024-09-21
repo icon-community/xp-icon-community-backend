@@ -11,10 +11,9 @@ export class UserSeasonDto {
 
 export class CreateUserDto {
   constructor(
-    public walletAddress: string,
-    public registrationBlock: number,
-    public updatedAtBlock: number,
-    public seasons: UserSeasonDto[],
+    public readonly walletAddress: string,
+    public readonly seasons: UserSeasonDto[],
+    public readonly referralCode: string,
   ) {}
 }
 
