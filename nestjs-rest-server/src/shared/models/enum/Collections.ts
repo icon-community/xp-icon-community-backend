@@ -4,4 +4,5 @@ export enum Collections {
   TASKS = "tasks",
   SEASONS = "seasons",
   USER_TASKS = "user_tasks",
+  REFERRALS = "referrals",
 }

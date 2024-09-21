@@ -12,6 +12,7 @@ import { XpgoConfigModule } from "./config/xpgo-config.module";
 import { IconEoaAddressValidationPipe } from "./shared/pipes/icon-eoa-address-validation-pipe.service";
 import { MongooseModule } from "@nestjs/mongoose";
 import { XpgoConfigService } from "./config/xpgo-config.service";
+import { ReferralModule } from "./referral/referral.module";
 
 @Module({
   imports: [
@@ -32,6 +33,7 @@ import { XpgoConfigService } from "./config/xpgo-config.service";
     XpgoConfigModule,
     ChainConnectorsModule,
     RankingModule,
+    ReferralModule,
   ],
   controllers: [AppController],
   providers: [AppService, Logger, ValidationPipe, IconEoaAddressValidationPipe],
