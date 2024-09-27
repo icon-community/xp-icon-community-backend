@@ -16,6 +16,7 @@ import { TaskDbService } from "../db/services/users-db/task-db.service";
 import {
   formatSeasonDocument,
   formatTaskDocument,
+  formatUser,
   formatUserDocument,
   formatUserTaskDocument,
 } from "../shared/utils/mapper";
@@ -26,6 +27,8 @@ import { REFERRAL_CODE_LENGTH } from "../constants";
 import { CreateUserDto } from "../db/db-models";
 import { MongoDbErrorCode } from "../shared/models/enum/MongoDbErrorCode";
 import { ReferralService } from "../referral/referral.service";
+import { UserDto } from "./dto/user.dto";
+import { UserErrorCodes } from "./error/user-error-codes";
 
 @Injectable()
 export class UserService {
@@ -40,10 +43,14 @@ export class UserService {
     private referralService: ReferralService,
   ) {}
 
-  getUserAllSeasons(): void {
-    throw new InternalServerErrorException({
-      message: "Not implemented",
-    });
+  async getUser(address: string): Promise<UserDto> {
+    const user = await this.userDb.getUserByAddress(address);
+
+    if (!user) {
+      throw new NotFoundException(UserErrorCodes.USER_NOT_FOUND);
+    }
+
+    return formatUser(user);
   }
 
   async getUserBySeason(userWallet: string, seasonLabel: SeasonLabel): Promise<FormattedUserSeason> {
@@ -57,7 +64,7 @@ export class UserService {
     const formattedUser = formatUserDocument(user);
 
     if (!user) {
-      throw new Error("User not found");
+      throw new Error(UserErrorCodes.USER_NOT_FOUND);
     }
 
     const season = await this.seasonDb.getSeasonByNumberId(seasonDbLabel);
@@ -153,7 +160,7 @@ export class UserService {
     const referralCode = await this.userDb.getUserReferralCode(publicAddress);
 
     if (!referralCode) {
-      throw new NotFoundException(`User ${publicAddress} not found`);
+      throw new NotFoundException(UserErrorCodes.USER_NOT_FOUND);
     }
 
     return referralCode;
@@ -190,11 +197,11 @@ export class UserService {
       await this.userDb.createUser(createUserDto);
     } catch (e) {
       if (e?.code === MongoDbErrorCode.DUPLICATE) {
-        throw new BadRequestException("User already exists");
+        throw new BadRequestException(UserErrorCodes.USER_ALREADY_EXISTS);
       }
 
       this.logger.error(`Failed to register user: ${JSON.stringify(e, null, 2)}`);
-      throw new InternalServerErrorException(`Failed to save user`);
+      throw new InternalServerErrorException(UserErrorCodes.REGISTRATION_FAILED);
     }
   }
 
