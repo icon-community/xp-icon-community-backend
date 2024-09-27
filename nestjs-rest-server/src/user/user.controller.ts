@@ -1,4 +1,13 @@
-import { Controller, Get, Param, InternalServerErrorException, UseGuards, Post, UsePipes } from "@nestjs/common";
+import {
+  Controller,
+  Get,
+  InternalServerErrorException,
+  Param,
+  Post,
+  UnauthorizedException,
+  UseGuards,
+  UsePipes,
+} from "@nestjs/common";
 import { UserService } from "./user.service";
 import { SeasonLabel } from "../shared/models/enum/SeasonLabel";
 import { UserAddress } from "./decorator/user.decorators";
@@ -7,6 +16,7 @@ import { ReferralCodeDto } from "./dto/referral-code.dto";
 import { ApiHeader, ApiParam } from "@nestjs/swagger";
 import { FormattedUserSeason } from "../shared/models/types/FormattedTypes";
 import { ValidationPipe } from "../shared/pipes/validation.pipe";
+import { UserDto } from "./dto/user.dto";
 
 @Controller("user")
 export class UserController {
@@ -30,8 +40,22 @@ export class UserController {
   }
 
   @Get(":address")
-  getUserAllSeasons(): void {
-    return this.userService.getUserAllSeasons();
+  @UseGuards(JwtAuthGuard)
+  @ApiHeader({
+    name: "authorization",
+    description: "JWT Authorization header. E.g. 'Bearer {Token}'",
+  })
+  async getUser(@UserAddress() publicAddress: string, @Param("address") address: string): Promise<UserDto> {
+    if (publicAddress != address) {
+      throw new UnauthorizedException(`Unauthorized to query user ${address} data`);
+    }
+
+    try {
+      return await this.userService.getUser(publicAddress);
+    } catch (e) {
+      console.error(e);
+      throw new InternalServerErrorException(e.message);
+    }
   }
 
   @Get("/:userWallet/season/:season")

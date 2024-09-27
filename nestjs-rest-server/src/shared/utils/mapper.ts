@@ -9,6 +9,14 @@ import {
 import { UserTaskDocument, XpEarned } from "../../db/schemas/UserTask.schema";
 import { UserDocument } from "../../db/schemas/User.schema";
 import { SeasonsDocument } from "../../db/schemas/Seasons.schema";
+import { UserDto } from "../../user/dto/user.dto";
+
+export function formatUser(user: UserDocument): UserDto {
+  return {
+    seasons: user.seasons,
+    referralCode: user.referralCode,
+  };
+}
 
 export function formatTaskDocument(task: TaskDocument | null | undefined): FormattedTask | null | undefined {
   if (!task) return task;
