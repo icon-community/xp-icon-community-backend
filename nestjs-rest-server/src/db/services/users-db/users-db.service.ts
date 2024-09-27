@@ -46,12 +46,17 @@ export class UsersDbService {
   }
 
   async getUsersByReferralCode(referralCode: string): Promise<User | null> {
-    return this.userModel
-      .findOne({
-        referralCode: referralCode,
-      })
-      .lean()
-      .exec();
+    try {
+      return await this.userModel
+        .findOne({
+          referralCode: referralCode,
+        })
+        .lean()
+        .exec();
+    } catch (e) {
+      this.logger.error(e);
+      throw e;
+    }
   }
 
   async getUserReferralCode(address: string): Promise<string | undefined> {

@@ -169,19 +169,8 @@ export class UserService {
   async registerUser(publicAddress: string, referralCode?: string): Promise<void> {
     // handle referral first
     if (referralCode) {
-      // find referrer user
-      const referrerUser = await this.userDb.getUsersByReferralCode(referralCode);
-
-      if (!referrerUser) {
-        throw new BadRequestException(`Failed to find referral user for ${referralCode} code.`);
-      }
-
       try {
-        await this.referralService.createReferral({
-          referrerUserAddress: referrerUser.walletAddress,
-          referralCode: referralCode,
-          referredUserAddress: publicAddress,
-        });
+        await this.referralService.createUserReferral(referralCode, publicAddress);
       } catch {
         throw new InternalServerErrorException("Failed to create referral");
       }
