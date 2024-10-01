@@ -54,6 +54,9 @@ export class User {
     maxlength: REFERRAL_CODE_LENGTH,
   })
   referralCode: string;
+
+  createdAt: Date;
+  updatedAt: Date;
 }
 
 export type UserDocument = HydratedDocument<User>;

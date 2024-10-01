@@ -10,14 +10,13 @@ import {
 } from "@nestjs/common";
 import { ReferralService } from "./referral.service";
 import { Referral } from "../db/schemas/Referral.schema";
-import { Collections } from "../shared/models/enum/Collections";
 import { IconEoaAddressValidationPipe } from "../shared/pipes/icon-eoa-address-validation-pipe.service";
 import { FindUserReferralsQueryDTO } from "./dto/FindUserReferralsQueryDTO";
 import { UserAddress } from "../user/decorator/user.decorators";
 import { JwtAuthGuard } from "../auth/guards/jwt-auth.guard";
 import { ApiHeader } from "@nestjs/swagger";
 
-@Controller(Collections.REFERRALS)
+@Controller("referral")
 export class ReferralController {
   constructor(private readonly referralService: ReferralService) {}
 

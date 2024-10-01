@@ -7,14 +7,24 @@ import {
   FormattedXpEarned,
 } from "../models/types/FormattedTypes";
 import { UserTaskDocument, XpEarned } from "../../db/schemas/UserTask.schema";
-import { UserDocument } from "../../db/schemas/User.schema";
+import { UserDocument, UserSeason } from "../../db/schemas/User.schema";
 import { SeasonsDocument } from "../../db/schemas/Seasons.schema";
-import { UserDto } from "../../user/dto/user.dto";
+import { UserSeasonResDto } from "../../user/dto/user-season-res.dto";
+import { UserResDto } from "../../user/dto/user-res.dto";
 
-export function formatUser(user: UserDocument): UserDto {
+export function formatUserSeason(value: UserSeason): UserSeasonResDto {
   return {
-    seasons: user.seasons,
+    seasonId: value.seasonId.toString(),
+    registrationDate: value.registrationDate,
+  };
+}
+
+export function formatUser(user: UserDocument): UserResDto {
+  return {
+    seasons: user.seasons.map((v) => formatUserSeason(v)),
     referralCode: user.referralCode,
+    createdAt: user.createdAt.getTime(),
+    walletAddress: user.walletAddress,
   };
 }
 

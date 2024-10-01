@@ -11,11 +11,9 @@ export class UsersDbService {
 
   constructor(@InjectModel(User.name) private userModel: Model<User>) {}
 
-  async createUser(user: CreateUserDto): Promise<boolean> {
+  async createUser(user: CreateUserDto): Promise<UserDocument> {
     try {
-      const createdUser: UserDocument = await new this.userModel(user).save();
-
-      return createdUser != null;
+      return await new this.userModel(user).save();
     } catch (e) {
       if (e.code != MongoDbErrorCode.DUPLICATE) {
         this.logger.error(`Failed to save new user equity.. Error: ${JSON.stringify(e, null, 2)}`);

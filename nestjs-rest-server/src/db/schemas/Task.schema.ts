@@ -54,6 +54,8 @@ export class Task {
     required: true,
   })
   chain: Chains;
+
+  createdAt: Date;
 }
 
 export type TaskDocument = HydratedDocument<Task>;
