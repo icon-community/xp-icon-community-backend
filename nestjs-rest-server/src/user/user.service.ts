@@ -27,8 +27,8 @@ import { REFERRAL_CODE_LENGTH } from "../constants";
 import { CreateUserDto } from "../db/db-models";
 import { MongoDbErrorCode } from "../shared/models/enum/MongoDbErrorCode";
 import { ReferralService } from "../referral/referral.service";
-import { UserDto } from "./dto/user.dto";
 import { UserErrorCodes } from "./error/user-error-codes";
+import { UserResDto } from "./dto/user-res.dto";
 
 @Injectable()
 export class UserService {
@@ -43,7 +43,7 @@ export class UserService {
     private referralService: ReferralService,
   ) {}
 
-  async getUser(address: string): Promise<UserDto> {
+  async getUser(address: string): Promise<UserResDto> {
     const user = await this.userDb.getUserByAddress(address);
 
     if (!user) {
@@ -166,7 +166,7 @@ export class UserService {
     return referralCode;
   }
 
-  async registerUser(publicAddress: string, referralCode?: string): Promise<void> {
+  async registerUser(publicAddress: string, referralCode?: string): Promise<UserResDto> {
     // handle referral first
     if (referralCode) {
       try {
@@ -183,7 +183,7 @@ export class UserService {
         referralCode: this.generateReferralCode(publicAddress),
       };
 
-      await this.userDb.createUser(createUserDto);
+      return formatUser(await this.userDb.createUser(createUserDto));
     } catch (e) {
       if (e?.code === MongoDbErrorCode.DUPLICATE) {
         throw new BadRequestException(UserErrorCodes.USER_ALREADY_EXISTS);

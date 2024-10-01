@@ -76,6 +76,8 @@ export class UserTask {
     required: true,
   })
   updatedAtBlock: number;
+
+  createdAt: Date;
 }
 
 export type UserTaskQuery = {
