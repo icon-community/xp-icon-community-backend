@@ -25,6 +25,14 @@ export function formatUser(user: UserDocument): UserResDto {
     referralCode: user.referralCode,
     createdAt: user.createdAt.getTime(),
     walletAddress: user.walletAddress,
+    linkedSocials: user.linkedSocials.map((v) => {
+      return {
+        provider: v.provider,
+        name: v.name,
+        email: v.email,
+        imageUrl: v.imageUrl,
+      };
+    }),
   };
 }
 

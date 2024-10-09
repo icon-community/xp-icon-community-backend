@@ -29,6 +29,7 @@ import { MongoDbErrorCode } from "../shared/models/enum/MongoDbErrorCode";
 import { ReferralService } from "../referral/referral.service";
 import { UserErrorCodes } from "./error/user-error-codes";
 import { UserResDto } from "./dto/user-res.dto";
+import { LinkSocialDataDto } from "./dto/link-social-data.dto";
 
 @Injectable()
 export class UserService {
@@ -51,6 +52,24 @@ export class UserService {
     }
 
     return formatUser(user);
+  }
+
+  async linkUserSocial(socialData: LinkSocialDataDto, address: string): Promise<UserResDto> {
+    try {
+      const updatedUser = await this.userDb.linkUserSocial(socialData, address);
+
+      if (!updatedUser) {
+        throw new BadRequestException("User not found or social already linked");
+      }
+
+      return formatUser(updatedUser);
+    } catch (e: unknown) {
+      if (e instanceof BadRequestException) {
+        throw e;
+      } else {
+        throw new InternalServerErrorException("Failed to link user social");
+      }
+    }
   }
 
   async getUserBySeason(userWallet: string, seasonLabel: SeasonLabel): Promise<FormattedUserSeason> {
