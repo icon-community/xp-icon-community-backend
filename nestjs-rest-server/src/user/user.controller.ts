@@ -1,4 +1,5 @@
 import {
+  Body,
   Controller,
   Get,
   InternalServerErrorException,
@@ -19,6 +20,7 @@ import { ApiHeader, ApiQuery } from "@nestjs/swagger";
 import { FormattedUserSeason } from "../shared/models/types/FormattedTypes";
 import { ValidationPipe } from "../shared/pipes/validation.pipe";
 import { UserResDto } from "./dto/user-res.dto";
+import { LinkSocialDataDto } from "./dto/link-social-data.dto";
 
 @Controller("user")
 export class UserController {
@@ -42,6 +44,17 @@ export class UserController {
     @Query("referralCode") referralCode?: string,
   ): Promise<UserResDto> {
     return this.userService.registerUser(publicAddress.toLowerCase(), referralCode);
+  }
+
+  @Post("/link-social")
+  @UseGuards(JwtAuthGuard)
+  @ApiHeader({
+    name: "authorization",
+    description: "JWT Authorization header. E.g. 'Bearer {Token}'",
+  })
+  @UsePipes(new ValidationPipe())
+  linkUserSocial(@UserAddress() address: string, @Body() socialDataDto: LinkSocialDataDto): Promise<UserResDto> {
+    return this.userService.linkUserSocial(socialDataDto, address);
   }
 
   @Get(":address")

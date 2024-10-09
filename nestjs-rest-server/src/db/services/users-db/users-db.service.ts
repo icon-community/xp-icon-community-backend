@@ -4,6 +4,7 @@ import { User, UserDocument } from "../../schemas/User.schema";
 import { Model, Types } from "mongoose";
 import { CreateUserDto, UserSeasonDto } from "../../db-models";
 import { MongoDbErrorCode } from "../../../shared/models/enum/MongoDbErrorCode";
+import { LinkSocialDataDto } from "../../../user/dto/link-social-data.dto";
 
 @Injectable()
 export class UsersDbService {
@@ -19,6 +20,28 @@ export class UsersDbService {
         this.logger.error(`Failed to save new user equity.. Error: ${JSON.stringify(e, null, 2)}`);
       }
 
+      throw e;
+    }
+  }
+
+  async linkUserSocial(socialData: LinkSocialDataDto, address: string): Promise<UserDocument | null> {
+    try {
+      return this.userModel
+        .findOneAndUpdate(
+          {
+            walletAddress: address.toLowerCase(),
+            linkedSocials: {
+              $not: { $elemMatch: { provider: socialData.provider, providerAccountId: socialData.providerAccountId } },
+            },
+          },
+          {
+            $push: { linkedSocials: socialData }, // Action to push new item
+          },
+          { new: true }, // Return updated document
+        )
+        .exec();
+    } catch (e) {
+      this.logger.error(e);
       throw e;
     }
   }

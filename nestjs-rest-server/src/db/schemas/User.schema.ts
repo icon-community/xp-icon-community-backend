@@ -6,6 +6,45 @@ import { REFERRAL_CODE_LENGTH } from "../../constants";
 @Schema({
   _id: false,
 })
+export class SocialData {
+  @Prop({
+    type: String,
+    isRequired: true,
+  })
+  provider: string;
+
+  @Prop({
+    type: String,
+    isRequired: true,
+    unique: true,
+  })
+  providerAccountId: string;
+
+  @Prop({
+    type: String,
+    isRequired: false,
+  })
+  name: string | null | undefined;
+
+  @Prop({
+    type: String,
+    isRequired: false,
+  })
+  email: string | null | undefined;
+
+  @Prop({
+    type: String,
+    isRequired: false,
+  })
+  imageUrl: string | null | undefined;
+}
+
+export type SocialDataDocument = HydratedDocument<SocialData>;
+export const SocialDataSchema = SchemaFactory.createForClass(SocialData);
+
+@Schema({
+  _id: false,
+})
 export class UserSeason {
   @Prop({
     type: SchemaTypes.ObjectId,
@@ -54,6 +93,12 @@ export class User {
     maxlength: REFERRAL_CODE_LENGTH,
   })
   referralCode: string;
+
+  @Prop({
+    type: [SocialDataSchema],
+    default: [],
+  })
+  linkedSocials: SocialData[];
 
   createdAt: Date;
   updatedAt: Date;
