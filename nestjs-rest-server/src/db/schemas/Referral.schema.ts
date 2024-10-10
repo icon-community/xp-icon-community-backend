@@ -31,6 +31,8 @@ export class Referral {
     index: true,
   })
   referralCode: string;
+
+  createdAt: Date;
 }
 
 export type ReferralDocument = HydratedDocument<Referral>;

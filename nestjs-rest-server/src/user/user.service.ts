@@ -16,6 +16,7 @@ import { TaskDbService } from "../db/services/users-db/task-db.service";
 import {
   formatSeasonDocument,
   formatTaskDocument,
+  formatUser,
   formatUserDocument,
   formatUserTaskDocument,
 } from "../shared/utils/mapper";
@@ -26,6 +27,9 @@ import { REFERRAL_CODE_LENGTH } from "../constants";
 import { CreateUserDto } from "../db/db-models";
 import { MongoDbErrorCode } from "../shared/models/enum/MongoDbErrorCode";
 import { ReferralService } from "../referral/referral.service";
+import { UserErrorCodes } from "./error/user-error-codes";
+import { UserResDto } from "./dto/user-res.dto";
+import { LinkSocialDataDto } from "./dto/link-social-data.dto";
 
 @Injectable()
 export class UserService {
@@ -40,10 +44,32 @@ export class UserService {
     private referralService: ReferralService,
   ) {}
 
-  getUserAllSeasons(): void {
-    throw new InternalServerErrorException({
-      message: "Not implemented",
-    });
+  async getUser(address: string): Promise<UserResDto> {
+    const user = await this.userDb.getUserByAddress(address);
+
+    if (!user) {
+      throw new NotFoundException(UserErrorCodes.USER_NOT_FOUND);
+    }
+
+    return formatUser(user);
+  }
+
+  async linkUserSocial(socialData: LinkSocialDataDto, address: string): Promise<UserResDto> {
+    try {
+      const updatedUser = await this.userDb.linkUserSocial(socialData, address);
+
+      if (!updatedUser) {
+        throw new BadRequestException("User not found or social already linked");
+      }
+
+      return formatUser(updatedUser);
+    } catch (e: unknown) {
+      if (e instanceof BadRequestException) {
+        throw e;
+      } else {
+        throw new InternalServerErrorException("Failed to link user social");
+      }
+    }
   }
 
   async getUserBySeason(userWallet: string, seasonLabel: SeasonLabel): Promise<FormattedUserSeason> {
@@ -57,7 +83,7 @@ export class UserService {
     const formattedUser = formatUserDocument(user);
 
     if (!user) {
-      throw new Error("User not found");
+      throw new Error(UserErrorCodes.USER_NOT_FOUND);
     }
 
     const season = await this.seasonDb.getSeasonByNumberId(seasonDbLabel);
@@ -153,28 +179,17 @@ export class UserService {
     const referralCode = await this.userDb.getUserReferralCode(publicAddress);
 
     if (!referralCode) {
-      throw new NotFoundException(`User ${publicAddress} not found`);
+      throw new NotFoundException(UserErrorCodes.USER_NOT_FOUND);
     }
 
     return referralCode;
   }
 
-  async registerUser(publicAddress: string, referralCode?: string): Promise<void> {
+  async registerUser(publicAddress: string, referralCode?: string): Promise<UserResDto> {
     // handle referral first
     if (referralCode) {
-      // find referrer user
-      const referrerUser = await this.userDb.getUsersByReferralCode(referralCode);
-
-      if (!referrerUser) {
-        throw new BadRequestException(`Failed to find referral user for ${referralCode} code.`);
-      }
-
       try {
-        await this.referralService.createReferral({
-          referrerUserAddress: referrerUser.walletAddress,
-          referralCode: referralCode,
-          referredUserAddress: publicAddress,
-        });
+        await this.referralService.createUserReferral(referralCode, publicAddress);
       } catch {
         throw new InternalServerErrorException("Failed to create referral");
       }
@@ -187,14 +202,14 @@ export class UserService {
         referralCode: this.generateReferralCode(publicAddress),
       };
 
-      await this.userDb.createUser(createUserDto);
+      return formatUser(await this.userDb.createUser(createUserDto));
     } catch (e) {
       if (e?.code === MongoDbErrorCode.DUPLICATE) {
-        throw new BadRequestException("User already exists");
+        throw new BadRequestException(UserErrorCodes.USER_ALREADY_EXISTS);
       }
 
       this.logger.error(`Failed to register user: ${JSON.stringify(e, null, 2)}`);
-      throw new InternalServerErrorException(`Failed to save user`);
+      throw new InternalServerErrorException(UserErrorCodes.REGISTRATION_FAILED);
     }
   }
 

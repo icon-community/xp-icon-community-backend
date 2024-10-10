@@ -7,8 +7,34 @@ import {
   FormattedXpEarned,
 } from "../models/types/FormattedTypes";
 import { UserTaskDocument, XpEarned } from "../../db/schemas/UserTask.schema";
-import { UserDocument } from "../../db/schemas/User.schema";
+import { UserDocument, UserSeason } from "../../db/schemas/User.schema";
 import { SeasonsDocument } from "../../db/schemas/Seasons.schema";
+import { UserSeasonResDto } from "../../user/dto/user-season-res.dto";
+import { UserResDto } from "../../user/dto/user-res.dto";
+
+export function formatUserSeason(value: UserSeason): UserSeasonResDto {
+  return {
+    seasonId: value.seasonId.toString(),
+    registrationDate: value.registrationDate,
+  };
+}
+
+export function formatUser(user: UserDocument): UserResDto {
+  return {
+    seasons: user.seasons.map((v) => formatUserSeason(v)),
+    referralCode: user.referralCode,
+    createdAt: user.createdAt.getTime(),
+    walletAddress: user.walletAddress,
+    linkedSocials: user.linkedSocials.map((v) => {
+      return {
+        provider: v.provider,
+        name: v.name,
+        email: v.email,
+        imageUrl: v.imageUrl,
+      };
+    }),
+  };
+}
 
 export function formatTaskDocument(task: TaskDocument | null | undefined): FormattedTask | null | undefined {
   if (!task) return task;

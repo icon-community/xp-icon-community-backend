@@ -4,6 +4,7 @@ import { User, UserDocument } from "../../schemas/User.schema";
 import { Model, Types } from "mongoose";
 import { CreateUserDto, UserSeasonDto } from "../../db-models";
 import { MongoDbErrorCode } from "../../../shared/models/enum/MongoDbErrorCode";
+import { LinkSocialDataDto } from "../../../user/dto/link-social-data.dto";
 
 @Injectable()
 export class UsersDbService {
@@ -11,16 +12,36 @@ export class UsersDbService {
 
   constructor(@InjectModel(User.name) private userModel: Model<User>) {}
 
-  async createUser(user: CreateUserDto): Promise<boolean> {
+  async createUser(user: CreateUserDto): Promise<UserDocument> {
     try {
-      const createdUser: UserDocument = await new this.userModel(user).save();
-
-      return createdUser != null;
+      return await new this.userModel(user).save();
     } catch (e) {
       if (e.code != MongoDbErrorCode.DUPLICATE) {
         this.logger.error(`Failed to save new user equity.. Error: ${JSON.stringify(e, null, 2)}`);
       }
 
+      throw e;
+    }
+  }
+
+  async linkUserSocial(socialData: LinkSocialDataDto, address: string): Promise<UserDocument | null> {
+    try {
+      return this.userModel
+        .findOneAndUpdate(
+          {
+            walletAddress: address.toLowerCase(),
+            linkedSocials: {
+              $not: { $elemMatch: { provider: socialData.provider, providerAccountId: socialData.providerAccountId } },
+            },
+          },
+          {
+            $push: { linkedSocials: socialData }, // Action to push new item
+          },
+          { new: true }, // Return updated document
+        )
+        .exec();
+    } catch (e) {
+      this.logger.error(e);
       throw e;
     }
   }
@@ -46,12 +67,17 @@ export class UsersDbService {
   }
 
   async getUsersByReferralCode(referralCode: string): Promise<User | null> {
-    return this.userModel
-      .findOne({
-        referralCode: referralCode,
-      })
-      .lean()
-      .exec();
+    try {
+      return await this.userModel
+        .findOne({
+          referralCode: referralCode,
+        })
+        .lean()
+        .exec();
+    } catch (e) {
+      this.logger.error(e);
+      throw e;
+    }
   }
 
   async getUserReferralCode(address: string): Promise<string | undefined> {

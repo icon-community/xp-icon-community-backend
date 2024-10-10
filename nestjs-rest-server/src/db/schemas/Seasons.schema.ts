@@ -56,6 +56,9 @@ export class Season {
     ref: Collections.TASKS,
   })
   tasks: Types.ObjectId[];
+
+  createdAt: Date;
+  updatedAt: Date;
 }
 
 export type SeasonsDocument = HydratedDocument<Season>;

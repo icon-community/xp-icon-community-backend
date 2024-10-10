@@ -1,12 +1,26 @@
-import { Controller, Get, Param, InternalServerErrorException, UseGuards, Post, UsePipes } from "@nestjs/common";
+import {
+  Body,
+  Controller,
+  Get,
+  InternalServerErrorException,
+  NotFoundException,
+  Param,
+  Post,
+  Query,
+  UnauthorizedException,
+  UseGuards,
+  UsePipes,
+} from "@nestjs/common";
 import { UserService } from "./user.service";
 import { SeasonLabel } from "../shared/models/enum/SeasonLabel";
 import { UserAddress } from "./decorator/user.decorators";
 import { JwtAuthGuard } from "../auth/guards/jwt-auth.guard";
 import { ReferralCodeDto } from "./dto/referral-code.dto";
-import { ApiHeader, ApiParam } from "@nestjs/swagger";
+import { ApiHeader, ApiQuery } from "@nestjs/swagger";
 import { FormattedUserSeason } from "../shared/models/types/FormattedTypes";
 import { ValidationPipe } from "../shared/pipes/validation.pipe";
+import { UserResDto } from "./dto/user-res.dto";
+import { LinkSocialDataDto } from "./dto/link-social-data.dto";
 
 @Controller("user")
 export class UserController {
@@ -18,20 +32,52 @@ export class UserController {
     name: "authorization",
     description: "JWT Authorization header. E.g. 'Bearer {Token}'",
   })
-  @ApiParam({
+  @ApiQuery({
     name: "referralCode",
     type: String,
     description: "Optional referral code",
     required: false,
   })
   @UsePipes(new ValidationPipe())
-  async register(@UserAddress() publicAddress: string, @Param("referralCode") referralCode?: string): Promise<void> {
+  async register(
+    @UserAddress() publicAddress: string,
+    @Query("referralCode") referralCode?: string,
+  ): Promise<UserResDto> {
     return this.userService.registerUser(publicAddress.toLowerCase(), referralCode);
   }
 
+  @Post("/link-social")
+  @UseGuards(JwtAuthGuard)
+  @ApiHeader({
+    name: "authorization",
+    description: "JWT Authorization header. E.g. 'Bearer {Token}'",
+  })
+  @UsePipes(new ValidationPipe())
+  linkUserSocial(@UserAddress() address: string, @Body() socialDataDto: LinkSocialDataDto): Promise<UserResDto> {
+    return this.userService.linkUserSocial(socialDataDto, address);
+  }
+
   @Get(":address")
-  getUserAllSeasons(): void {
-    return this.userService.getUserAllSeasons();
+  @UseGuards(JwtAuthGuard)
+  @ApiHeader({
+    name: "authorization",
+    description: "JWT Authorization header. E.g. 'Bearer {Token}'",
+  })
+  async getUser(@UserAddress() publicAddress: string, @Param("address") address: string): Promise<UserResDto> {
+    if (publicAddress != address) {
+      throw new UnauthorizedException(`Unauthorized to query user ${address} data`);
+    }
+
+    try {
+      return await this.userService.getUser(publicAddress);
+    } catch (e) {
+      if (e instanceof NotFoundException) {
+        throw e;
+      } else {
+        console.error(e);
+        throw new InternalServerErrorException(e.message);
+      }
+    }
   }
 
   @Get("/:userWallet/season/:season")
