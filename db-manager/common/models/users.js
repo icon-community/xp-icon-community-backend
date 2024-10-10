@@ -26,6 +26,17 @@ const season = new Schema({
 });
 
 /*
+ * linked wallet schema
+ */
+const linkedWallet = new Schema({
+  address: {
+    type: String,
+    unique: true,
+    required: [true, "Please specify field"],
+  },
+});
+
+/*
  * User schema
  */
 const userSchema = new Schema({
@@ -34,6 +45,10 @@ const userSchema = new Schema({
     unique: true,
     index: true,
     required: [true, "Please specify field"],
+  },
+  linkedWallets: {
+    type: [linkedWallet],
+    default: [],
   },
   // registrationBlock: {
   //   type: Number,

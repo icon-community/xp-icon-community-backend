@@ -3,6 +3,19 @@ require("dotenv").config();
 const SELECTED_CHAIN =
   process.env.CHAIN == null ? "mainnet" : process.env.CHAIN;
 const config = {
+  tokens: {
+    avax: "AVAX",
+    bnb: "BNB",
+    btc: "BTC",
+    btcb: "BTCB",
+    eth: "ETH",
+    inj: "INJ",
+    sicx: "sICX",
+    tbtc: "tBTC",
+    weeth: "weETH",
+    wsteth: "wstETH",
+    bnusd: "bnUSD",
+  },
   seeds: {
     seasons: "db-manager/data/seasons-seed.json",
     tasks: "db-manager/data/tasks-seed.json",
