@@ -130,8 +130,13 @@ async function getDataFromStandings(wallet, token, data, height) {
   }
 }
 
-async function getTotalDebtInUSDValue(wallet, height) {
+async function getTotalDebtInUSDValue(userObject, height) {
+  let wallet = userObject.walletAddress;
   try {
+    if (wallet == null) {
+      throw new Error("null wallet");
+    }
+
     const position = await getAccountPositions(wallet, height);
 
     const tokens = Object.keys(position.standings);
@@ -144,7 +149,7 @@ async function getTotalDebtInUSDValue(wallet, height) {
 
     return totalDebt;
   } catch (err) {
-    console.log(`Error getting total debt value in USD for ${wallet}`);
+    console.log(`Error getting total debt value in USD for wallet ${wallet}`);
     console.log(err.message);
     const str = [
       "does not have a position in Balanced",
@@ -159,15 +164,31 @@ async function getTotalDebtInUSDValue(wallet, height) {
   }
 }
 
+async function getXChainDebtInUSDValue(userObject, height) {
+  const wallet = userObject.walletAddress;
+  void height, wallet;
+  return null;
+  // return getDataFromStandings(wallet, "bnUSD", "total_debt_in_USD", height);
+}
+
+async function getXChainCollateralInUSDValue(userObject, height) {
+  const wallet = userObject.walletAddress;
+  void height, wallet;
+  return null;
+  // return getDataFromStandings(wallet, "bnUSD", "collateral_in_USD", height);
+}
+
 async function getSicxDebtInUSDValue(wallet, height) {
   return getDataFromStandings(wallet, "sICX", "total_debt_in_USD", height);
 }
 
-async function getAVAXCollateralInUSDValue(wallet, height) {
+async function getAVAXCollateralInUSDValue(userObject, height) {
+  const wallet = userObject.walletAddress;
   return getDataFromStandings(wallet, "AVAX", "collateral_in_USD", height);
 }
 
-async function getSICXCollateralInUSDValue(wallet, height) {
+async function getSICXCollateralInUSDValue(userObject, height) {
+  const wallet = userObject.walletAddress;
   return getDataFromStandings(wallet, "sICX", "collateral_in_USD", height);
 }
 
@@ -198,11 +219,10 @@ async function getLockedAmount(
   }
 }
 
-async function getLockedAmountAsDecimal(user, height) {
+async function getLockedAmountAsDecimal(userObject, height) {
   try {
-    const response = await getLockedAmount(user, height);
-    // console.log("response");
-    // console.log(response);
+    const wallet = userObject.walletAddress;
+    const response = await getLockedAmount(wallet, height);
     return parseInt(response, 16) / 10 ** 18;
   } catch (err) {
     console.log("Error getting locked amount in USD value");
@@ -285,4 +305,6 @@ module.exports = {
   getTotalDebtInUSDValue,
   getUserRegistrationBlock,
   getUsersList,
+  getXChainCollateralInUSDValue,
+  getXChainDebtInUSDValue,
 };

@@ -175,7 +175,8 @@ async function genericTask(taskInput, db, seedId, callback) {
         // fetch amount for user for this current term
         console.log(`-- Fetching amount for user ${validUser.walletAddress}`);
         const callbackResponse = await callback(
-          validUser.walletAddress,
+          // validUser.walletAddress,
+          validUser,
           height,
         );
 
