@@ -108,6 +108,10 @@ function isValidHex(str) {
   return hexRegex.test(str);
 }
 
+function isXChainWallet(wallet) {
+  return wallet.includes("/");
+}
+
 function taskRunner(task, db) {
   return async (input) => await task(input, db);
 }
@@ -171,6 +175,7 @@ module.exports = {
   makeJsonRpcRequestObject,
   makeJsonRpcCall,
   isValidHex,
+  isXChainWallet,
   taskRunner,
   getInitBlock,
 };

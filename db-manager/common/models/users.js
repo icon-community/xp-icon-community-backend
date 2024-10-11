@@ -34,6 +34,11 @@ const linkedWallet = new Schema({
     unique: true,
     required: [true, "Please specify field"],
   },
+  type: {
+    type: String,
+    required: true,
+    enum: ["evm", "icon"],
+  },
 });
 
 /*
