@@ -1,0 +1,3 @@
+# TODO
+
+* (comment by fidelVe) Currently the `tasks` model have a value called `chain`. On initial design this value was meant to be used to define on the database the type of chain but currently when integrating new chains to track loans and collateral I realized that is not possible with the current design to define the chain at the moment of creating the task in the database. Due to this the value for `chain` currently should always be `icon` until the code is refactored to allow for the chain to be defined at the moment of creating the task in the database, another option is to remove the `chain` value from the database.

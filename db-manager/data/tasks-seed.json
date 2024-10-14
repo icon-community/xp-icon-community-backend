@@ -46,7 +46,7 @@
   },
   {
     "seedId": "t6",
-    "type": "onchain",
+    "type": "xchain",
     "description": "for depositing native crosschan collateral, the user will receive 1 XP per USD value of the collateral deposited that day. It will be done daily (per chain period)",
     "criteria": {},
     "title": "deposit native crosschain collateral",
@@ -55,7 +55,7 @@
   },
   {
     "seedId": "t7",
-    "type": "onchain",
+    "type": "xchain",
     "description": "for minting bnUSD crosschain, the user will receive 3 XP per bnUSD loan held per day. It will be done daily (per chain period)",
     "criteria": {},
     "title": "holding a crosschain loan",

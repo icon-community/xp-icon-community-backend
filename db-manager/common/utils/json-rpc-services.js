@@ -1,4 +1,8 @@
-const { makeJsonRpcRequestObject, makeJsonRpcCall } = require("./utils");
+const {
+  makeJsonRpcRequestObject,
+  makeJsonRpcCall,
+  isXChainWallet,
+} = require("./utils");
 const config = require("./config");
 
 async function getNetworkInfo(height = null) {
@@ -130,26 +134,22 @@ async function getDataFromStandings(wallet, token, data, height) {
   }
 }
 
-async function getTotalDebtInUSDValue(userObject, height) {
-  let wallet = userObject.walletAddress;
+async function getSumOfEntryFromStandings(wallet, entry, height) {
   try {
     if (wallet == null) {
       throw new Error("null wallet");
     }
-
     const position = await getAccountPositions(wallet, height);
 
     const tokens = Object.keys(position.standings);
-    let totalDebt = 0;
+    let sum = 0;
     for (let i = 0; i < tokens.length; i++) {
-      totalDebt +=
-        parseInt(position.standings[tokens[i]]["total_debt_in_USD"], 16) /
-        10 ** 18;
+      sum += parseInt(position.standings[tokens[i]][entry], 16) / 10 ** 18;
     }
 
-    return totalDebt;
+    return sum;
   } catch (err) {
-    console.log(`Error getting total debt value in USD for wallet ${wallet}`);
+    console.log(`Error getting sum of ${entry} for wallet ${wallet}`);
     console.log(err.message);
     const str = [
       "does not have a position in Balanced",
@@ -164,31 +164,69 @@ async function getTotalDebtInUSDValue(userObject, height) {
   }
 }
 
-async function getXChainDebtInUSDValue(userObject, height) {
-  const wallet = userObject.walletAddress;
-  void height, wallet;
-  return null;
-  // return getDataFromStandings(wallet, "bnUSD", "total_debt_in_USD", height);
+async function getTotalDebtInUSDValue(wallet, height) {
+  try {
+    return await getSumOfEntryFromStandings(
+      wallet,
+      "total_debt_in_USD",
+      height,
+    );
+  } catch (err) {
+    console.log(`Error getting total debt value in USD for wallet ${wallet}`);
+    console.log(err.message);
+    throw new Error(err.message);
+  }
 }
 
-async function getXChainCollateralInUSDValue(userObject, height) {
-  const wallet = userObject.walletAddress;
-  void height, wallet;
-  return null;
-  // return getDataFromStandings(wallet, "bnUSD", "collateral_in_USD", height);
+async function getTotalCollateralInUSDValue(wallet, height) {
+  try {
+    return await getSumOfEntryFromStandings(
+      wallet,
+      "collateral_in_USD",
+      height,
+    );
+  } catch (err) {
+    console.log(`Error getting total debt value in USD for wallet ${wallet}`);
+    console.log(err.message);
+    throw new Error(err.message);
+  }
+}
+
+async function getXChainDebtInUSDValue(wallet, height) {
+  try {
+    if (!isXChainWallet(wallet)) {
+      throw new Error("wallet is not an XChain wallet");
+    }
+    return await getTotalDebtInUSDValue(wallet, height);
+  } catch (err) {
+    console.log(`Error getting XChain debt value in USD for wallet ${wallet}`);
+    throw new Error(err.message);
+  }
+}
+
+async function getXChainCollateralInUSDValue(wallet, height) {
+  try {
+    if (!isXChainWallet(wallet)) {
+      throw new Error("wallet is not an XChain wallet");
+    }
+    return await getTotalCollateralInUSDValue(wallet, height);
+  } catch (err) {
+    console.log(
+      `Error getting XChain collateral value in USD for wallet ${wallet}`,
+    );
+    throw new Error(err.message);
+  }
 }
 
 async function getSicxDebtInUSDValue(wallet, height) {
   return getDataFromStandings(wallet, "sICX", "total_debt_in_USD", height);
 }
 
-async function getAVAXCollateralInUSDValue(userObject, height) {
-  const wallet = userObject.walletAddress;
+async function getAVAXCollateralInUSDValue(wallet, height) {
   return getDataFromStandings(wallet, "AVAX", "collateral_in_USD", height);
 }
 
-async function getSICXCollateralInUSDValue(userObject, height) {
-  const wallet = userObject.walletAddress;
+async function getSICXCollateralInUSDValue(wallet, height) {
   return getDataFromStandings(wallet, "sICX", "collateral_in_USD", height);
 }
 
@@ -219,9 +257,8 @@ async function getLockedAmount(
   }
 }
 
-async function getLockedAmountAsDecimal(userObject, height) {
+async function getLockedAmountAsDecimal(wallet, height) {
   try {
-    const wallet = userObject.walletAddress;
     const response = await getLockedAmount(wallet, height);
     return parseInt(response, 16) / 10 ** 18;
   } catch (err) {
@@ -302,6 +339,7 @@ module.exports = {
   getPRepTerm,
   getSICXCollateralInUSDValue,
   getSicxDebtInUSDValue,
+  getTotalCollateralInUSDValue,
   getTotalDebtInUSDValue,
   getUserRegistrationBlock,
   getUsersList,
