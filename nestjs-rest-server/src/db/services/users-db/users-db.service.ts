@@ -5,6 +5,8 @@ import { Model, Types } from "mongoose";
 import { CreateUserDto, UserSeasonDto } from "../../db-models";
 import { MongoDbErrorCode } from "../../../shared/models/enum/MongoDbErrorCode";
 import { LinkSocialDataDto } from "../../../user/dto/link-social-data.dto";
+import { LinkEvmWalletDto } from "../../../user/dto/link-evm-wallet.dto";
+import { MAX_LINKED_EVM_WALLETS } from "../../../constants";
 
 @Injectable()
 export class UsersDbService {
@@ -36,6 +38,29 @@ export class UsersDbService {
           },
           {
             $push: { linkedSocials: socialData }, // Action to push new item
+          },
+          { new: true }, // Return updated document
+        )
+        .exec();
+    } catch (e) {
+      this.logger.error(e);
+      throw e;
+    }
+  }
+
+  async linkUserEvmWallet(linkEvmWalletDto: LinkEvmWalletDto, address: string): Promise<UserDocument | null> {
+    try {
+      return this.userModel
+        .findOneAndUpdate(
+          {
+            walletAddress: address.toLowerCase(),
+            linkedWallets: {
+              $not: { $elemMatch: { address: linkEvmWalletDto.address, type: linkEvmWalletDto.type } },
+            },
+            $expr: { $lt: [{ $size: "$linkedWallets" }, MAX_LINKED_EVM_WALLETS] },
+          },
+          {
+            $push: { linkedWallets: linkEvmWalletDto },
           },
           { new: true }, // Return updated document
         )

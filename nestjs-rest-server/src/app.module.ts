@@ -9,7 +9,7 @@ import { RankingModule } from "./ranking/ranking.module";
 import { ChainConnectorsModule } from "./chain-connectors/chain-connectors.module";
 import { ValidationPipe } from "./shared/pipes/validation.pipe";
 import { XpgoConfigModule } from "./config/xpgo-config.module";
-import { IconEoaAddressValidationPipe } from "./shared/pipes/icon-eoa-address-validation-pipe.service";
+import { AddressValidationPipe } from "./shared/pipes/icon-eoa-address-validation-pipe.service";
 import { MongooseModule } from "@nestjs/mongoose";
 import { XpgoConfigService } from "./config/xpgo-config.service";
 import { ReferralModule } from "./referral/referral.module";
@@ -36,7 +36,7 @@ import { ReferralModule } from "./referral/referral.module";
     ReferralModule,
   ],
   controllers: [AppController],
-  providers: [AppService, Logger, ValidationPipe, IconEoaAddressValidationPipe],
+  providers: [AppService, Logger, ValidationPipe, AddressValidationPipe],
 })
 export class AppModule implements NestModule {
   configure(consumer: MiddlewareConsumer): void {

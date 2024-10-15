@@ -10,7 +10,7 @@ import { UserTaskDocument, XpEarned } from "../../db/schemas/UserTask.schema";
 import { UserDocument, UserSeason } from "../../db/schemas/User.schema";
 import { SeasonsDocument } from "../../db/schemas/Seasons.schema";
 import { UserSeasonResDto } from "../../user/dto/user-season-res.dto";
-import { UserResDto } from "../../user/dto/user-res.dto";
+import { UserResponseDto } from "../../user/dto/user-response.dto";
 
 export function formatUserSeason(value: UserSeason): UserSeasonResDto {
   return {
@@ -19,7 +19,7 @@ export function formatUserSeason(value: UserSeason): UserSeasonResDto {
   };
 }
 
-export function formatUser(user: UserDocument): UserResDto {
+export function formatUser(user: UserDocument): UserResponseDto {
   return {
     seasons: user.seasons.map((v) => formatUserSeason(v)),
     referralCode: user.referralCode,
@@ -31,6 +31,12 @@ export function formatUser(user: UserDocument): UserResDto {
         name: v.name,
         email: v.email,
         imageUrl: v.imageUrl,
+      };
+    }),
+    linkedWallets: user.linkedWallets.map((v) => {
+      return {
+        address: v.address,
+        type: v.type,
       };
     }),
   };
