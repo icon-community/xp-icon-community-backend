@@ -1,4 +1,4 @@
-import { Injectable, InternalServerErrorException } from "@nestjs/common";
+import { Injectable, InternalServerErrorException, UnauthorizedException } from "@nestjs/common";
 import { ChallengeRequestDto } from "./dto/ChallengeRequestDto";
 import { HttpService } from "@nestjs/axios";
 import { catchError, firstValueFrom } from "rxjs";
@@ -6,6 +6,7 @@ import { AxiosError } from "axios";
 import { XpgoConfigService } from "../config/xpgo-config.service";
 import { TokenDto } from "./dto/token.dto";
 import { ChallengeResponseDto } from "./dto/ChallengeResponseDto";
+import { AuthResDto } from "./dto/auth-res.dto";
 
 @Injectable()
 export class AuthService {
@@ -44,6 +45,29 @@ export class AuthService {
           }),
         ),
     );
+
+    return data;
+  }
+
+  async authenticateUser(accessToken: string): Promise<AuthResDto> {
+    const { data } = await firstValueFrom(
+      this.httpService
+        .get<AuthResDto>(`${this.config.authServerUrl}/api/auth/authenticate`, {
+          headers: {
+            Authorization: `Bearer ${accessToken}`,
+          },
+        })
+        .pipe(
+          catchError((error: AxiosError) => {
+            console.error(error?.response?.data);
+            throw new InternalServerErrorException({ error: "Failed to authenticate." });
+          }),
+        ),
+    );
+
+    if (!data.publicAddress) {
+      throw new UnauthorizedException();
+    }
 
     return data;
   }

@@ -2,6 +2,7 @@ import {
   Body,
   Controller,
   Get,
+  HttpException,
   InternalServerErrorException,
   NotFoundException,
   Param,
@@ -19,8 +20,9 @@ import { ReferralCodeDto } from "./dto/referral-code.dto";
 import { ApiHeader, ApiQuery } from "@nestjs/swagger";
 import { FormattedUserSeason } from "../shared/models/types/FormattedTypes";
 import { ValidationPipe } from "../shared/pipes/validation.pipe";
-import { UserResDto } from "./dto/user-res.dto";
+import { UserResponseDto } from "./dto/user-response.dto";
 import { LinkSocialDataDto } from "./dto/link-social-data.dto";
+import { LinkEvmWalletDto } from "./dto/link-evm-wallet.dto";
 
 @Controller("user")
 export class UserController {
@@ -42,7 +44,7 @@ export class UserController {
   async register(
     @UserAddress() publicAddress: string,
     @Query("referralCode") referralCode?: string,
-  ): Promise<UserResDto> {
+  ): Promise<UserResponseDto> {
     return this.userService.registerUser(publicAddress.toLowerCase(), referralCode);
   }
 
@@ -53,8 +55,28 @@ export class UserController {
     description: "JWT Authorization header. E.g. 'Bearer {Token}'",
   })
   @UsePipes(new ValidationPipe())
-  linkUserSocial(@UserAddress() address: string, @Body() socialDataDto: LinkSocialDataDto): Promise<UserResDto> {
+  linkUserSocial(@UserAddress() address: string, @Body() socialDataDto: LinkSocialDataDto): Promise<UserResponseDto> {
     return this.userService.linkUserSocial(socialDataDto, address);
+  }
+
+  @Post("/link-wallet")
+  @UseGuards(JwtAuthGuard)
+  @ApiHeader({
+    name: "authorization",
+    description: "JWT Authorization header. E.g. 'Bearer {Token}'",
+  })
+  @UsePipes(new ValidationPipe())
+  async linkUserEvmWallet(
+    @UserAddress() address: string,
+    @Body() linkEvmWalletDto: LinkEvmWalletDto,
+  ): Promise<UserResponseDto> {
+    const data = await this.userService.linkUserEvmWallet(linkEvmWalletDto, address);
+
+    if (data instanceof HttpException) {
+      throw data;
+    }
+
+    return data;
   }
 
   @Get(":address")
@@ -63,7 +85,7 @@ export class UserController {
     name: "authorization",
     description: "JWT Authorization header. E.g. 'Bearer {Token}'",
   })
-  async getUser(@UserAddress() publicAddress: string, @Param("address") address: string): Promise<UserResDto> {
+  async getUser(@UserAddress() publicAddress: string, @Param("address") address: string): Promise<UserResponseDto> {
     if (publicAddress != address) {
       throw new UnauthorizedException(`Unauthorized to query user ${address} data`);
     }
