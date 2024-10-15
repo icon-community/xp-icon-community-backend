@@ -155,7 +155,7 @@ async function genericTask(taskInput, db, seedId, callback) {
           }
           // execute the logic per each xchain wallet
           for (const xChainWallet of linkedWallets) {
-            const = userWallet = xChainWallet.address;
+            const userWallet = xChainWallet.address;
             console.log(`--- xChainWallet found: ${userWallet}`);
             await userTaskMainLogic(
               userTaskDoc,
