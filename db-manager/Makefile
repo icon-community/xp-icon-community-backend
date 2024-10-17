@@ -116,7 +116,7 @@ test-add-linked-wallet:
 	NODE_ENV=dev node scripts/updateUsers.js
 	@echo ">>> Add dummy linked wallet"
 	NODE_ENV=dev node tests/integration/dummy-addLinkedWallet.js
-	# @echo ">>> Run Blockchain scraper"
-	# BLOCK=82070542 TIME=360 NODE_ENV=dev node blockchain-scraper.js
+	@echo ">>> Run Blockchain scraper"
+	BLOCK=87930000 TIME=360 NODE_ENV=dev node blockchain-scraper.js
 	$(LINE_BREAK)
 	$(STOP_DOCKER_NON_PERSISTENT)

@@ -36,7 +36,7 @@
     "blockStart": 87939018,
     "blockEnd": 95396675,
     "active": true,
-    "tasks": ["t1", "t2", "t3", "t4", "t5", "t6", "t7"],
+    "tasks": ["t6", "t7"],
     "contract": "cxaf04a2eba3f28f519c0290db46d37833161f7e19"
   }
 ]
