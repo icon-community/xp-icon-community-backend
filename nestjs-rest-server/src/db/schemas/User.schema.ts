@@ -2,6 +2,30 @@ import { Prop, Schema, SchemaFactory } from "@nestjs/mongoose";
 import { HydratedDocument, SchemaTypes, Types } from "mongoose";
 import { Collections } from "../../shared/models/enum/Collections";
 import { REFERRAL_CODE_LENGTH } from "../../constants";
+import { ChainType } from "../../shared/models/enum/ChainType";
+
+@Schema({
+  _id: false,
+})
+export class LinkedWallet {
+  @Prop({
+    type: String,
+    isRequired: true,
+    unique: true,
+    lowercase: true,
+  })
+  address: string;
+
+  @Prop({
+    type: String,
+    isRequired: true,
+    enum: ChainType,
+  })
+  type: ChainType;
+}
+
+export type LinkedWalletDocument = HydratedDocument<LinkedWallet>;
+export const LinkedWalletSchema = SchemaFactory.createForClass(LinkedWallet);
 
 @Schema({
   _id: false,
@@ -78,6 +102,7 @@ export class User {
     isRequired: true,
     unique: true,
     index: true,
+    lowercase: true,
   })
   walletAddress: string;
 
@@ -99,6 +124,12 @@ export class User {
     default: [],
   })
   linkedSocials: SocialData[];
+
+  @Prop({
+    type: [LinkedWalletSchema],
+    default: [],
+  })
+  linkedWallets: LinkedWallet[];
 
   createdAt: Date;
   updatedAt: Date;

@@ -10,7 +10,7 @@ import {
 } from "@nestjs/common";
 import { ReferralService } from "./referral.service";
 import { Referral } from "../db/schemas/Referral.schema";
-import { IconEoaAddressValidationPipe } from "../shared/pipes/icon-eoa-address-validation-pipe.service";
+import { AddressValidationPipe } from "../shared/pipes/icon-eoa-address-validation-pipe.service";
 import { FindUserReferralsQueryDTO } from "./dto/FindUserReferralsQueryDTO";
 import { UserAddress } from "../user/decorator/user.decorators";
 import { JwtAuthGuard } from "../auth/guards/jwt-auth.guard";
@@ -21,13 +21,13 @@ export class ReferralController {
   constructor(private readonly referralService: ReferralService) {}
 
   @Get(":address")
-  findUserReferrals(@Param("address", IconEoaAddressValidationPipe) address: string): Promise<Referral[]> {
+  findUserReferrals(@Param("address", AddressValidationPipe) address: string): Promise<Referral[]> {
     return this.referralService.findAllUserReferrals(address);
   }
 
   @Get(":address/period")
   findUserReferralsForPeriod(
-    @Param("address", IconEoaAddressValidationPipe) address: string,
+    @Param("address", AddressValidationPipe) address: string,
     @Query(
       new ValidationPipe({
         transform: true,

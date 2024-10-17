@@ -1,5 +1,6 @@
 import {
   BadRequestException,
+  HttpException,
   Injectable,
   InternalServerErrorException,
   Logger,
@@ -28,8 +29,10 @@ import { CreateUserDto } from "../db/db-models";
 import { MongoDbErrorCode } from "../shared/models/enum/MongoDbErrorCode";
 import { ReferralService } from "../referral/referral.service";
 import { UserErrorCodes } from "./error/user-error-codes";
-import { UserResDto } from "./dto/user-res.dto";
+import { UserResponseDto } from "./dto/user-response.dto";
 import { LinkSocialDataDto } from "./dto/link-social-data.dto";
+import { LinkEvmWalletDto } from "./dto/link-evm-wallet.dto";
+import { AuthService } from "../auth/auth.service";
 
 @Injectable()
 export class UserService {
@@ -42,9 +45,10 @@ export class UserService {
     private taskDb: TaskDbService,
     private rankingService: RankingService,
     private referralService: ReferralService,
+    private authService: AuthService,
   ) {}
 
-  async getUser(address: string): Promise<UserResDto> {
+  async getUser(address: string): Promise<UserResponseDto> {
     const user = await this.userDb.getUserByAddress(address);
 
     if (!user) {
@@ -54,7 +58,7 @@ export class UserService {
     return formatUser(user);
   }
 
-  async linkUserSocial(socialData: LinkSocialDataDto, address: string): Promise<UserResDto> {
+  async linkUserSocial(socialData: LinkSocialDataDto, address: string): Promise<UserResponseDto> {
     try {
       const updatedUser = await this.userDb.linkUserSocial(socialData, address);
 
@@ -69,6 +73,29 @@ export class UserService {
       } else {
         throw new InternalServerErrorException("Failed to link user social");
       }
+    }
+  }
+
+  async linkUserEvmWallet(
+    linkEvmWalletDto: LinkEvmWalletDto,
+    address: string,
+  ): Promise<UserResponseDto | HttpException> {
+    try {
+      const authData = await this.authService.authenticateUser(linkEvmWalletDto.evmAccessToken);
+
+      if (authData.publicAddress.toLowerCase() != linkEvmWalletDto.address.toLowerCase()) {
+        return new BadRequestException("Invalid evmAccessToken for given address");
+      }
+
+      const updatedUser = await this.userDb.linkUserEvmWallet(linkEvmWalletDto, address);
+
+      if (!updatedUser) {
+        return new BadRequestException("User not found or social already linked");
+      }
+
+      return formatUser(updatedUser);
+    } catch {
+      return new InternalServerErrorException("Failed to link user social");
     }
   }
 
@@ -185,7 +212,7 @@ export class UserService {
     return referralCode;
   }
 
-  async registerUser(publicAddress: string, referralCode?: string): Promise<UserResDto> {
+  async registerUser(publicAddress: string, referralCode?: string): Promise<UserResponseDto> {
     // handle referral first
     if (referralCode) {
       try {
