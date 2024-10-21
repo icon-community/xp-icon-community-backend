@@ -12,6 +12,7 @@ export class LinkedWallet {
     type: String,
     isRequired: true,
     unique: true,
+    sparse: true,
     lowercase: true,
   })
   address: string;
@@ -41,6 +42,7 @@ export class SocialData {
     type: String,
     isRequired: true,
     unique: true,
+    sparse: true,
   })
   providerAccountId: string;
 
