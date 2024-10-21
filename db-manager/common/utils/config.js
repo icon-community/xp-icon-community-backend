@@ -3,6 +3,16 @@ require("dotenv").config();
 const SELECTED_CHAIN =
   process.env.CHAIN == null ? "mainnet" : process.env.CHAIN;
 const config = {
+  chains: {
+    evm: [
+      "0x2105.base",
+      "0x38.bsc",
+      "0x89.polygon",
+      "0xa.optimism",
+      "0xa4b1.arbitrum",
+      "0xa86a.avax",
+    ],
+  },
   tokens: {
     avax: "AVAX",
     bnb: "BNB",
