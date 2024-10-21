@@ -7,14 +7,10 @@ const { getAllUsers, addLinkedWalletToUser } = userService;
 const params = { ...config.mongoParams };
 
 const db = new MainDb(params);
-const userWallet = "hxe70351dce99ef6bb0573765e541b77ce22409896";
+const userWallet = "hx191e87b17bc2265953677f1201653b00fe87881f";
 const linkedWallets = [
   {
-    address: "injective-1/inj1arzzjhnsy6wqw6mzsy49w5slawrwxrljwya4tq",
-    type: "evm",
-  },
-  {
-    address: "injective-1/inj17uvp6ku8r5v2xd98gkymxunxed8pj4tjeccnsz",
+    address: "0x2105.base/0x3B66Bf513CB1D89966d9f2f7a985E2019ed54eb0",
     type: "evm",
   },
 ];
