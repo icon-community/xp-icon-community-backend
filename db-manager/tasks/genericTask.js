@@ -2,6 +2,7 @@
 // balanced related data (collateral, loans, etc) from
 // the blockchain and updating the database with the
 // latest amounts.
+const { chains } = require("../common/utils/config");
 const {
   userService,
   taskService,
@@ -118,6 +119,18 @@ async function genericTask(taskInput, db, seedId, callback) {
         }
       }
 
+      if (filteredUsers.length === 0) {
+        console.log(
+          "--- No users found in DB with registration block less than or equal to current block height",
+        );
+        // no user found in the database with the
+        // registration block less than or equal to the
+        // current block height, this means no user has
+        // yet registered for this season, we skip the
+        // season and continue with the other seasons
+        continue;
+      }
+
       // for each user, find the userTask document with the
       // user id, task id and season id
       // if the userTask document does not exist, create one
@@ -155,20 +168,24 @@ async function genericTask(taskInput, db, seedId, callback) {
           }
           // execute the logic per each xchain wallet
           for (const xChainWallet of linkedWallets) {
-            const userWallet = xChainWallet.address;
-            console.log(`--- xChainWallet found: ${userWallet}`);
-            await userTaskMainLogic(
-              userTaskDoc,
-              targetTask,
-              prepTerm,
-              validUser,
-              activeSeason,
-              callback,
-              height,
-              rewardFormula,
-              userWallet,
-              db,
-            );
+            if (xChainWallet.type === "evm") {
+              for (const chain of chains.evm) {
+                const userWallet = `${chain}/${xChainWallet.address}`;
+                console.log(`--- xChainWallet found: ${userWallet}`);
+                await userTaskMainLogic(
+                  userTaskDoc,
+                  targetTask,
+                  prepTerm,
+                  validUser,
+                  activeSeason,
+                  callback,
+                  height,
+                  rewardFormula,
+                  userWallet,
+                  db,
+                );
+              }
+            }
           }
         } else {
           // execute the logic for the user's wallet

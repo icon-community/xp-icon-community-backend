@@ -10,7 +10,7 @@ const db = new MainDb(params);
 const userWallet = "hx191e87b17bc2265953677f1201653b00fe87881f";
 const linkedWallets = [
   {
-    address: "0x2105.base/0x3B66Bf513CB1D89966d9f2f7a985E2019ed54eb0",
+    address: "0x3B66Bf513CB1D89966d9f2f7a985E2019ed54eb0",
     type: "evm",
   },
 ];
