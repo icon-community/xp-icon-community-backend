@@ -14,13 +14,7 @@ import { UsersTaskDbService } from "../db/services/users-db/user-task-db.service
 import { sha3_256 } from "js-sha3";
 import { Types } from "mongoose";
 import { TaskDbService } from "../db/services/users-db/task-db.service";
-import {
-  formatSeasonDocument,
-  formatTaskDocument,
-  formatUser,
-  formatUserDocument,
-  formatUserTaskDocument,
-} from "../shared/utils/mapper";
+import { formatSeasonDocument, formatUser, formatUserDocument, formatUserTaskDocument } from "../shared/utils/mapper";
 import { sumXp24hrs, sumXpTotal } from "../shared/utils/xp-util";
 import { RankingService } from "../ranking/service/ranking.service";
 import { FormattedUserBySeasonTask, FormattedUserSeason } from "../shared/models/types/FormattedTypes";
@@ -33,6 +27,7 @@ import { UserResponseDto } from "./dto/user-response.dto";
 import { LinkSocialDataDto } from "./dto/link-social-data.dto";
 import { LinkEvmWalletDto } from "./dto/link-evm-wallet.dto";
 import { AuthService } from "../auth/auth.service";
+import { SeasonErrorCodes } from "./error/season-error-codes";
 
 @Injectable()
 export class UserService {
@@ -58,21 +53,18 @@ export class UserService {
     return formatUser(user);
   }
 
-  async linkUserSocial(socialData: LinkSocialDataDto, address: string): Promise<UserResponseDto> {
+  async linkUserSocial(socialData: LinkSocialDataDto, address: string): Promise<UserResponseDto | HttpException> {
     try {
       const updatedUser = await this.userDb.linkUserSocial(socialData, address);
 
       if (!updatedUser) {
-        throw new BadRequestException("User not found or social already linked");
+        return new BadRequestException("User not found or social already linked");
       }
 
       return formatUser(updatedUser);
     } catch (e: unknown) {
-      if (e instanceof BadRequestException) {
-        throw e;
-      } else {
-        throw new InternalServerErrorException("Failed to link user social");
-      }
+      console.error(e);
+      throw new InternalServerErrorException("Failed to link user social");
     }
   }
 
@@ -99,7 +91,7 @@ export class UserService {
     }
   }
 
-  async getUserBySeason(userWallet: string, seasonLabel: SeasonLabel): Promise<FormattedUserSeason> {
+  async getUserBySeason(userWallet: string, seasonLabel: SeasonLabel): Promise<FormattedUserSeason | HttpException> {
     const seasonDbLabel = seasonsConfig.routes[seasonLabel];
 
     if (!seasonDbLabel) {
@@ -109,16 +101,19 @@ export class UserService {
     const user = await this.userDb.getUserByAddress(userWallet);
     const formattedUser = formatUserDocument(user);
 
-    if (!user) {
-      throw new Error(UserErrorCodes.USER_NOT_FOUND);
+    if (!user || !formattedUser) {
+      throw new BadRequestException(UserErrorCodes.USER_NOT_FOUND);
     }
 
     const season = await this.seasonDb.getSeasonByNumberId(seasonDbLabel);
+
+    if (!season) {
+      throw new BadRequestException(SeasonErrorCodes.SEASON_NOT_FOUND);
+    }
+
     const formattedSeason = formatSeasonDocument(season);
 
-    if (!season || !formattedSeason) {
-      throw new Error("Season not found");
-    }
+    const seasonTasks = (await this.taskDb.getTasksByIds(season.tasks)) ?? [];
 
     const tasks: FormattedUserBySeasonTask[] = [];
     const userAboveTasks = [];
@@ -130,8 +125,8 @@ export class UserService {
     const userAbove = thisUserIndex - 1 < 0 ? null : rankings[thisUserIndex - 1].address;
     const userBelow = thisUserIndex + 1 >= rankings.length ? null : rankings[thisUserIndex + 1].address;
 
-    for (let i = 0; i < season.tasks.length; i++) {
-      const taskFromDb = formatTaskDocument(await this.taskDb.getTaskById(season.tasks[i]._id));
+    for (let i = 0; i < seasonTasks.length; i++) {
+      const taskFromDb = seasonTasks[i];
 
       if (taskFromDb == null) {
         console.log("Task not found");

@@ -15,7 +15,7 @@ import { UserResponseDto } from "../../user/dto/user-response.dto";
 export function formatUserSeason(value: UserSeason): UserSeasonResDto {
   return {
     seasonId: value.seasonId.toString(),
-    registrationDate: value.registrationDate,
+    registrationBlock: value.registrationBlock,
   };
 }
 
@@ -90,7 +90,7 @@ export function formatUserDocument(user: UserDocument | null | undefined): Forma
   };
 }
 
-export function formatSeasonDocument(season: SeasonsDocument | null | undefined): FormattedSeason | null | undefined {
+export function formatSeasonDocument(season: SeasonsDocument): FormattedSeason {
   if (!season) return season;
 
   return {
@@ -98,7 +98,6 @@ export function formatSeasonDocument(season: SeasonsDocument | null | undefined)
     blockStart: season.blockStart,
     blockEnd: season.blockEnd,
     active: season.active,
-    tasks: season.tasks,
     XPEarned_total: null,
     XPEarned_24hrs: null,
     Rank: null,

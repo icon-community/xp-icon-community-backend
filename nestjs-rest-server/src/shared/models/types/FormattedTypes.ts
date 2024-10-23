@@ -1,6 +1,5 @@
 import { Chains } from "../enum/Chains";
 import { Status } from "../enum/Status";
-import { Types } from "mongoose";
 
 export type FormattedTask = {
   // _id: task[0]._id,
@@ -32,7 +31,6 @@ export type FormattedUserBySeasonTask = {
 
 export type FormattedUser = {
   walletAddress: string;
-  // registrationBlock: number,
 };
 
 export type FormattedSeason = {
@@ -40,7 +38,6 @@ export type FormattedSeason = {
   blockStart: number;
   blockEnd: number;
   active: boolean;
-  tasks: (Types.ObjectId | FormattedUserBySeasonTask)[];
   XPEarned_total: null | number;
   XPEarned_24hrs: null | number;
   Rank: null | number;
@@ -60,6 +57,6 @@ export type FormattedUserBySeason = {
 };
 
 export type FormattedUserSeason = {
-  user: FormattedUser | null | undefined;
+  user: FormattedUser | null;
   season: FormattedSeason & FormattedUserBySeason;
 };
