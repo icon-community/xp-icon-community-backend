@@ -31,6 +31,16 @@ async function addSeasonToUser(userWallet, season, connection) {
   );
 }
 
+async function addLinkedWalletToUser(userWallet, linkedWallet, connection) {
+  return await updateOrCreateEntry(
+    { walletAddress: userWallet },
+    { $push: { linkedWallets: linkedWallet } },
+    USER,
+    connection,
+    false,
+  );
+}
+
 async function getUsersBySeason(season, connection) {
   return await getEntryByParam(
     { "seasons.seasonId": season },
@@ -54,4 +64,5 @@ module.exports = {
   addSeasonToUser,
   getUsersBySeason,
   getUserCountBySeason,
+  addLinkedWalletToUser,
 };

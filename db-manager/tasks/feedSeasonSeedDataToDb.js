@@ -41,8 +41,8 @@ async function feedSeasonSeedDataToDb(db, useSeed = null, update = false) {
     const existingSeasons = await getAllSeasons(db.connection);
 
     // DEBUG PRINT
-    console.log("Existing seasons in DB:");
-    console.log(existingSeasons);
+    // console.log("Existing seasons in DB:");
+    // console.log(existingSeasons);
 
     // Compare seasons in seed file with seasons in DB
     // if season is not in DB, save it
@@ -81,7 +81,8 @@ async function feedSeasonSeedDataToDb(db, useSeed = null, update = false) {
           await createSeason(season, db.connection);
           console.log(`Season #${season.number} saved`);
         }
-
+      } else {
+        console.log(`Season #${season.number} already exists in DB`);
         if (update) {
           console.log(
             `Season #${season.number} exists in DB but command to update was send, updating it`,
@@ -94,8 +95,6 @@ async function feedSeasonSeedDataToDb(db, useSeed = null, update = false) {
           await updateSeason(seasonToUpdate._id, season, db.connection);
           console.log(`Season #${season.number} updated`);
         }
-      } else {
-        console.log(`Season #${season.number} already exists in DB`);
       }
     }
 

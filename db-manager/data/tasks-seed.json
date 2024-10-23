@@ -43,5 +43,23 @@
     "title": "deposit AVAX collateral",
     "rewardFormula": ["amount", "return amount * 1"],
     "chain": "icon"
+  },
+  {
+    "seedId": "t6",
+    "type": "xchain",
+    "description": "for depositing native crosschan collateral, the user will receive 1 XP per USD value of the collateral deposited that day. It will be done daily (per chain period)",
+    "criteria": {},
+    "title": "deposit native crosschain collateral",
+    "rewardFormula": ["amount", "return amount * 1"],
+    "chain": "icon"
+  },
+  {
+    "seedId": "t7",
+    "type": "xchain",
+    "description": "for minting bnUSD crosschain, the user will receive 3 XP per bnUSD loan held per day. It will be done daily (per chain period)",
+    "criteria": {},
+    "title": "holding a crosschain loan",
+    "rewardFormula": ["amount", "return amount * 3"],
+    "chain": "icon"
   }
 ]

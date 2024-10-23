@@ -42,6 +42,10 @@ const userTasksSchema = new Schema({
     enum: ["pending", "completed", "failed"],
     default: "pending",
   },
+  walletAddress: {
+    type: String,
+    required: true,
+  },
   xpEarned: {
     type: [xpEarnedSchema],
   },

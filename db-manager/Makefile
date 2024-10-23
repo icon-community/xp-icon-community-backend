@@ -104,17 +104,19 @@ test-user-addition:
 	$(LINE_BREAK)
 	$(STOP_DOCKER_NON_PERSISTENT)
 
-test-user-addition-2:
+test-add-linked-wallet:
 	@echo "> Running scraper tests"
 	$(START_DOCKER_NON_PERSISTENT)
 	$(LINE_BREAK)
-	@echo "Starting task addition"
+	@echo ">>> Starting task addition"
 	NODE_ENV=dev node scripts/updateTasks.js
-	@echo "Starting season addition"
+	@echo ">>> Starting season addition"
 	NODE_ENV=dev node scripts/updateSeasons.js
-	@echo "Starting users addition"
+	@echo ">>> Starting users addition"
 	NODE_ENV=dev node scripts/updateUsers.js
-	@echo "Starting users addition"
-	NODE_ENV=dev node scripts/updateUsers.js
+	@echo ">>> Add dummy linked wallet"
+	NODE_ENV=dev node tests/integration/dummy-addLinkedWallet.js
+	@echo ">>> Run Blockchain scraper"
+	BLOCK=87930000 TIME=360 NODE_ENV=dev node blockchain-scraper.js
 	$(LINE_BREAK)
 	$(STOP_DOCKER_NON_PERSISTENT)

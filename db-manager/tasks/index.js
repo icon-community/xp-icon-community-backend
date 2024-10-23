@@ -6,6 +6,8 @@ const fetchLockedSavingsAndUpdateDb = require("./fetchLockedSavingsAndUpdateDb")
 const feedTaskSeedDataToDb = require("./feedTaskSeedDataToDb");
 const feedSeasonSeedDataToDb = require("./feedSeasonSeedDataToDb");
 const fetchNewUsersAndGiveRegistrationReward = require("./fetchNewUsersAndGiveRegistrationReward");
+const fetchXChainLoansAndUpdateDb = require("./fetchXChainLoansAndUpdateDb");
+const fetchXChainCollateralsAndUpdateDb = require("./fetchXChainCollateralsAndUpdateDb");
 
 module.exports = {
   fetchRegisteredUsersAndUpdateDb,
@@ -16,4 +18,6 @@ module.exports = {
   feedTaskSeedDataToDb,
   feedSeasonSeedDataToDb,
   fetchNewUsersAndGiveRegistrationReward,
+  fetchXChainLoansAndUpdateDb,
+  fetchXChainCollateralsAndUpdateDb,
 };

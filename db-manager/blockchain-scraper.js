@@ -16,6 +16,8 @@ const {
   feedTaskSeedDataToDb,
   feedSeasonSeedDataToDb,
   fetchNewUsersAndGiveRegistrationReward,
+  fetchXChainLoansAndUpdateDb,
+  fetchXChainCollateralsAndUpdateDb,
 } = require("./tasks");
 const config = require("./common/utils/config");
 
@@ -105,6 +107,11 @@ async function main() {
     // Run task that fetches locked savings by each user and updates the db
     tasks.push(taskRunner(fetchLockedSavingsAndUpdateDb, db));
 
+    // Run task that fetches cross chain loans taken by each user and updates the db
+    tasks.push(taskRunner(fetchXChainLoansAndUpdateDb, db));
+
+    // Run task that fetches cross chain collaterals deposited by each user and updates the db
+    tasks.push(taskRunner(fetchXChainCollateralsAndUpdateDb, db));
     // create monitor instance
     monitor = new Monitor(
       JVM_SERVICE,

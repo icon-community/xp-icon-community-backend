@@ -26,6 +26,22 @@ const season = new Schema({
 });
 
 /*
+ * linked wallet schema
+ */
+const linkedWallet = new Schema({
+  address: {
+    type: String,
+    // unique: true,
+    required: [true, "Please specify field"],
+  },
+  type: {
+    type: String,
+    required: true,
+    enum: ["evm", "icon"],
+  },
+});
+
+/*
  * User schema
  */
 const userSchema = new Schema({
@@ -34,6 +50,17 @@ const userSchema = new Schema({
     unique: true,
     index: true,
     required: [true, "Please specify field"],
+  },
+  linkedWallets: {
+    type: [linkedWallet],
+    default: [],
+    validate: {
+      validator: function (wallets) {
+        const addresses = wallets.map((wallet) => wallet.address);
+        return addresses.length === new Set(addresses).size;
+      },
+      message: "Address in linkedWallets must be unique",
+    },
   },
   // registrationBlock: {
   //   type: Number,
