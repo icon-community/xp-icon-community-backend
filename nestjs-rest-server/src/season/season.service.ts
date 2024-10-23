@@ -64,7 +64,7 @@ export class SeasonService {
 
     const totalWithoutBaseline = total - baseline * participants;
 
-    const rewards = rankData.map((obj) => {
+    return rankData.map((obj) => {
       const { total, address } = obj;
 
       if (omitFilter.includes(address)) {
@@ -88,8 +88,6 @@ export class SeasonService {
         amount: amount,
       };
     });
-
-    return rewards;
   }
 
   async getSeason(seasonLabel: SeasonLabel): Promise<SeasonDto> {
@@ -100,11 +98,12 @@ export class SeasonService {
     }
 
     const season = await this.seasonDb.getSeasonByNumberId(seasonDbLabel);
-    const seasonFormatted = formatSeasonDocument(season);
 
-    if (season == null || seasonFormatted == null) {
+    if (!season) {
       throw new Error("Season not found");
     }
+
+    const seasonFormatted = formatSeasonDocument(season);
 
     const users = (await this.userDb.getUsersBySeason(season._id)) ?? [];
 
@@ -173,7 +172,7 @@ export class SeasonService {
     };
   }
 
-  getTaskBySeason(seasonLabel: SeasonLabel, taskLabel: string) {
+  getTaskBySeason(seasonLabel: SeasonLabel, taskLabel: string): void {
     // TODO implement
 
     console.log(`seasonLabel=${seasonLabel}, taskLabel=${taskLabel}`);

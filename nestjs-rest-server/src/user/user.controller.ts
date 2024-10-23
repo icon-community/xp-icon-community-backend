@@ -55,8 +55,17 @@ export class UserController {
     description: "JWT Authorization header. E.g. 'Bearer {Token}'",
   })
   @UsePipes(new ValidationPipe())
-  linkUserSocial(@UserAddress() address: string, @Body() socialDataDto: LinkSocialDataDto): Promise<UserResponseDto> {
-    return this.userService.linkUserSocial(socialDataDto, address);
+  async linkUserSocial(
+    @UserAddress() address: string,
+    @Body() socialDataDto: LinkSocialDataDto,
+  ): Promise<UserResponseDto> {
+    const data = await this.userService.linkUserSocial(socialDataDto, address);
+
+    if (data instanceof HttpException) {
+      throw data;
+    }
+
+    return data;
   }
 
   @Post("/link-wallet")
@@ -107,13 +116,13 @@ export class UserController {
     @Param("userWallet") userWallet: string,
     @Param("season") season: SeasonLabel,
   ): Promise<FormattedUserSeason> {
-    try {
-      return this.userService.getUserBySeason(userWallet.toLowerCase(), season);
-    } catch (e) {
-      throw new InternalServerErrorException({
-        error: e.message,
-      });
+    const data = await this.userService.getUserBySeason(userWallet.toLowerCase(), season);
+
+    if (data instanceof HttpException) {
+      throw data;
     }
+
+    return data;
   }
 
   @Get("/referral-code")

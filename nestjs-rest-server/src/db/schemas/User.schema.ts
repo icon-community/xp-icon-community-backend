@@ -80,10 +80,10 @@ export class UserSeason {
   seasonId: Types.ObjectId;
 
   @Prop({
-    type: () => Date,
+    type: Number,
     required: true,
   })
-  registrationDate: Date;
+  registrationBlock: number;
 }
 
 export type UserSeasonDocument = HydratedDocument<UserSeason>;
@@ -107,6 +107,12 @@ export class User {
     lowercase: true,
   })
   walletAddress: string;
+
+  @Prop({
+    type: Number,
+    default: 0,
+  })
+  dailyCheckInStreak: number;
 
   @Prop({
     type: [UserSeasonSchema],
