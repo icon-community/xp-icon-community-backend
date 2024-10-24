@@ -98,10 +98,11 @@ const config = {
     },
   },
   seasonsRoutes: {
-    iconteam: "1",
-    ripdao: "2",
-    vybzdao: "3",
-    mrgryzzly: "4",
+    balanced: 1,
+    // iconteam: "1",
+    // ripdao: "2",
+    // vybzdao: "3",
+    // mrgryzzly: "4",
     // uncomment these during testing
     // test1: "1",
     // test2: "2",
