@@ -47,7 +47,7 @@
   {
     "seedId": "t6",
     "type": "xchain",
-    "description": "for depositing native crosschan collateral, the user will receive 1 XP per USD value of the collateral deposited that day. It will be done daily (per chain period)",
+    "description": "for depositing native crosschain collateral, the user will receive 1 XP per USD value of the collateral deposited that day. It will be done daily (per chain period)",
     "criteria": {},
     "title": "deposit native crosschain collateral",
     "rewardFormula": ["amount", "return amount * 1"],
