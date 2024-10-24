@@ -1,39 +1,40 @@
 import { Module } from "@nestjs/common";
 import { MongooseModule } from "@nestjs/mongoose";
-import { User, UserSchema } from "./schemas/User.schema";
-import { UserTask, UserTaskSchema } from "./schemas/UserTask.schema";
-import { Season, SeasonsSchema } from "./schemas/Seasons.schema";
-import { Task, TaskSchema } from "./schemas/Task.schema";
+import { UserSchema } from "./schemas/User.schema";
+import { UserTaskSchema } from "./schemas/UserTask.schema";
+import { SeasonsSchema } from "./schemas/Seasons.schema";
+import { TaskSchema } from "./schemas/Task.schema";
 import { XpgoConfigModule } from "../config/xpgo-config.module";
 import { SeasonDbService } from "./services/users-db/season-db.service";
 import { TaskDbService } from "./services/users-db/task-db.service";
 import { UsersTaskDbService } from "./services/users-db/user-task-db.service";
 import { UsersDbService } from "./services/users-db/users-db.service";
 import { ReferralDbService } from "./services/users-db/referral-db.service";
-import { Referral, ReferralSchema } from "./schemas/Referral.schema";
+import { ReferralSchema } from "./schemas/Referral.schema";
+import { Collections } from "../shared/models/enum/Collections";
 
 @Module({
   imports: [
     XpgoConfigModule,
     MongooseModule.forFeature([
       {
-        name: User.name,
+        name: Collections.USERS,
         schema: UserSchema,
       },
       {
-        name: UserTask.name,
+        name: Collections.USER_TASKS,
         schema: UserTaskSchema,
       },
       {
-        name: Season.name,
+        name: Collections.SEASONS,
         schema: SeasonsSchema,
       },
       {
-        name: Task.name,
+        name: Collections.TASKS,
         schema: TaskSchema,
       },
       {
-        name: Referral.name,
+        name: Collections.REFERRALS,
         schema: ReferralSchema,
       },
     ]),

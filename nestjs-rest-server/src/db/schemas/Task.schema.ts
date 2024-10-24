@@ -1,62 +1,30 @@
-import { Prop, Schema, SchemaFactory } from "@nestjs/mongoose";
-import { HydratedDocument, Schema as MongooseSchema } from "mongoose";
+import { HydratedDocument, Schema } from "mongoose";
 import { Chains } from "../../shared/models/enum/Chains";
 import { Collections } from "../../shared/models/enum/Collections";
+import { ChainType } from "../../shared/models/enum/ChainType";
 
-@Schema({
-  collection: Collections.TASKS,
-  autoCreate: true,
-  autoIndex: true,
-  timestamps: {
-    createdAt: true,
-  },
-})
-export class Task {
-  @Prop({
-    type: String,
-    required: true,
-  })
+export interface ITask {
   seedId: string;
-
-  @Prop({
-    type: String,
-    required: true,
-  })
   type: string;
-
-  @Prop({
-    type: String,
-    required: true,
-  })
   description: string;
-
-  @Prop({
-    type: MongooseSchema.Types.Mixed,
-    required: true,
-  })
-  criteria: object;
-
-  @Prop({
-    type: String,
-    required: true,
-  })
+  criteria: any;
   title: string;
-
-  @Prop({
-    type: [String],
-    required: true,
-  })
   rewardFormula: [string];
-
-  @Prop({
-    type: String,
-    enum: Chains,
-    required: true,
-  })
   chain: Chains;
-
   createdAt: Date;
 }
 
-export type TaskDocument = HydratedDocument<Task>;
-export const TaskSchema = SchemaFactory.createForClass(Task);
+export type TaskDocument = HydratedDocument<ITask>;
+export const TaskSchema = new Schema<ITask>({
+    seedId: { type: String, required: true },
+    type: { type: String, required: true },
+    description: { type: String, required: true },
+    criteria: Schema.Types.Mixed,
+    title: { type: String, required: true },
+    rewardFormula: { type: [String], required: true },
+    createdAt: { type: Date, default: Date.now },
+    chain: { type: String, required: true, enum: ChainType },
+},
+{
+  collection: Collections.TASKS,
+})
