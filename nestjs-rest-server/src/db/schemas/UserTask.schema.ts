@@ -7,7 +7,6 @@ export interface IXpEarned {
   period: number;
 }
 
-
 export const XpEarnedSchema = new Schema<IXpEarned>({
   xp: {
     type: Number,

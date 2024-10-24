@@ -15,7 +15,8 @@ export interface ITask {
 }
 
 export type TaskDocument = HydratedDocument<ITask>;
-export const TaskSchema = new Schema<ITask>({
+export const TaskSchema = new Schema<ITask>(
+  {
     seedId: { type: String, required: true },
     type: { type: String, required: true },
     description: { type: String, required: true },
@@ -24,7 +25,8 @@ export const TaskSchema = new Schema<ITask>({
     rewardFormula: { type: [String], required: true },
     createdAt: { type: Date, default: Date.now },
     chain: { type: String, required: true, enum: ChainType },
-},
-{
-  collection: Collections.TASKS,
-})
+  },
+  {
+    collection: Collections.TASKS,
+  },
+);

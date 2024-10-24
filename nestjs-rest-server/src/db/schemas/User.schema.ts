@@ -8,7 +8,8 @@ interface ILinkedWallet {
   type: ChainType;
 }
 
-export const LinkedWalletSchema = new Schema<ILinkedWallet>({
+export const LinkedWalletSchema = new Schema<ILinkedWallet>(
+  {
     address: {
       type: String,
       unique: true,
@@ -20,11 +21,12 @@ export const LinkedWalletSchema = new Schema<ILinkedWallet>({
       type: String,
       required: [true, "Please specify field"],
       enum: ChainType,
-    }
+    },
   },
   {
     _id: false,
-  });
+  },
+);
 
 interface ISocialData {
   provider: string;
@@ -34,7 +36,8 @@ interface ISocialData {
   imageUrl: string | null | undefined;
 }
 
-export const SocialDataSchema = new Schema<ISocialData>({
+export const SocialDataSchema = new Schema<ISocialData>(
+  {
     provider: {
       type: String,
       required: [true, "Please specify field"],
@@ -60,15 +63,16 @@ export const SocialDataSchema = new Schema<ISocialData>({
   },
   {
     _id: false,
-  });
-
+  },
+);
 
 export interface IUserSeasonRegistration {
   seasonId: Types.ObjectId;
   registrationBlock: number;
 }
 
-export const UserSeasonRegistrationSchema = new Schema<IUserSeasonRegistration>({
+export const UserSeasonRegistrationSchema = new Schema<IUserSeasonRegistration>(
+  {
     seasonId: {
       type: SchemaTypes.ObjectId,
       ref: Collections.SEASONS,
@@ -77,11 +81,12 @@ export const UserSeasonRegistrationSchema = new Schema<IUserSeasonRegistration>(
     registrationBlock: {
       type: Number,
       required: [true, "Please specify field"],
-    }
+    },
   },
   {
     _id: false,
-  });
+  },
+);
 
 export interface IUser {
   walletAddress: string;
@@ -95,7 +100,8 @@ export interface IUser {
 }
 
 export type UserDocument = HydratedDocument<IUser>;
-export const UserSchema = new Schema<IUser>({
+export const UserSchema = new Schema<IUser>(
+  {
     walletAddress: {
       type: String,
       unique: true,
@@ -122,18 +128,19 @@ export const UserSchema = new Schema<IUser>({
       default: [],
     },
     linkedWallets: {
-        type: [LinkedWalletSchema],
-        default: [],
-      },
+      type: [LinkedWalletSchema],
+      default: [],
+    },
     createdAt: {
-        type: Date,
-        default: Date.now
+      type: Date,
+      default: Date.now,
     },
     updatedAt: {
-        type: Date,
-        default: Date.now
+      type: Date,
+      default: Date.now,
     },
   },
   {
-    collection: Collections.USERS
-  });
+    collection: Collections.USERS,
+  },
+);

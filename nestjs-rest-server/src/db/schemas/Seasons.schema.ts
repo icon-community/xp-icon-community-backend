@@ -13,43 +13,46 @@ export interface ISeason {
 }
 
 export type SeasonsDocument = HydratedDocument<ISeason>;
-export const SeasonsSchema = new Schema<ISeason>({
-  number: {
-    type: Number,
-    required: true,
-    unique: true,
-    index: true,
-  },
-  blockStart: {
-    type: Number,
-    required: true,
-  },
-  blockEnd: {
-    type: Number,
-    required: true,
-    validate: {
-      validator: function (v) {
-        return v > this.blockStart;
-      },
-      message: "blockEnd must be greater than blockStart",
+export const SeasonsSchema = new Schema<ISeason>(
+  {
+    number: {
+      type: Number,
+      required: true,
+      unique: true,
+      index: true,
     },
-  },
-  active: {
-    type: Boolean,
-    required: true,
-    default: true,
-  },
-  contract: {
-    type: String,
-    required: true,
-  },
-  tasks: [
-    {
-      type: Schema.Types.ObjectId,
-      ref: Collections.TASKS,
+    blockStart: {
+      type: Number,
       required: true,
     },
-  ],
-},{
-  collection: Collections.SEASONS,
-})
+    blockEnd: {
+      type: Number,
+      required: true,
+      validate: {
+        validator: function (v) {
+          return v > this.blockStart;
+        },
+        message: "blockEnd must be greater than blockStart",
+      },
+    },
+    active: {
+      type: Boolean,
+      required: true,
+      default: true,
+    },
+    contract: {
+      type: String,
+      required: true,
+    },
+    tasks: [
+      {
+        type: Schema.Types.ObjectId,
+        ref: Collections.TASKS,
+        required: true,
+      },
+    ],
+  },
+  {
+    collection: Collections.SEASONS,
+  },
+);
