@@ -4,12 +4,13 @@ import { Model } from "mongoose";
 import { Referral } from "../../schemas/Referral.schema";
 import { CreateReferralDto } from "../../../referral/dto/create-referral.dto";
 import { MongoDbErrorCode } from "../../../shared/models/enum/MongoDbErrorCode";
+import { Collections } from "../../../shared/models/enum/Collections";
 
 @Injectable()
 export class ReferralDbService {
   private readonly logger = new Logger(ReferralDbService.name);
 
-  constructor(@InjectModel(Referral.name) private referralModel: Model<Referral>) {}
+  constructor(@InjectModel(Collections.REFERRALS) private referralModel: Model<Referral>) {}
 
   async createReferral(referral: CreateReferralDto): Promise<boolean> {
     try {

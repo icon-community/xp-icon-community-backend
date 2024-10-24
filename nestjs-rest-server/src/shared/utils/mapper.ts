@@ -6,13 +6,13 @@ import {
   FormattedUserTask,
   FormattedXpEarned,
 } from "../models/types/FormattedTypes";
-import { UserTaskDocument, XpEarned } from "../../db/schemas/UserTask.schema";
-import { UserDocument, UserSeason } from "../../db/schemas/User.schema";
+import { UserTaskDocument, IXpEarned } from "../../db/schemas/UserTask.schema";
+import { UserDocument, IUserSeasonRegistration } from "../../db/schemas/User.schema";
 import { SeasonsDocument } from "../../db/schemas/Seasons.schema";
 import { UserSeasonResDto } from "../../user/dto/user-season-res.dto";
 import { UserResponseDto } from "../../user/dto/user-response.dto";
 
-export function formatUserSeason(value: UserSeason): UserSeasonResDto {
+export function formatUserSeason(value: IUserSeasonRegistration): UserSeasonResDto {
   return {
     seasonId: value.seasonId.toString(),
     registrationBlock: value.registrationBlock,
@@ -55,7 +55,7 @@ export function formatTaskDocument(task: TaskDocument | null | undefined): Forma
   };
 }
 
-export function formatXpEarnedDocument(xpArray: XpEarned[]): FormattedXpEarned[] {
+export function formatXpEarnedDocument(xpArray: IXpEarned[]): FormattedXpEarned[] {
   if (xpArray.length == 0) {
     return [];
   }

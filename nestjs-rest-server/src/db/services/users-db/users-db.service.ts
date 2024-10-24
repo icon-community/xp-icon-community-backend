@@ -1,18 +1,19 @@
 import { Injectable, Logger } from "@nestjs/common";
 import { InjectModel } from "@nestjs/mongoose";
-import { User, UserDocument } from "../../schemas/User.schema";
+import { IUser, UserDocument } from "../../schemas/User.schema";
 import { Model, Types } from "mongoose";
 import { CreateUserDto, UserSeasonDto } from "../../db-models";
 import { MongoDbErrorCode } from "../../../shared/models/enum/MongoDbErrorCode";
 import { LinkSocialDataDto } from "../../../user/dto/link-social-data.dto";
 import { LinkEvmWalletDto } from "../../../user/dto/link-evm-wallet.dto";
 import { MAX_LINKED_EVM_WALLETS } from "../../../constants";
+import { Collections } from "../../../shared/models/enum/Collections";
 
 @Injectable()
 export class UsersDbService {
   private readonly logger = new Logger(UsersDbService.name);
 
-  constructor(@InjectModel(User.name) private userModel: Model<User>) {}
+  constructor(@InjectModel(Collections.USERS) private userModel: Model<IUser>) {}
 
   async createUser(user: CreateUserDto): Promise<UserDocument> {
     try {
@@ -91,7 +92,7 @@ export class UsersDbService {
       .exec();
   }
 
-  async getUsersByReferralCode(referralCode: string): Promise<User | null> {
+  async getUsersByReferralCode(referralCode: string): Promise<IUser | null> {
     try {
       return await this.userModel
         .findOne({

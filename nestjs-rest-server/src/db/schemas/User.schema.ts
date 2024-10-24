@@ -1,147 +1,139 @@
-import { Prop, Schema, SchemaFactory } from "@nestjs/mongoose";
-import { HydratedDocument, SchemaTypes, Types } from "mongoose";
+import { HydratedDocument, SchemaTypes, Types, Schema } from "mongoose";
 import { Collections } from "../../shared/models/enum/Collections";
 import { REFERRAL_CODE_LENGTH } from "../../constants";
 import { ChainType } from "../../shared/models/enum/ChainType";
 
-@Schema({
-  _id: false,
-})
-export class LinkedWallet {
-  @Prop({
-    type: String,
-    isRequired: true,
-    unique: true,
-    sparse: true,
-    lowercase: true,
-  })
+interface ILinkedWallet {
   address: string;
-
-  @Prop({
-    type: String,
-    isRequired: true,
-    enum: ChainType,
-  })
   type: ChainType;
 }
 
-export type LinkedWalletDocument = HydratedDocument<LinkedWallet>;
-export const LinkedWalletSchema = SchemaFactory.createForClass(LinkedWallet);
+export const LinkedWalletSchema = new Schema<ILinkedWallet>({
+    address: {
+      type: String,
+      unique: true,
+      sparse: true,
+      lowercase: true,
+      required: [true, "Please specify field"],
+    },
+    type: {
+      type: String,
+      required: [true, "Please specify field"],
+      enum: ChainType,
+    }
+  },
+  {
+    _id: false,
+  });
 
-@Schema({
-  _id: false,
-})
-export class SocialData {
-  @Prop({
-    type: String,
-    isRequired: true,
-  })
+interface ISocialData {
   provider: string;
-
-  @Prop({
-    type: String,
-    isRequired: true,
-    unique: true,
-    sparse: true,
-  })
   providerAccountId: string;
-
-  @Prop({
-    type: String,
-    isRequired: false,
-  })
   name: string | null | undefined;
-
-  @Prop({
-    type: String,
-    isRequired: false,
-  })
   email: string | null | undefined;
-
-  @Prop({
-    type: String,
-    isRequired: false,
-  })
   imageUrl: string | null | undefined;
 }
 
-export type SocialDataDocument = HydratedDocument<SocialData>;
-export const SocialDataSchema = SchemaFactory.createForClass(SocialData);
+export const SocialDataSchema = new Schema<ISocialData>({
+    provider: {
+      type: String,
+      required: [true, "Please specify field"],
+    },
+    providerAccountId: {
+      type: String,
+      required: [true, "Please specify field"],
+      unique: true,
+      sparse: true,
+    },
+    name: {
+      type: String,
+      required: [false, ""],
+    },
+    email: {
+      type: String,
+      required: [false, ""],
+    },
+    imageUrl: {
+      type: String,
+      required: [false, ""],
+    },
+  },
+  {
+    _id: false,
+  });
 
-@Schema({
-  _id: false,
-})
-export class UserSeason {
-  @Prop({
-    type: SchemaTypes.ObjectId,
-    ref: Collections.SEASONS,
-    isRequired: true,
-  })
+
+export interface IUserSeasonRegistration {
   seasonId: Types.ObjectId;
-
-  @Prop({
-    type: Number,
-    required: true,
-  })
   registrationBlock: number;
 }
 
-export type UserSeasonDocument = HydratedDocument<UserSeason>;
-export const UserSeasonSchema = SchemaFactory.createForClass(UserSeason);
-
-@Schema({
-  collection: Collections.USERS,
-  autoCreate: true,
-  autoIndex: true,
-  timestamps: {
-    createdAt: true,
-    updatedAt: true,
+export const UserSeasonRegistrationSchema = new Schema<IUserSeasonRegistration>({
+    seasonId: {
+      type: SchemaTypes.ObjectId,
+      ref: Collections.SEASONS,
+      required: [true, "Please specify field"],
+    },
+    registrationBlock: {
+      type: Number,
+      required: [true, "Please specify field"],
+    }
   },
-})
-export class User {
-  @Prop({
-    type: String,
-    isRequired: true,
-    unique: true,
-    index: true,
-    lowercase: true,
-  })
+  {
+    _id: false,
+  });
+
+export interface IUser {
   walletAddress: string;
-
-  @Prop({
-    type: Number,
-    default: 0,
-  })
   dailyCheckInStreak: number;
-
-  @Prop({
-    type: [UserSeasonSchema],
-    default: [],
-  })
-  seasons: UserSeason[];
-
-  @Prop({
-    isRequired: true,
-    immutable: true,
-    maxlength: REFERRAL_CODE_LENGTH,
-  })
+  seasons: IUserSeasonRegistration[];
+  linkedWallets: ILinkedWallet[];
+  linkedSocials: ISocialData[];
   referralCode: string;
-
-  @Prop({
-    type: [SocialDataSchema],
-    default: [],
-  })
-  linkedSocials: SocialData[];
-
-  @Prop({
-    type: [LinkedWalletSchema],
-    default: [],
-  })
-  linkedWallets: LinkedWallet[];
-
   createdAt: Date;
   updatedAt: Date;
 }
 
-export type UserDocument = HydratedDocument<User>;
-export const UserSchema = SchemaFactory.createForClass(User);
+export type UserDocument = HydratedDocument<IUser>;
+export const UserSchema = new Schema<IUser>({
+    walletAddress: {
+      type: String,
+      unique: true,
+      index: true,
+      lowercase: true,
+      required: [true, "Please specify field"],
+    },
+    dailyCheckInStreak: {
+      type: Number,
+      default: 0,
+    },
+    seasons: {
+      type: [UserSeasonRegistrationSchema],
+      default: [],
+    },
+    referralCode: {
+      type: String,
+      required: [true, "Please specify field"],
+      immutable: true,
+      maxlength: REFERRAL_CODE_LENGTH,
+    },
+    linkedSocials: {
+      type: [SocialDataSchema],
+      default: [],
+    },
+    linkedWallets: {
+        type: [LinkedWalletSchema],
+        default: [],
+      },
+    createdAt: {
+        type: Date,
+        default: Date.now
+    },
+    updatedAt: {
+        type: Date,
+        default: Date.now
+    },
+  },
+  {
+    collection: Collections.USERS
+  });
