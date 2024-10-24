@@ -14,15 +14,6 @@ const season = new Schema({
     type: Number,
     required: [true, "Please specify field"],
   },
-  referrals: {
-    type: [
-      {
-        type: Schema.Types.ObjectId,
-        ref: "User",
-      },
-    ],
-    default: [],
-  },
 });
 
 /*
@@ -62,20 +53,10 @@ const userSchema = new Schema({
       message: "Address in linkedWallets must be unique",
     },
   },
-  // registrationBlock: {
-  //   type: Number,
-  //   required: [true, "Please specify field"],
-  // },
   dailyCheckInStreak: {
     type: Number,
     default: 0,
   },
-  // referrals: [
-  //   {
-  //     type: Schema.Types.ObjectId,
-  //     ref: "User",
-  //   },
-  // ],
   seasons: {
     type: [season],
     default: [],

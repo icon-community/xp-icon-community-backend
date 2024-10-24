@@ -2,11 +2,12 @@ import { Injectable } from "@nestjs/common";
 import { InjectModel } from "@nestjs/mongoose";
 import { Model, Types } from "mongoose";
 import { CreateUserTaskDto, UpdateUserTaskDto } from "../../db-models";
-import { UserTask, UserTaskDocument, UserTaskQuery } from "../../schemas/UserTask.schema";
+import { IUserTask, UserTaskDocument, UserTaskQuery } from "../../schemas/UserTask.schema";
+import { Collections } from "../../../shared/models/enum/Collections";
 
 @Injectable()
 export class UsersTaskDbService {
-  constructor(@InjectModel(UserTask.name) private userTaskModel: Model<UserTask>) {}
+  constructor(@InjectModel(Collections.USER_TASKS) private userTaskModel: Model<IUserTask>) {}
 
   async createUserTask(task: CreateUserTaskDto): Promise<UserTaskDocument> {
     const createdUserTask: UserTaskDocument = new this.userTaskModel(task);

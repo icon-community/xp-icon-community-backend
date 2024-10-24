@@ -1,82 +1,35 @@
-import { Prop, Schema, SchemaFactory } from "@nestjs/mongoose";
-import { HydratedDocument, SchemaTypes, Types } from "mongoose";
+import { HydratedDocument, Types, Schema } from "mongoose";
 import { Status } from "../../shared/models/enum/Status";
-import { Collections } from "../../shared/models/enum/Collections";
 
-@Schema({
-  _id: false,
-})
-export class XpEarned {
-  @Prop({
-    type: Number,
-    required: true,
-  })
+export interface IXpEarned {
   xp: number;
-
-  @Prop({
-    type: Number,
-    required: true,
-  })
   block: number;
-
-  @Prop({
-    type: Number,
-    required: true,
-  })
   period: number;
 }
 
-export type XpEarnedDocument = HydratedDocument<XpEarned>;
-export const XpEarnedSchema = SchemaFactory.createForClass(XpEarned);
-
-@Schema({
-  collection: Collections.USER_TASKS,
-  autoCreate: true,
-  autoIndex: true,
-  timestamps: {
-    createdAt: true,
-  },
-})
-export class UserTask {
-  @Prop({
-    type: SchemaTypes.ObjectId,
-    ref: Collections.USERS,
-    required: true,
-  })
-  userId: Types.ObjectId;
-
-  @Prop({
-    type: SchemaTypes.ObjectId,
-    ref: Collections.TASKS,
-    required: true,
-  })
-  taskId: Types.ObjectId;
-
-  @Prop({
-    type: SchemaTypes.ObjectId,
-    ref: Collections.SEASONS,
-    required: true,
-  })
-  seasonId: Types.ObjectId;
-
-  @Prop({
-    type: String,
-    enum: Status,
-    default: Status.PENDING,
-  })
-  status: Status;
-
-  @Prop({
-    type: [XpEarnedSchema],
-  })
-  xpEarned: XpEarned[];
-
-  @Prop({
+export const XpEarnedSchema = new Schema<IXpEarned>({
+  xp: {
     type: Number,
     required: true,
-  })
-  updatedAtBlock: number;
+  },
+  block: {
+    type: Number,
+    required: true,
+  },
+  period: {
+    type: Number,
+    required: true,
+  },
+});
 
+export interface IUserTask {
+  userId: Types.ObjectId;
+  taskId: Types.ObjectId;
+  seasonId: Types.ObjectId;
+  status: Status;
+  walletAddress: string;
+  xpEarned: IXpEarned[];
+  updatedAtBlock: number;
   createdAt: Date;
 }
 
@@ -85,8 +38,42 @@ export type UserTaskQuery = {
   taskId: Types.ObjectId;
   seasonId: Types.ObjectId;
 };
-export type UserTaskDocument = HydratedDocument<UserTask>;
-export const UserTaskSchema = SchemaFactory.createForClass(UserTask);
 
-// define user,task and season ID as compound index
-UserTaskSchema.index({ userId: 1, taskId: 1, seasonId: 1 }, { unique: true });
+export type UserTaskDocument = HydratedDocument<IUserTask>;
+export const UserTaskSchema = new Schema<IUserTask>({
+  userId: {
+    type: Schema.Types.ObjectId,
+    ref: "User",
+    required: true,
+  },
+  taskId: {
+    type: Schema.Types.ObjectId,
+    ref: "Task",
+    required: true,
+  },
+  seasonId: {
+    type: Schema.Types.ObjectId,
+    ref: "Season",
+    required: true,
+  },
+  status: {
+    type: String,
+    enum: Status,
+    default: Status.PENDING,
+  },
+  walletAddress: {
+    type: String,
+    required: true,
+  },
+  xpEarned: {
+    type: [XpEarnedSchema],
+  },
+  createdAt: {
+    type: Date,
+    default: Date.now,
+  },
+  updatedAtBlock: {
+    type: Number,
+    required: true,
+  },
+});

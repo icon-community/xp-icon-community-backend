@@ -2,11 +2,12 @@ import { Injectable } from "@nestjs/common";
 import { InjectModel } from "@nestjs/mongoose";
 import { Model, Types } from "mongoose";
 import { CreateSeasonDto } from "../../db-models";
-import { Season, SeasonsDocument } from "../../schemas/Seasons.schema";
+import { ISeason, SeasonsDocument } from "../../schemas/Seasons.schema";
+import { Collections } from "../../../shared/models/enum/Collections";
 
 @Injectable()
 export class SeasonDbService {
-  constructor(@InjectModel(Season.name) private seasonModel: Model<Season>) {}
+  constructor(@InjectModel(Collections.SEASONS) private seasonModel: Model<ISeason>) {}
 
   async createSeason(task: CreateSeasonDto): Promise<SeasonsDocument> {
     const createdSeason: SeasonsDocument = new this.seasonModel(task);
