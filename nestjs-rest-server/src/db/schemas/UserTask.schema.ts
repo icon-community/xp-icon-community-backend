@@ -29,7 +29,6 @@ export interface IUserTask {
   status: Status;
   walletAddress: string;
   xpEarned: IXpEarned[];
-  updatedAtBlock: number;
   createdAt: Date;
 }
 
@@ -71,9 +70,5 @@ export const UserTaskSchema = new Schema<IUserTask>({
   createdAt: {
     type: Date,
     default: Date.now,
-  },
-  updatedAtBlock: {
-    type: Number,
-    required: true,
   },
 });

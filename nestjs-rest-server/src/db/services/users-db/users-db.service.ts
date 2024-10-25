@@ -32,7 +32,7 @@ export class UsersDbService {
       return this.userModel
         .findOneAndUpdate(
           {
-            walletAddress: address.toLowerCase(),
+            walletAddress: address,
             linkedSocials: {
               $not: { $elemMatch: { provider: socialData.provider, providerAccountId: socialData.providerAccountId } },
             },
@@ -54,7 +54,7 @@ export class UsersDbService {
       return this.userModel
         .findOneAndUpdate(
           {
-            walletAddress: address.toLowerCase(),
+            walletAddress: address,
             linkedWallets: {
               $not: { $elemMatch: { address: linkEvmWalletDto.address, type: linkEvmWalletDto.type } },
             },
@@ -79,7 +79,7 @@ export class UsersDbService {
   async getUserByAddress(address: string): Promise<UserDocument | null> {
     return this.userModel
       .findOne({
-        walletAddress: address.toLowerCase(),
+        walletAddress: address,
       })
       .exec();
   }
@@ -128,7 +128,7 @@ export class UsersDbService {
     return this.userModel
       .findOneAndUpdate(
         {
-          walletAddress: address.toLowerCase(),
+          walletAddress: address,
         },
         {
           $push: { seasons: season },

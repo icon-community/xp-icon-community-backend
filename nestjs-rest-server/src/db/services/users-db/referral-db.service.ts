@@ -33,7 +33,7 @@ export class ReferralDbService {
     try {
       return this.referralModel
         .find({
-          referrerUserAddress: address.toLowerCase(),
+          referrerUserAddress: address,
         })
         .lean()
         .select("-_id")
@@ -48,7 +48,7 @@ export class ReferralDbService {
     try {
       return this.referralModel
         .find({
-          referrerUserAddress: address.toLowerCase(),
+          referrerUserAddress: address,
           createdAt: { $gte: start, $lte: end },
         })
         .lean()

@@ -32,7 +32,6 @@ export class CreateUserTaskDto {
     public seasonId: Types.ObjectId,
     public status: Status,
     public xpEarned: [XpEarnedDto],
-    public updatedAtBlock: number,
   ) {}
 }
 
@@ -40,7 +39,6 @@ export class UpdateUserTaskDto {
   constructor(
     public status: Status,
     public xpEarned: [XpEarnedDto],
-    public updatedAtBlock: number,
   ) {}
 }
 

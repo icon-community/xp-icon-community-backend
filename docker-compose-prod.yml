@@ -1,4 +1,20 @@
 services:
+  auth-server:
+    image: 'iconcommunity/icon-wallet-auth-backend-app:1.0.0'
+    container_name: auth-server
+    ports:
+      - "3005:3005"
+    networks:
+      - mynetworkdev
+    environment:
+      - NODE_ENV=production
+      - JWT_SECRET="VERY SECRET SECRET TO BE CHANGED IN PRODUCTION 98237492"
+      - JWT_EXPIRES_IN_S=604800
+      - CHALLENGE_EXPIRATION_TIME_MS=180000
+      - AUTH_TTL=60000
+      - AUTH_LIMIT=300
+      - CORS_ENABLED=true
+      - PORT=3005
   mongodb-prod:
     image: mongo:latest
     container_name: mongodb-prod
@@ -17,12 +33,11 @@ services:
 
   blockchain-scraper:
     build:
-      context: .
-      dockerfile: Dockerfile
+      context: ./db-manager
     container_name: blockchain-scraper
     depends_on:
       - mongodb-prod
-
+      - rest-server
     networks:
       - mynetworkprod
     command: ["node", "blockchain-scraper.js"]
@@ -30,21 +45,24 @@ services:
       MONGO_CONTAINER: mongodb-prod
 
   rest-server:
-    build:
-      context: .
-      dockerfile: Dockerfile
     container_name: rest-server
+    build:
+      context: ./nestjs-rest-server
+    restart: always
     ports:
       - "3500:3500"
     depends_on:
       - mongodb-prod
-      - blockchain-scraper
-
+      - auth-server
     networks:
-      - mynetworkprod
-    command: ["node", "../rest-server/server.js"]
+      - mynetworkdev
     environment:
-      MONGO_CONTAINER: mongodb-prod
+      NODE_ENV: prod
+      LOG_LEVEL: debug
+      PORT: 3500
+      MONGO_CONFIG: ${MONGO_CONFIG}
+      ICON_NETWORK: mainnet
+      AUTH_URL: http://auth-server:3005
 
 networks:
   mynetworkprod:

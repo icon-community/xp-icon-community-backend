@@ -1,4 +1,20 @@
 services:
+  auth-server:
+    image: 'iconcommunity/icon-wallet-auth-backend-app:1.0.0'
+    container_name: auth-server
+    ports:
+      - "3005:3005"
+    networks:
+      - mynetworkdev
+    environment:
+      - NODE_ENV=production
+      - JWT_SECRET="VERY SECRET SECRET TO BE CHANGED IN PRODUCTION 98237492"
+      - JWT_EXPIRES_IN_S=604800
+      - CHALLENGE_EXPIRATION_TIME_MS=180000
+      - AUTH_TTL=60000
+      - AUTH_LIMIT=300
+      - CORS_ENABLED=true
+      - PORT=3005
   mongodb:
     image: mongo:latest
     container_name: mongodb-dev
@@ -9,15 +25,16 @@ services:
     environment:
       MONGO_INITDB_ROOT_USERNAME: ${MONGO_USER}
       MONGO_INITDB_ROOT_PASSWORD: ${MONGO_PASSWORD}
+    volumes:
+      - ./dev-db/data:/data/db
 
   blockchain-scraper:
     build:
-      context: .
-      dockerfile: Dockerfile
+      context: ./db-manager
     container_name: blockchain-scraper
     depends_on:
       - mongodb
-
+      - rest-server
     networks:
       - mynetworkdev
     command: ["node", "blockchain-scraper.js"]
@@ -26,25 +43,24 @@ services:
       USE_TEST_SEASON: true # set to true to use the test season
 
   rest-server:
-    build:
-      context: .
-      dockerfile: Dockerfile
     container_name: rest-server
+    build:
+      context: ./nestjs-rest-server
+    restart: always
     ports:
       - "3500:3500"
     depends_on:
       - mongodb
-      - blockchain-scraper
-
+      - auth-server
     networks:
       - mynetworkdev
-
-    # move into the rest-server folder, and run the
-    # rest-server in development mode
-    command: sh -c "cd ../rest-server && npm run dev-mongo"
-
     environment:
-      MONGO_CONTAINER: mongodb-dev
+      NODE_ENV: prod
+      LOG_LEVEL: debug
+      PORT: 3500
+      MONGO_CONFIG: ${MONGO_CONFIG}
+      ICON_NETWORK: mainnet
+      AUTH_URL: http://auth-server:3005
 
     # mount the current directory into the container
     # to allow for hot-reloading

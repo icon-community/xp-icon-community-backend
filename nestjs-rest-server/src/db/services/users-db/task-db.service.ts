@@ -34,11 +34,12 @@ export class TaskDbService {
       .exec();
   }
 
-  async getTasksByIds(taskIds: Types.ObjectId[]): Promise<TaskDocument[]> {
+  async getTasksByIds(taskIds: Types.ObjectId[]): Promise<ITask[]> {
     return this.taskModel
       .find({
         _id: { $in: [...taskIds] },
       })
+      .lean()
       .exec();
   }
 }

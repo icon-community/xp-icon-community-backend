@@ -53,10 +53,6 @@ const userTasksSchema = new Schema({
     type: Date,
     default: Date.now,
   },
-  updatedAtBlock: {
-    type: Number,
-    required: true,
-  },
 });
 
 // const UserTasks = mongoose.model("UserTasks", userTasksSchema);

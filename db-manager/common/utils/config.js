@@ -27,11 +27,11 @@ const config = {
     bnusd: "bnUSD",
   },
   seeds: {
-    seasons: "db-manager/data/seasons-seed.json",
-    tasks: "db-manager/data/tasks-seed.json",
-    main: "db-manager/data/main-seed.json",
+    seasons: "data/seasons-seed.json",
+    tasks: "data/tasks-seed.json",
+    main: "data/main-seed.json",
     test: {
-      season: "db-manager/data/test-seeds/seasons-seed-test-1.json",
+      season: "data/seasons-seed.json",
     },
   },
   misc: {

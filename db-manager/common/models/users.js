@@ -61,10 +61,6 @@ const userSchema = new Schema({
     type: [season],
     default: [],
   },
-  updatedAtBlock: {
-    type: Number,
-    required: [true, "Please specify field"],
-  },
   createdAt: { type: Date, default: Date.now },
   updatedAt: { type: Date, default: Date.now },
 });

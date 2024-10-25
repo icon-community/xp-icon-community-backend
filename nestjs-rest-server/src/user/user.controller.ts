@@ -45,7 +45,7 @@ export class UserController {
     @UserAddress() publicAddress: string,
     @Query("referralCode") referralCode?: string,
   ): Promise<UserResponseDto> {
-    return this.userService.registerUser(publicAddress.toLowerCase(), referralCode);
+    return this.userService.registerUser(publicAddress, referralCode);
   }
 
   @Post("/link-social")
@@ -116,7 +116,7 @@ export class UserController {
     @Param("userWallet") userWallet: string,
     @Param("season") season: SeasonLabel,
   ): Promise<FormattedUserSeason> {
-    const data = await this.userService.getUserBySeason(userWallet.toLowerCase(), season);
+    const data = await this.userService.getUserBySeason(userWallet, season);
 
     if (data instanceof HttpException) {
       throw data;
@@ -133,7 +133,7 @@ export class UserController {
   })
   async getUserReferralCode(@UserAddress() publicAddress: string): Promise<ReferralCodeDto> {
     try {
-      return { code: await this.userService.getUserReferralCode(publicAddress.toLowerCase()) };
+      return { code: await this.userService.getUserReferralCode(publicAddress) };
     } catch (e) {
       throw new InternalServerErrorException({
         error: e.message,

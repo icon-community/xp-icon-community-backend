@@ -145,7 +145,6 @@ test> db.users.findOne()
   registrationBlock: 80884702,
   dailyCheckInStreak: 0,
   referrals: [],
-  updatedAtBlock: 80884702,
   createdAt: ISODate('2024-05-23T14:43:02.522Z'),
   updatedAt: ISODate('2024-05-23T14:43:02.522Z'),
   __v: 0,

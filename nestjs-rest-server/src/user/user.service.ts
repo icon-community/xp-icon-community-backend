@@ -75,7 +75,7 @@ export class UserService {
     try {
       const authData = await this.authService.authenticateUser(linkEvmWalletDto.evmAccessToken);
 
-      if (authData.publicAddress.toLowerCase() != linkEvmWalletDto.address.toLowerCase()) {
+      if (authData.publicAddress != linkEvmWalletDto.address) {
         return new BadRequestException("Invalid evmAccessToken for given address");
       }
 
@@ -236,6 +236,6 @@ export class UserService {
   }
 
   private generateReferralCode(publicAddress: string): string {
-    return `${sha3_256(publicAddress.toLowerCase()).slice(0, REFERRAL_CODE_LENGTH)}`;
+    return `${sha3_256(publicAddress).slice(0, REFERRAL_CODE_LENGTH)}`;
   }
 }

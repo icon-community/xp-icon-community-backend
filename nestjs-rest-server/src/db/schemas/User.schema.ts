@@ -14,7 +14,6 @@ export const LinkedWalletSchema = new Schema<ILinkedWallet>(
       type: String,
       unique: true,
       sparse: true,
-      lowercase: true,
       required: [true, "Please specify field"],
     },
     type: {
@@ -106,7 +105,6 @@ export const UserSchema = new Schema<IUser>(
       type: String,
       unique: true,
       index: true,
-      lowercase: true,
       required: [true, "Please specify field"],
     },
     dailyCheckInStreak: {

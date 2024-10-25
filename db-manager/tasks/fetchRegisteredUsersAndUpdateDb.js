@@ -1,5 +1,5 @@
 const { userService, seasonService } = require("../common/services/v1");
-const { createUser, getAllUsers, addSeasonToUser } = userService;
+const { getAllUsers, addSeasonToUser } = userService;
 const { getActiveSeason } = seasonService;
 const {
   getUsersList,
@@ -65,30 +65,6 @@ async function fetchRegisteredUsersAndUpdateDb(taskInput, db) {
               );
               await addSeasonToUser(user, newSeason, db.connection);
             }
-          }
-        } else {
-          // User is not in DB.
-          console.log(`--- User ${user} not in DB`);
-          console.log("--- Fetching registration block for user: ", user);
-          const registrationBlock = await getUserRegistrationBlock(
-            user,
-            null,
-            season.contract,
-          );
-          if (isValidHex(registrationBlock)) {
-            const newUser = {
-              walletAddress: user,
-              updatedAtBlock: parseInt(registrationBlock, 16),
-              seasons: [
-                {
-                  seasonId: season._id,
-                  registrationBlock: parseInt(registrationBlock, 16),
-                },
-              ],
-            };
-
-            console.log(`---- Creating user ${user} in DB`);
-            await createUser(newUser, db.connection);
           }
         }
       }

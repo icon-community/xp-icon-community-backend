@@ -15,7 +15,6 @@ const users = [
     _id: IDS.users1,
     walletAddress: "0x1234567890",
     registrationBlock: 1,
-    updatedAtBlock: 2,
     seasons: [
       {
         seasonId: IDS.seasons1,
@@ -28,7 +27,6 @@ const users = [
     _id: IDS.users2,
     walletAddress: "0x0987654321",
     registrationBlock: 2,
-    updatedAtBlock: 2,
     seasons: [
       {
         seasonId: IDS.seasons1,
@@ -99,7 +97,6 @@ const userTasks = [
       },
     ],
     createdAt: new Date(),
-    updatedAtBlock: 0,
   },
   {
     userId: IDS.users2,
@@ -114,7 +111,6 @@ const userTasks = [
       },
     ],
     createdAt: new Date(),
-    updatedAtBlock: 0,
   },
 ];
 
