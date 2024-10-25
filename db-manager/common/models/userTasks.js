@@ -48,6 +48,7 @@ const userTasksSchema = new Schema({
   },
   xpEarned: {
     type: [xpEarnedSchema],
+    default: [],
   },
   createdAt: {
     type: Date,

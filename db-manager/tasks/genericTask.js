@@ -154,7 +154,6 @@ async function genericTask(taskInput, db, seedId, callback) {
           activeSeason._id,
           db.connection,
         );
-        const userTaskDoc = userTaskDocArr[0];
 
         // if the task is xchain, iterate over each wallet
         if (targetTask.type === "xchain") {
@@ -170,6 +169,12 @@ async function genericTask(taskInput, db, seedId, callback) {
           for (const xChainWallet of linkedWallets) {
             if (xChainWallet.type === "evm") {
               for (const chain of chains.evm) {
+                const userTaskDoc = userTaskDocArr.filter((doc) => {
+                  return (
+                    doc.walletAddress === `${chain}/${xChainWallet.address}`
+                  );
+                });
+
                 const userWallet = `${chain}/${xChainWallet.address}`;
                 console.log(`--- xChainWallet found: ${userWallet}`);
                 await userTaskMainLogic(
@@ -188,6 +193,9 @@ async function genericTask(taskInput, db, seedId, callback) {
             }
           }
         } else {
+          const userTaskDoc = userTaskDocArr.find((doc) => {
+            return doc.walletAddress === validUser.walletAddress;
+          });
           // execute the logic for the user's wallet
           const userWallet = validUser.walletAddress;
           await userTaskMainLogic(
@@ -232,87 +240,92 @@ async function userTaskMainLogic(
   userWallet,
   db,
 ) {
-  const xpArray = [];
-  // if userTask document exists, fetch the xpEarned array
-  // TODO: modify this to a better performance logic
-  // search if is possible to update the task
-  // xpEarned array without fetching the whole document
-  if (userTaskDoc != null && userTaskDoc.xpEarned.length > 0) {
-    if (targetTask.type === "non-recursive") {
-      console.log("--- non-recursive task");
-      // if the task is non-recursive, do nothing
-      // and continue to the next user,
-      // to be in this step in the logic means
-      // that the user has already earned XP
-      // for this task
-      // continue;
-      return;
+  try {
+    const xpArray = [];
+    // if userTask document exists, fetch the xpEarned array
+    // TODO: modify this to a better performance logic
+    // search if is possible to update the task
+    // xpEarned array without fetching the whole document
+    if (
+      userTaskDoc != null &&
+      userTaskDoc.xpEarned != null &&
+      userTaskDoc.xpEarned.length > 0
+    ) {
+      if (targetTask.type === "non-recursive") {
+        console.log("--- non-recursive task");
+        // if the task is non-recursive, do nothing
+        // and continue to the next user,
+        // to be in this step in the logic means
+        // that the user has already earned XP
+        // for this task
+        // continue;
+        return;
+      }
+      // find if an entry for the prepTerm exists in the 'xpEarned' array
+      // in other words check if the user has already earned XP for the current term
+      const alreadyExists = userTaskDoc.xpEarned.find((xpEarned) => {
+        return xpEarned.period === prepTerm;
+      });
+
+      if (alreadyExists != null) {
+        // if the entry exists, do nothing and continue to the next user
+        console.log(
+          `--- UserTask document for user ${validUser._id} and task ${targetTask._id} and season ${activeSeason._id} already has an entry for prepTerm ${prepTerm}, with marked block height of ${alreadyExists.block}, and earned XP of ${alreadyExists.xp}`,
+        );
+        // continue;
+        return;
+      } else {
+        // if the entry does not exist, fetch all the existing entries (these are for the previous terms)
+        xpArray.push(...userTaskDoc.xpEarned);
+      }
     }
-    // find if an entry for the prepTerm exists in the 'xpEarned' array
-    // in other words check if the user has already earned XP for the current term
-    const alreadyExists = userTaskDoc.xpEarned.find((xpEarned) => {
-      return xpEarned.period === prepTerm;
+
+    // fetch amount for user for this current term
+    console.log(`--- Fetching amount for user ${userWallet}`);
+    const callbackResponse = await callback(userWallet, height);
+
+    let amount = 0;
+    if (callbackResponse == null) {
+      console.log(
+        `--- No amount found for user ${validUser.walletAddress} at block ${height}`,
+      );
+    } else {
+      // TODO: this requires type and error checking,
+      // first evaluate if the object exists then
+      // do the math operation and evaluate if NaN is
+      // returned, etc
+      console.log("--- amount found for user, calculating earned XP");
+      amount = callbackResponse;
+      console.log("--- value in USD: ", amount);
+    }
+
+    console.log("--- Updating userTask document with new xpEarned array");
+    // here we are adding the new entry for the current term to the xpEarned array. At this point the xpEarned array contains all the previous terms and we are adding the current term to it
+    xpArray.push({
+      period: prepTerm,
+      block: height,
+      xp: rewardFormula(amount),
     });
 
-    if (alreadyExists != null) {
-      // if the entry exists, do nothing and continue to the next user
-      console.log(
-        `--- UserTask document for user ${validUser._id} and task ${targetTask._id} and season ${activeSeason._id} already has an entry for prepTerm ${prepTerm}, with marked block height of ${alreadyExists.block}, and earned XP of ${alreadyExists.xp}`,
-      );
-      // continue;
-      return;
-    } else {
-      // if the entry does not exist, fetch all the existing entries (these are for the previous terms)
-      xpArray.push(...userTaskDoc.xpEarned);
-    }
-  }
-
-  // fetch amount for user for this current term
-  console.log(`--- Fetching amount for user ${validUser.walletAddress}`);
-  const callbackResponse = await callback(
-    //TODO: remove after xchain implementation
-    // validUser.walletAddress,
-    userWallet,
-    height,
-  );
-
-  let amount = 0;
-  if (callbackResponse == null) {
-    console.log(
-      `--- No amount found for user ${validUser.walletAddress} at block ${height}`,
+    // Update userTask document with new xpEarned array
+    // at this point we got the xpEarned array with all the previous terms and we added the current term to it
+    await updateOrCreateUserTask(
+      {
+        userId: validUser._id,
+        taskId: targetTask._id,
+        seasonId: activeSeason._id,
+        // TODO: update this to support xchain wallets
+        walletAddress: userWallet,
+      },
+      { xpEarned: xpArray },
+      db.connection,
     );
-  } else {
-    // TODO: this requires type and error checking,
-    // first evaluate if the object exists then
-    // do the math operation and evaluate if NaN is
-    // returned, etc
-    console.log("--- amount found for user, calculating earned XP");
-    amount = callbackResponse;
-    console.log("--- value in USD: ", amount);
+    console.log("--- UserTask document updated");
+  } catch (err) {
+    console.log("> Error running userTaskMainLogic ");
+    console.log(err);
+    throw new Error(err.message);
   }
-
-  console.log("--- Updating userTask document with new xpEarned array");
-  // here we are adding the new entry for the current term to the xpEarned array. At this point the xpEarned array contains all the previous terms and we are adding the current term to it
-  xpArray.push({
-    period: prepTerm,
-    block: height,
-    xp: rewardFormula(amount),
-  });
-
-  // Update userTask document with new xpEarned array
-  // at this point we got the xpEarned array with all the previous terms and we added the current term to it
-  await updateOrCreateUserTask(
-    {
-      userId: validUser._id,
-      taskId: targetTask._id,
-      seasonId: activeSeason._id,
-      // TODO: update this to support xchain wallets
-      walletAddress: userWallet,
-    },
-    { xpEarned: xpArray },
-    db.connection,
-  );
-  console.log("--- UserTask document updated");
 }
 
 module.exports = genericTask;

@@ -1,16 +1,40 @@
 // customPath.js
 //
 const path = require("path");
+const fs = require("fs");
 
-const fullPath = path.parse(__filename).dir;
-const fullPathArray = fullPath.split("/");
-const MAIN_FOLDER = fullPathArray[fullPathArray.length - 4];
+const fullPath = path.dirname(require.main.filename);
+let fullPathArray = fullPath.split("/");
+fullPathArray[0] = "/";
+let MAIN_FOLDER = null;
+
+let maxLoops = 100;
+while (MAIN_FOLDER === null && maxLoops > 0) {
+  maxLoops--;
+  const folderPath = path.join(...fullPathArray);
+  const packageJsonPath = path.join(folderPath, "package.json");
+  // console.log("while loop");
+  // console.log(fullPathArray);
+  // console.log(maxLoops);
+  // console.log(packageJsonPath);
+  try {
+    fs.accessSync(packageJsonPath, fs.constants.F_OK);
+    const folderSplit = folderPath.split("/");
+    MAIN_FOLDER = folderSplit[folderSplit.length - 1];
+    console.log(`package.json found in ${folderPath}`);
+  } catch (err) {
+    void err;
+    // console.log(`no package.json found in ${folderPath}`);
+    fullPathArray.pop();
+  }
+}
 
 function customPath(relativePath) {
   const parsedPath = path.parse(__filename);
   let fullPathSplit = parsedPath.dir.split("/");
+  // fullPathSplit[0] = "/";
 
-  for (let i = 0; i < fullPathSplit.length; i++) {
+  while (fullPathSplit.length > 0) {
     if (fullPathSplit[fullPathSplit.length - 1] === MAIN_FOLDER) {
       break;
     } else {

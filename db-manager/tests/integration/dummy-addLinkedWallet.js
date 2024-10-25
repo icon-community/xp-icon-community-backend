@@ -1,8 +1,9 @@
 //
 const MainDb = require("../../common/utils/mainDb");
 const config = require("../../common/utils/config");
-const { userService } = require("../../common/services/v1");
-const { getAllUsers, addLinkedWalletToUser } = userService;
+const { userService, seasonService } = require("../../common/services/v1");
+const { getAllUsers, addLinkedWalletToUser, createUser } = userService;
+const { getActiveSeason } = seasonService;
 
 const params = { ...config.mongoParams };
 
@@ -32,6 +33,19 @@ async function main() {
     await db.createConnection();
 
     await foo();
+
+    // register user in seasons
+    const activeSeasons = await getActiveSeason(db.connection);
+
+    const seasonsForUser = [];
+    for (const season of activeSeasons) {
+      seasonsForUser.push({ seasonId: season._id, registrationBlock: 0 });
+    }
+    const newUser = {
+      walletAddress: userWallet,
+      season: seasonsForUser,
+    };
+    await createUser(newUser, db.connection);
 
     for (const xchainWallet of linkedWallets) {
       const linkedWallet = {
