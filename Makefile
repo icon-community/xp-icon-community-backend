@@ -33,3 +33,11 @@ run-dev-mongodb:
 stop-dev-mongodb:
 	@echo "Running dev mongodb server"
 	@docker compose -f docker-compose-dev.yml down mongodb
+
+run-dev-rest-api:
+	@echo "Running dev mongodb server"
+	@docker compose -f docker-compose-dev.yml up -d rest-server --build
+
+stop-dev-rest-api:
+	@echo "Running dev mongodb server"
+	@docker compose -f docker-compose-dev.yml down rest-server

@@ -2,8 +2,8 @@ import { Injectable } from "@nestjs/common";
 import { UsersDbService } from "../../db/services/users-db/users-db.service";
 import { SeasonDbService } from "../../db/services/users-db/season-db.service";
 import { UsersTaskDbService } from "../../db/services/users-db/user-task-db.service";
-import { TaskDbService } from "../../db/services/users-db/task-db.service";
 import { RankData, TaskXp } from "../../shared/models/types/RankedTypes";
+import { calculateTaskTotalXp } from "../../shared/utils/xp-util";
 
 @Injectable()
 export class RankingService {
@@ -11,7 +11,6 @@ export class RankingService {
     private userDb: UsersDbService,
     private seasonDb: SeasonDbService,
     private userTaskDb: UsersTaskDbService,
-    private taskDb: TaskDbService,
   ) {}
 
   public async getRankingOfSeason(seasonNumber: number): Promise<RankData[]> {
@@ -33,13 +32,13 @@ export class RankingService {
       };
 
       for (let ii = 0; ii < season.tasks.length; ii++) {
-        const userTask = await this.userTaskDb.getUserTaskByAllIds(allUsers[i]._id, season.tasks[ii], season._id);
+        const userTasks = await this.userTaskDb.getUserTaskByAllIds(allUsers[i]._id, season.tasks[ii], season._id);
 
-        if (!userTask) {
+        if (!userTasks || userTasks.length == 0) {
           continue;
         }
 
-        const taskTotalXp = userTask.xpEarned.reduce((a, b) => a + Number(b.xp), 0);
+        const taskTotalXp = calculateTaskTotalXp(userTasks);
 
         tempData.total = tempData.total + taskTotalXp;
         tempData.tasks.push({

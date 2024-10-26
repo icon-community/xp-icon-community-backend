@@ -14,10 +14,14 @@ import { UsersTaskDbService } from "../db/services/users-db/user-task-db.service
 import { sha3_256 } from "js-sha3";
 import { Types } from "mongoose";
 import { TaskDbService } from "../db/services/users-db/task-db.service";
-import { formatSeasonDocument, formatUser, formatUserDocument, formatUserTaskDocument } from "../shared/utils/mapper";
-import { sumXp24hrs, sumXpTotal } from "../shared/utils/xp-util";
+import { formatSeasonDocument, formatUser, formatUserDocument, formatUserTaskDocuments } from "../shared/utils/mapper";
+import { calculateTaskTotalXp, sumXp24hrs, sumXpTotal } from "../shared/utils/xp-util";
 import { RankingService } from "../ranking/service/ranking.service";
-import { FormattedUserBySeasonTask, FormattedUserSeason } from "../shared/models/types/FormattedTypes";
+import {
+  FormattedUserBySeasonTask,
+  FormattedUserSeason,
+  FormattedUserTask,
+} from "../shared/models/types/FormattedTypes";
 import { REFERRAL_CODE_LENGTH } from "../constants";
 import { CreateUserDto } from "../db/db-models";
 import { MongoDbErrorCode } from "../shared/models/enum/MongoDbErrorCode";
@@ -151,23 +155,27 @@ export class UserService {
         });
       }
 
-      const userTask = formatUserTaskDocument(
+      const userTasks = formatUserTaskDocuments(
         await this.userTaskDb.getUserTaskByAllIds(user._id, season.tasks[i]._id, season._id),
       );
 
-      if (userTask == null) {
+      if (userTasks == null || userTasks.length == 0) {
         console.log("User task not found");
         continue;
       }
 
-      const taskTotalXp = userTask.xpEarned.reduce((a, b) => a + Number(b.xp), 0);
+      const taskTotalXp = calculateTaskTotalXp(userTasks);
+      const xp = {
+        status: userTasks[0].status,
+        xpEarned: userTasks.map((task) => task.xpEarned).flat(),
+      } satisfies FormattedUserTask;
 
       tasks.push({
         task: {
           ...taskFromDb,
           XPEarned_total_task: taskTotalXp,
         },
-        xp: userTask,
+        xp,
       });
     }
 
@@ -188,13 +196,13 @@ export class UserService {
   }
 
   async getTaskTotalXp(userId: Types.ObjectId, taskId: Types.ObjectId, seasonId: Types.ObjectId): Promise<number> {
-    const userTask = await this.userTaskDb.getUserTaskByAllIds(userId, taskId, seasonId);
+    const userTasks = await this.userTaskDb.getUserTaskByAllIds(userId, taskId, seasonId);
 
-    if (userTask == null) {
+    if (userTasks == null || userTasks.length == 0) {
       return 0;
     }
 
-    return userTask.xpEarned.reduce((a, b) => a + Number(b.xp), 0);
+    return calculateTaskTotalXp(userTasks);
   }
 
   async getUserReferralCode(publicAddress: string): Promise<string> {

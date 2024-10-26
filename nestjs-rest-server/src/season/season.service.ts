@@ -136,13 +136,14 @@ export class SeasonService {
           icxBalance += (await this.iconConnector.getIcxBalance(user.walletAddress, true)).toNumber();
         }
 
-        const userTask = await this.userTaskDb.getUserTaskByAllIds(user._id, task._id, season._id);
+        const userTasks = await this.userTaskDb.getUserTaskByAllIds(user._id, task._id, season._id);
 
-        if (!userTask) {
+        if (!userTasks || userTasks.length == 0) {
           continue;
         }
 
-        const lastXp = userTask.xpEarned[userTask.xpEarned.length - 1].xp / divider;
+        const lastXp =
+          userTasks.reduce((sum, userTask) => sum + userTask.xpEarned[userTask.xpEarned.length - 1].xp, 0) / divider;
 
         if (!Number.isNaN(lastXp)) {
           ammount += lastXp;

@@ -22,9 +22,9 @@ export class UsersTaskDbService {
     userId: Types.ObjectId,
     taskId: Types.ObjectId,
     seasonId: Types.ObjectId,
-  ): Promise<UserTaskDocument | null> {
+  ): Promise<UserTaskDocument[] | null> {
     return this.userTaskModel
-      .findOne({
+      .find({
         userId: userId,
         taskId: taskId,
         seasonId: seasonId,

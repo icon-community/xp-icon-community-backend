@@ -69,16 +69,17 @@ export function formatXpEarnedDocument(xpArray: IXpEarned[]): FormattedXpEarned[
   });
 }
 
-export function formatUserTaskDocument(
-  task: UserTaskDocument | null | undefined,
-): FormattedUserTask | null | undefined {
+export function formatUserTaskDocuments(
+  task: UserTaskDocument[] | null | undefined,
+): FormattedUserTask[] | null | undefined {
   if (!task) return task;
 
-  return {
-    // _id: task._id,
-    status: task.status,
-    xpEarned: formatXpEarnedDocument(task.xpEarned),
-  };
+  return task.map((v) => {
+    return {
+      status: v.status,
+      xpEarned: formatXpEarnedDocument(v.xpEarned),
+    };
+  });
 }
 
 export function formatUserDocument(user: UserDocument | null | undefined): FormattedUser | null | undefined {
