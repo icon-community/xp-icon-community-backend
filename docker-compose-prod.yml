@@ -42,6 +42,10 @@ services:
       - mynetworkprod
     command: ["node", "blockchain-scraper.js"]
     environment:
+      MONGO_USER: ${MONGO_USER}
+      MONGO_PASSWORD: ${MONGO_PASSWORD}
+      MONGO_PORT: ${MONGO_PORT}
+      MONGO_DB_NAME: ${MONGO_DB_NAME}
       MONGO_CONTAINER: mongodb-prod
 
   rest-server:
@@ -60,7 +64,11 @@ services:
       NODE_ENV: prod
       LOG_LEVEL: debug
       PORT: 3500
-      MONGO_CONFIG: ${MONGO_CONFIG}
+      MONGO_USER: ${MONGO_USER}
+      MONGO_PASSWORD: ${MONGO_PASSWORD}
+      MONGO_PORT: ${MONGO_PORT}
+      MONGO_DB_NAME: ${MONGO_DB_NAME}
+      MONGO_CONTAINER: mongodb-prod
       ICON_NETWORK: mainnet
       AUTH_URL: http://auth-server:3005
 

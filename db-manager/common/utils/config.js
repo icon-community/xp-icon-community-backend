@@ -49,9 +49,11 @@ const config = {
     userTask: process.env.USER_TASK_COLLECTION,
   },
   db: {
-    uri: process.env.URI,
     user: process.env.MONGO_USER,
     pwd: process.env.MONGO_PASSWORD,
+    port: process.env.MONGO_PORT,
+    dbName: process.env.MONGO_DB_NAME,
+    containerName: process.env.MONGO_CONTAINER,
   },
   flags: {
     useMockDb: process.env.USE_MOCK_DB,
@@ -117,12 +119,12 @@ const config = {
 config.jvm.default = config.jvm[SELECTED_CHAIN];
 
 const mongoContainer =
-  process.env.MONGO_CONTAINER == null ? "mongodb" : process.env.MONGO_CONTAINER;
+  process.env.NODE_ENV === "dev"
+    ? "localhost"
+    : config.db.containerName == null
+      ? "mongodb"
+      : config.db.containerName;
 
-if (process.env.NODE_ENV === "dev") {
-  config.mongoParams.uri = `mongodb://${config.db.user}:${config.db.pwd}@localhost:27017`;
-} else {
-  config.mongoParams.uri = `mongodb://${config.db.user}:${config.db.pwd}@${mongoContainer}:27017`;
-}
+config.mongoParams.uri = `mongodb://${config.db.user}:${config.db.pwd}@${mongoContainer}:${config.db.port}`;
 
 module.exports = config;

@@ -17,7 +17,10 @@ const evnConfig: Record<string, unknown> = {
   port: process.env.PORT,
   iconNetwork: process.env.ICON_NETWORK,
   authServerUrl: process.env.AUTH_URL,
-  mongoConfig: JSON.parse(process.env.MONGO_CONFIG ?? "{}"),
+  mongoConfig: {
+    url: `mongodb://${process.env.MONGO_USER}:${process.env.MONGO_PASSWORD}@${process.env.MONGO_CONTAINER}:${process.env.MONGO_PORT}/`,
+    dbName: `${process.env.MONGO_DB_NAME}`,
+  },
 };
 
 export default registerAs("config", () => {
