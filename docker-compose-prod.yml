@@ -1,11 +1,11 @@
 services:
   auth-server:
-    image: 'iconcommunity/icon-wallet-auth-backend-app:1.0.0'
+    image: "iconcommunity/icon-wallet-auth-backend-app:1.0.0"
     container_name: auth-server
     ports:
       - "3005:3005"
     networks:
-      - mynetworkdev
+      - mynetworkprod
     environment:
       - NODE_ENV=production
       - JWT_SECRET="VERY SECRET SECRET TO BE CHANGED IN PRODUCTION 98237492"
@@ -55,7 +55,7 @@ services:
       - mongodb-prod
       - auth-server
     networks:
-      - mynetworkdev
+      - mynetworkprod
     environment:
       NODE_ENV: prod
       LOG_LEVEL: debug

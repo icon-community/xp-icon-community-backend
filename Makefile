@@ -1,3 +1,4 @@
+#------------------- Prod Environment Commands----------
 run-prod:
 	@echo "Running production server"
 	@docker compose -f docker-compose-prod.yml up -d
@@ -18,6 +19,7 @@ update-prod-blockchain-scraper:
 	@echo "Updating production server (rest-server)"
 	@docker compose -f docker-compose-prod.yml up -d --no-deps --build blockchain-scraper
 
+#------------------- Dev Environment Commands-----------
 run-dev:
 	@echo "Running development server"
 	@docker compose -f docker-compose-dev.yml up -d --build
