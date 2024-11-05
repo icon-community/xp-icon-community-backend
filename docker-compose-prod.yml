@@ -1,6 +1,6 @@
 services:
   auth-server:
-    image: "iconcommunity/icon-wallet-auth-backend-app:1.0.1"
+    image: "iconcommunity/icon-wallet-auth-backend-app:1.0.2"
     container_name: auth-server
     ports:
       - "3005:3005"
