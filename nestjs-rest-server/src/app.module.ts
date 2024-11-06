@@ -9,7 +9,7 @@ import { RankingModule } from "./ranking/ranking.module";
 import { ChainConnectorsModule } from "./chain-connectors/chain-connectors.module";
 import { ValidationPipe } from "./shared/pipes/validation.pipe";
 import { XpgoConfigModule } from "./config/xpgo-config.module";
-import { AddressValidationPipe } from "./shared/pipes/icon-eoa-address-validation-pipe.service";
+import { AddressValidationPipe } from "./shared/pipes/address-validation-pipe.service";
 import { MongooseModule } from "@nestjs/mongoose";
 import { XpgoConfigService } from "./config/xpgo-config.service";
 import { ReferralModule } from "./referral/referral.module";
