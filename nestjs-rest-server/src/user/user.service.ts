@@ -29,7 +29,7 @@ import { ReferralService } from "../referral/referral.service";
 import { UserErrorCodes } from "./error/user-error-codes";
 import { UserResponseDto } from "./dto/user-response.dto";
 import { LinkSocialDataDto } from "./dto/link-social-data.dto";
-import { LinkEvmWalletDto } from "./dto/link-evm-wallet.dto";
+import { LinkWalletDto } from "./dto/link-wallet.dto";
 import { AuthService } from "../auth/auth.service";
 import { SeasonErrorCodes } from "./error/season-error-codes";
 
@@ -72,18 +72,15 @@ export class UserService {
     }
   }
 
-  async linkUserEvmWallet(
-    linkEvmWalletDto: LinkEvmWalletDto,
-    address: string,
-  ): Promise<UserResponseDto | HttpException> {
+  async linkUserEvmWallet(linkWalletDto: LinkWalletDto, address: string): Promise<UserResponseDto | HttpException> {
     try {
-      const authData = await this.authService.authenticateUser(linkEvmWalletDto.evmAccessToken);
+      const authData = await this.authService.authenticateUser(linkWalletDto.accessToken);
 
-      if (authData.publicAddress != linkEvmWalletDto.address) {
-        return new BadRequestException("Invalid evmAccessToken for given address");
+      if (authData.publicAddress != linkWalletDto.address) {
+        return new BadRequestException("Invalid accessToken for given address");
       }
 
-      const updatedUser = await this.userDb.linkUserEvmWallet(linkEvmWalletDto, address);
+      const updatedUser = await this.userDb.linkUserEvmWallet(linkWalletDto, address);
 
       if (!updatedUser) {
         return new BadRequestException("User not found or social already linked");

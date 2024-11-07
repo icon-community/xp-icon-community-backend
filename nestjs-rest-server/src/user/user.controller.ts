@@ -22,7 +22,7 @@ import { FormattedUserSeason } from "../shared/models/types/FormattedTypes";
 import { ValidationPipe } from "../shared/pipes/validation.pipe";
 import { UserResponseDto } from "./dto/user-response.dto";
 import { LinkSocialDataDto } from "./dto/link-social-data.dto";
-import { LinkEvmWalletDto } from "./dto/link-evm-wallet.dto";
+import { LinkWalletDto } from "./dto/link-wallet.dto";
 
 @Controller("user")
 export class UserController {
@@ -75,17 +75,21 @@ export class UserController {
     description: "JWT Authorization header. E.g. 'Bearer {Token}'",
   })
   @UsePipes(new ValidationPipe())
-  async linkUserEvmWallet(
-    @UserAddress() address: string,
-    @Body() linkEvmWalletDto: LinkEvmWalletDto,
-  ): Promise<UserResponseDto> {
-    const data = await this.userService.linkUserEvmWallet(linkEvmWalletDto, address);
+  async linkUserWallet(@UserAddress() address: string, @Body() linkWalletDto: LinkWalletDto): Promise<UserResponseDto> {
+    if (linkWalletDto.type === "evm") {
+      const data = await this.userService.linkUserEvmWallet(linkWalletDto, address);
 
-    if (data instanceof HttpException) {
-      throw data;
+      if (data instanceof HttpException) {
+        throw data;
+      }
+
+      return data;
+    } else if (linkWalletDto.type === "stellar") {
+      // TODO: to be implemented
+      throw new InternalServerErrorException("Invalid wallet type");
+    } else {
+      throw new InternalServerErrorException("Invalid wallet type");
     }
-
-    return data;
   }
 
   @Get(":address")
