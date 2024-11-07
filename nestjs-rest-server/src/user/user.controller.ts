@@ -48,6 +48,18 @@ export class UserController {
     return this.userService.registerUser(publicAddress, referralCode);
   }
 
+  @Post("/register-season")
+  @UseGuards(JwtAuthGuard)
+  @ApiHeader({
+    name: "authorization",
+    description: "JWT Authorization header. E.g. 'Bearer {Token}'",
+  })
+  @UsePipes(new ValidationPipe())
+  async registerSeason(@Body() body: { address: string; seasonLabel: SeasonLabel }): Promise<UserResponseDto> {
+    const { address, seasonLabel } = body;
+    return this.userService.registerSeason(address, seasonLabel);
+  }
+
   @Post("/link-social")
   @UseGuards(JwtAuthGuard)
   @ApiHeader({

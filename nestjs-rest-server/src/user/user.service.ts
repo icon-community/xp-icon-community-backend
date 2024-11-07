@@ -32,6 +32,7 @@ import { LinkSocialDataDto } from "./dto/link-social-data.dto";
 import { LinkWalletDto } from "./dto/link-wallet.dto";
 import { AuthService } from "../auth/auth.service";
 import { SeasonErrorCodes } from "./error/season-error-codes";
+import { IconConnectorService } from "../chain-connectors/icon-connector.service";
 
 @Injectable()
 export class UserService {
@@ -45,6 +46,7 @@ export class UserService {
     private rankingService: RankingService,
     private referralService: ReferralService,
     private authService: AuthService,
+    private iconConnector: IconConnectorService,
   ) {}
 
   async getUser(address: string): Promise<UserResponseDto> {
@@ -236,6 +238,53 @@ export class UserService {
       }
 
       this.logger.error(`Failed to register user: ${JSON.stringify(e, null, 2)}`);
+      throw new InternalServerErrorException(UserErrorCodes.REGISTRATION_FAILED);
+    }
+  }
+
+  async registerSeason(publicAddress: string, seasonLabel: SeasonLabel): Promise<UserResponseDto> {
+    try {
+      // find season by SeasonLabel
+      const seasonDbLabel = seasonsConfig.routes[seasonLabel];
+
+      if (!seasonDbLabel) {
+        throw new Error("Invalid season");
+      }
+
+      const season = await this.seasonDb.getSeasonByNumberId(seasonDbLabel);
+
+      if (!season) {
+        throw new BadRequestException(SeasonErrorCodes.SEASON_NOT_FOUND);
+      }
+
+      // fetch current block height on ICON chain
+      const latestBlock = await this.iconConnector.getLastBlock();
+
+      if (!latestBlock) {
+        throw new InternalServerErrorException("Failed to fetch latest block");
+      }
+
+      if (!("height" in latestBlock)) {
+        throw new InternalServerErrorException("Failed to fetch latest block height");
+      }
+
+      // add season to user
+      const newSeason: { seasonId: any; registrationBlock: any } = {
+        seasonId: season._id,
+        registrationBlock: latestBlock.height,
+      };
+      const result = await this.userDb.addSeasonToUser(publicAddress, newSeason);
+
+      if (result == null) {
+        throw new BadRequestException(UserErrorCodes.ADDING_SEASON_FAILED);
+      }
+      return formatUser(result);
+    } catch (e) {
+      if (e?.code === MongoDbErrorCode.DUPLICATE) {
+        throw new BadRequestException(UserErrorCodes.USER_ALREADY_EXISTS);
+      }
+
+      this.logger.error(`Failed to add season to user: ${JSON.stringify(e, null, 2)}`);
       throw new InternalServerErrorException(UserErrorCodes.REGISTRATION_FAILED);
     }
   }

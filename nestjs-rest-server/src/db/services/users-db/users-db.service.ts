@@ -125,6 +125,17 @@ export class UsersDbService {
   }
 
   async addSeasonToUser(address: string, season: UserSeasonDto): Promise<UserDocument | null> {
+    // Check if user already has this season
+    const existingUser = await this.userModel.findOne({
+      walletAddress: address,
+      "seasons.seasonId": season.seasonId,
+    });
+
+    // If user already has this season, return the user
+    if (existingUser) {
+      return existingUser;
+    }
+
     return this.userModel
       .findOneAndUpdate(
         {
