@@ -108,10 +108,30 @@ export class UserService {
       throw new BadRequestException(UserErrorCodes.USER_NOT_FOUND);
     }
 
+    // from the user data fetch the seasons that the
+    // user is registered in
+    const userSeasons = user.seasons;
+
+    // fetch the season by the provided season label
     const season = await this.seasonDb.getSeasonByNumberId(seasonDbLabel);
 
+    // if the season is not found, throw an error
     if (!season) {
       throw new BadRequestException(SeasonErrorCodes.SEASON_NOT_FOUND);
+    }
+
+    // verify that the user is registered in the season
+    // by checking if the id of season is inside the
+    // userSeasons array
+    let flag = false;
+    userSeasons.forEach((registeredSeasons) => {
+      if (registeredSeasons.seasonId.equals(season._id)) {
+        flag = true;
+      }
+    });
+
+    if (flag === false) {
+      throw new BadRequestException(SeasonErrorCodes.SEASON_NOT_REGISTERED);
     }
 
     const formattedSeason = formatSeasonDocument(season);
