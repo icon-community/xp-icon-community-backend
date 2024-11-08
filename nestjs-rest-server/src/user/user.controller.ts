@@ -23,6 +23,7 @@ import { ValidationPipe } from "../shared/pipes/validation.pipe";
 import { UserResponseDto } from "./dto/user-response.dto";
 import { LinkSocialDataDto } from "./dto/link-social-data.dto";
 import { LinkWalletDto } from "./dto/link-wallet.dto";
+import { RegisterSeasonDto } from "./dto/register-season.dto";
 
 @Controller("user")
 export class UserController {
@@ -55,9 +56,12 @@ export class UserController {
     description: "JWT Authorization header. E.g. 'Bearer {Token}'",
   })
   @UsePipes(new ValidationPipe())
-  async registerSeason(@Body() body: { address: string; seasonLabel: SeasonLabel }): Promise<UserResponseDto> {
-    const { address, seasonLabel } = body;
-    return this.userService.registerSeason(address, seasonLabel);
+  async registerSeason(
+    @UserAddress() publicAddress: string,
+    @Body() body: RegisterSeasonDto,
+  ): Promise<UserResponseDto> {
+    const { seasonLabel } = body;
+    return this.userService.registerSeason(publicAddress, seasonLabel);
   }
 
   @Post("/link-social")
@@ -127,6 +131,13 @@ export class UserController {
     }
   }
 
+  //TODO: fix this endpoint, due to the change in logic
+  // that now we dont use smart contracts to track the
+  // user registration to a season, this endpoint is broken
+  // is returning values for user and season when the user
+  // is not registered to the season.
+  // create a check that validates that the user is
+  // registered to the season before returning the data
   @Get("/:userWallet/season/:season")
   async getUserBySeason(
     @Param("userWallet") userWallet: string,
