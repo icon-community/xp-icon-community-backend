@@ -1,7 +1,7 @@
 import { IsEnum, IsNotEmpty, IsString } from "class-validator";
 import { ChainType } from "../../shared/models/enum/ChainType";
 
-export class LinkEvmWalletDto {
+export class LinkWalletDto {
   @IsString()
   @IsNotEmpty()
   address: string;
@@ -12,5 +12,5 @@ export class LinkEvmWalletDto {
 
   @IsString()
   @IsNotEmpty()
-  evmAccessToken: string;
+  accessToken: string;
 }

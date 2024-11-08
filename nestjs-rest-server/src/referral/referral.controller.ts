@@ -10,7 +10,7 @@ import {
 } from "@nestjs/common";
 import { ReferralService } from "./referral.service";
 import { Referral } from "../db/schemas/Referral.schema";
-import { AddressValidationPipe } from "../shared/pipes/icon-eoa-address-validation-pipe.service";
+import { AddressValidationPipe } from "../shared/pipes/address-validation-pipe.service";
 import { FindUserReferralsQueryDTO } from "./dto/FindUserReferralsQueryDTO";
 import { UserAddress } from "../user/decorator/user.decorators";
 import { JwtAuthGuard } from "../auth/guards/jwt-auth.guard";

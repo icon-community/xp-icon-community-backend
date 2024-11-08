@@ -5,7 +5,7 @@ import { Model, Types } from "mongoose";
 import { CreateUserDto, UserSeasonDto } from "../../db-models";
 import { MongoDbErrorCode } from "../../../shared/models/enum/MongoDbErrorCode";
 import { LinkSocialDataDto } from "../../../user/dto/link-social-data.dto";
-import { LinkEvmWalletDto } from "../../../user/dto/link-evm-wallet.dto";
+import { LinkWalletDto } from "../../../user/dto/link-wallet.dto";
 import { MAX_LINKED_EVM_WALLETS } from "../../../constants";
 import { Collections } from "../../../shared/models/enum/Collections";
 
@@ -49,19 +49,19 @@ export class UsersDbService {
     }
   }
 
-  async linkUserEvmWallet(linkEvmWalletDto: LinkEvmWalletDto, address: string): Promise<UserDocument | null> {
+  async linkUserEvmWallet(linkWalletDto: LinkWalletDto, address: string): Promise<UserDocument | null> {
     try {
       return this.userModel
         .findOneAndUpdate(
           {
             walletAddress: address,
             linkedWallets: {
-              $not: { $elemMatch: { address: linkEvmWalletDto.address, type: linkEvmWalletDto.type } },
+              $not: { $elemMatch: { address: linkWalletDto.address, type: linkWalletDto.type } },
             },
             $expr: { $lt: [{ $size: "$linkedWallets" }, MAX_LINKED_EVM_WALLETS] },
           },
           {
-            $push: { linkedWallets: linkEvmWalletDto },
+            $push: { linkedWallets: linkWalletDto },
           },
           { new: true }, // Return updated document
         )
@@ -125,6 +125,17 @@ export class UsersDbService {
   }
 
   async addSeasonToUser(address: string, season: UserSeasonDto): Promise<UserDocument | null> {
+    // Check if user already has this season
+    const existingUser = await this.userModel.findOne({
+      walletAddress: address,
+      "seasons.seasonId": season.seasonId,
+    });
+
+    // If user already has this season, return the user
+    if (existingUser) {
+      return existingUser;
+    }
+
     return this.userModel
       .findOneAndUpdate(
         {
