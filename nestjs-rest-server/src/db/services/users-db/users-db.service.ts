@@ -8,6 +8,7 @@ import { LinkSocialDataDto } from "../../../user/dto/link-social-data.dto";
 import { LinkWalletDto } from "../../../user/dto/link-wallet.dto";
 import { MAX_LINKED_EVM_WALLETS } from "../../../constants";
 import { Collections } from "../../../shared/models/enum/Collections";
+import { isStellarAddress, isEvmAddress } from "@/shared/utils/validate-utils";
 
 @Injectable()
 export class UsersDbService {
@@ -50,6 +51,31 @@ export class UsersDbService {
   }
 
   async linkUserEvmWallet(linkWalletDto: LinkWalletDto, address: string): Promise<UserDocument | null> {
+    try {
+      const isValidWallet = isEvmAddress(linkWalletDto.address);
+      if (!isValidWallet) {
+        throw new Error("Invalid EVM wallet address");
+      }
+      return this.linkUserWallet(linkWalletDto, address);
+    } catch (e) {
+      this.logger.error(e);
+      throw e;
+    }
+  }
+  async linkUserStellarWallet(linkWalletDto: LinkWalletDto, address: string): Promise<UserDocument | null> {
+    try {
+      const isValidWallet = isStellarAddress(linkWalletDto.address);
+      if (!isValidWallet) {
+        throw new Error("Invalid EVM wallet address");
+      }
+      return this.linkUserWallet(linkWalletDto, address);
+    } catch (e) {
+      this.logger.error(e);
+      throw e;
+    }
+  }
+
+  async linkUserWallet(linkWalletDto: LinkWalletDto, address: string): Promise<UserDocument | null> {
     try {
       return this.userModel
         .findOneAndUpdate(

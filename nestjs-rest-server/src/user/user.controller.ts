@@ -101,8 +101,13 @@ export class UserController {
 
       return data;
     } else if (linkWalletDto.type === "stellar") {
-      // TODO: to be implemented
-      throw new InternalServerErrorException("Invalid wallet type");
+      const data = await this.userService.linkUserStellarWallet(linkWalletDto, address);
+
+      if (data instanceof HttpException) {
+        throw data;
+      }
+
+      return data;
     } else {
       throw new InternalServerErrorException("Invalid wallet type");
     }

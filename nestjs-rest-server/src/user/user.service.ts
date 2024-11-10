@@ -75,6 +75,14 @@ export class UserService {
   }
 
   async linkUserEvmWallet(linkWalletDto: LinkWalletDto, address: string): Promise<UserResponseDto | HttpException> {
+    return this.linkUserWallet(linkWalletDto, address, "evm");
+  }
+
+  async linkUserStellarWallet(linkWalletDto: LinkWalletDto, address: string): Promise<UserResponseDto | HttpException> {
+    return this.linkUserWallet(linkWalletDto, address, "stellar");
+  }
+
+  async linkUserWallet(linkWalletDto: LinkWalletDto, address: string): Promise<UserResponseDto | HttpException> {
     try {
       const authData = await this.authService.authenticateUser(linkWalletDto.accessToken);
 
@@ -82,7 +90,17 @@ export class UserService {
         return new BadRequestException("Invalid accessToken for given address");
       }
 
-      const updatedUser = await this.userDb.linkUserEvmWallet(linkWalletDto, address);
+      let updatedUser = null;
+      switch (authData.chain) {
+        case "evm":
+          updatedUser = await this.userDb.linkUserEvmWallet(linkWalletDto, address);
+          break;
+        case "stellar":
+          updatedUser = await this.userDb.linkUserStellarWallet(linkWalletDto, address);
+          break;
+        default:
+          return new BadRequestException("Invalid chain");
+      }
 
       if (!updatedUser) {
         return new BadRequestException("User not found or social already linked");
