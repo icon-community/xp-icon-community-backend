@@ -92,25 +92,13 @@ export class UserController {
   })
   @UsePipes(new ValidationPipe())
   async linkUserWallet(@UserAddress() address: string, @Body() linkWalletDto: LinkWalletDto): Promise<UserResponseDto> {
-    if (linkWalletDto.type === "evm") {
-      const data = await this.userService.linkUserEvmWallet(linkWalletDto, address);
+    const data = await this.userService.linkUserWallet(linkWalletDto, address);
 
-      if (data instanceof HttpException) {
-        throw data;
-      }
-
-      return data;
-    } else if (linkWalletDto.type === "stellar") {
-      const data = await this.userService.linkUserStellarWallet(linkWalletDto, address);
-
-      if (data instanceof HttpException) {
-        throw data;
-      }
-
-      return data;
-    } else {
-      throw new InternalServerErrorException("Invalid wallet type");
+    if (data instanceof HttpException) {
+      throw data;
     }
+
+    return data;
   }
 
   @Get(":address")

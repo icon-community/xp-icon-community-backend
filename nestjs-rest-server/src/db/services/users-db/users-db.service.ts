@@ -50,33 +50,23 @@ export class UsersDbService {
     }
   }
 
-  async linkUserEvmWallet(linkWalletDto: LinkWalletDto, address: string): Promise<UserDocument | null> {
-    try {
-      const isValidWallet = isEvmAddress(linkWalletDto.address);
-      if (!isValidWallet) {
-        throw new Error("Invalid EVM wallet address");
-      }
-      return this.linkUserWallet(linkWalletDto, address);
-    } catch (e) {
-      this.logger.error(e);
-      throw e;
-    }
-  }
-  async linkUserStellarWallet(linkWalletDto: LinkWalletDto, address: string): Promise<UserDocument | null> {
-    try {
-      const isValidWallet = isStellarAddress(linkWalletDto.address);
-      if (!isValidWallet) {
-        throw new Error("Invalid EVM wallet address");
-      }
-      return this.linkUserWallet(linkWalletDto, address);
-    } catch (e) {
-      this.logger.error(e);
-      throw e;
-    }
-  }
-
   async linkUserWallet(linkWalletDto: LinkWalletDto, address: string): Promise<UserDocument | null> {
     try {
+      // validate user wallet
+      switch (linkWalletDto.type) {
+        case "evm":
+          if (!isEvmAddress(linkWalletDto.address)) {
+            throw new Error("Invalid EVM wallet address");
+          }
+          break;
+        case "stellar":
+          if (!isStellarAddress(linkWalletDto.address)) {
+            throw new Error("Invalid Stellar wallet address");
+          }
+          break;
+        default:
+          throw new Error("Invalid wallet type");
+      }
       return this.userModel
         .findOneAndUpdate(
           {
