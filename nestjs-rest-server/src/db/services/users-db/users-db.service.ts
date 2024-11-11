@@ -4,6 +4,7 @@ import { IUser, UserDocument } from "../../schemas/User.schema";
 import { Model, Types } from "mongoose";
 import { CreateUserDto, UserSeasonDto } from "../../db-models";
 import { MongoDbErrorCode } from "../../../shared/models/enum/MongoDbErrorCode";
+import { ChainType } from "../../../shared/models/enum/ChainType";
 import { LinkSocialDataDto } from "../../../user/dto/link-social-data.dto";
 import { LinkWalletDto } from "../../../user/dto/link-wallet.dto";
 import { MAX_LINKED_EVM_WALLETS } from "../../../constants";
@@ -54,12 +55,12 @@ export class UsersDbService {
     try {
       // validate user wallet
       switch (linkWalletDto.type) {
-        case "evm":
+        case ChainType.evm:
           if (!isEvmAddress(linkWalletDto.address)) {
             throw new Error("Invalid EVM wallet address");
           }
           break;
-        case "stellar":
+        case ChainType.stellar:
           if (!isStellarAddress(linkWalletDto.address)) {
             throw new Error("Invalid Stellar wallet address");
           }
