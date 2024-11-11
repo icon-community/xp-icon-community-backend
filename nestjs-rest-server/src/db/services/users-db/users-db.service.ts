@@ -9,7 +9,7 @@ import { LinkSocialDataDto } from "../../../user/dto/link-social-data.dto";
 import { LinkWalletDto } from "../../../user/dto/link-wallet.dto";
 import { MAX_LINKED_EVM_WALLETS } from "../../../constants";
 import { Collections } from "../../../shared/models/enum/Collections";
-import { isStellarAddress, isEvmAddress } from "@/shared/utils/validate-utils";
+import { isStellarAddress, isEvmAddress } from "../../../shared/utils/validate-util";
 
 @Injectable()
 export class UsersDbService {
