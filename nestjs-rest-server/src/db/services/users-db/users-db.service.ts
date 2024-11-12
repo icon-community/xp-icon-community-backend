@@ -4,10 +4,12 @@ import { IUser, UserDocument } from "../../schemas/User.schema";
 import { Model, Types } from "mongoose";
 import { CreateUserDto, UserSeasonDto } from "../../db-models";
 import { MongoDbErrorCode } from "../../../shared/models/enum/MongoDbErrorCode";
+import { ChainType } from "../../../shared/models/enum/ChainType";
 import { LinkSocialDataDto } from "../../../user/dto/link-social-data.dto";
 import { LinkWalletDto } from "../../../user/dto/link-wallet.dto";
 import { MAX_LINKED_EVM_WALLETS } from "../../../constants";
 import { Collections } from "../../../shared/models/enum/Collections";
+import { isStellarAddress, isEvmAddress } from "../../../shared/utils/validate-util";
 
 @Injectable()
 export class UsersDbService {
@@ -49,8 +51,23 @@ export class UsersDbService {
     }
   }
 
-  async linkUserEvmWallet(linkWalletDto: LinkWalletDto, address: string): Promise<UserDocument | null> {
+  async linkUserWallet(linkWalletDto: LinkWalletDto, address: string): Promise<UserDocument | null> {
     try {
+      // validate user wallet
+      switch (linkWalletDto.type) {
+        case ChainType.evm:
+          if (!isEvmAddress(linkWalletDto.address)) {
+            throw new Error("Invalid EVM wallet address");
+          }
+          break;
+        case ChainType.stellar:
+          if (!isStellarAddress(linkWalletDto.address)) {
+            throw new Error("Invalid Stellar wallet address");
+          }
+          break;
+        default:
+          throw new Error("Invalid wallet type");
+      }
       return this.userModel
         .findOneAndUpdate(
           {

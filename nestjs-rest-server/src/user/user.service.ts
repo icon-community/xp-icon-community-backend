@@ -74,7 +74,7 @@ export class UserService {
     }
   }
 
-  async linkUserEvmWallet(linkWalletDto: LinkWalletDto, address: string): Promise<UserResponseDto | HttpException> {
+  async linkUserWallet(linkWalletDto: LinkWalletDto, address: string): Promise<UserResponseDto | HttpException> {
     try {
       const authData = await this.authService.authenticateUser(linkWalletDto.accessToken);
 
@@ -82,7 +82,7 @@ export class UserService {
         return new BadRequestException("Invalid accessToken for given address");
       }
 
-      const updatedUser = await this.userDb.linkUserEvmWallet(linkWalletDto, address);
+      const updatedUser = await this.userDb.linkUserWallet(linkWalletDto, address);
 
       if (!updatedUser) {
         return new BadRequestException("User not found or social already linked");
