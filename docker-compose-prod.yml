@@ -1,4 +1,4 @@
-services
+services:
   auth-server:
     image: "iconcommunity/icon-wallet-auth-backend-app:1.0.2"
     container_name: auth-server
