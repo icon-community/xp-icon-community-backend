@@ -95,7 +95,17 @@ restore() {
   RESTORE_FILE=$1
 
   if [ ! -e "$RESTORE_FILE" ]; then
-    echo "Error: Backup file $RESTORE_FILE not found."
+    echo "Error: Backup file $RESTORE_FILE not found in the host."
+    exit 1
+  fi
+
+  echo "Copying MongoDB backup file to the container..."
+
+  # Copy the backup file to the container
+  docker cp "$RESTORE_FILE" "$CONTAINER_NAME:/tmp/$(basename $RESTORE_FILE)"
+
+  if [ $? -ne 0 ]; then
+    echo "Error: Failed to copy backup file to the container."
     exit 1
   fi
 
@@ -103,13 +113,20 @@ restore() {
 
   # Run the MongoDB restore command inside the container
 
-  docker exec "$CONTAINER_NAME" sh -c "mongorestore --archive=$RESTORE_FILE --gzip --drop --username=$MONGO_USER --password=$MONGO_PASSWORD --authenticationDatabase admin --db=$MONGO_DB_NAME"
+  docker exec "$CONTAINER_NAME" sh -c "mongorestore --archive=/temp/$(basename $RESTORE_FILE) --gzip --drop --username=$MONGO_USER --password=$MONGO_PASSWORD --authenticationDatabase admin --db=$MONGO_DB_NAME"
 
   if [ $? -eq 0 ]; then
     echo "MongoDB restore completed successfully."
   else
     echo "Error: Failed to restore MongoDB data."
     exit 1
+  fi
+
+  echo "Cleaning up temporary backup file in the container..."
+  docker exec "$CONTAINER_NAME" sh -c "rm /temp/$(basename $RESTORE_FILE)"
+
+  if [ $? -ne 0 ]; then
+    echo "Warning: Failed to clean up temporary backup file in the container."
   fi
 
   echo "Restore completed successfully."
