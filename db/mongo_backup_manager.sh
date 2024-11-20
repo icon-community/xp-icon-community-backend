@@ -45,7 +45,7 @@ backup() {
   fi
 
   # Run the MongoDB dump command inside the container
-docker exec "$CONTAINER_NAME" sh -c "mongodump --archive=$BACKUP_FILE --gzip --uri=mongodb://$MONGO_USER:$MONGO_PASSWORD@localhost:$MONGO_PORT/$MONGO_DB_NAME"
+  docker exec "$CONTAINER_NAME" sh -c "mongodump --archive=$BACKUP_FILE --gzip --username=$MONGO_USER --password=$MONGO_PASSWORD --authenticationDatabase admin --db=$MONGO_DB_NAME"
 
   if [ $? -eq 0 ]; then
     echo "MongoDB dump completed successfully."
@@ -103,7 +103,8 @@ restore() {
   echo "Restoring MongoDB backup from $RESTORE_FILE..."
 
   # Run the MongoDB restore command inside the container
-  docker exec $CONTAINER_NAME mongorestore --archive=$RESTORE_FILE --gzip --drop --uri=mongodb://$MONGO_USER:$MONGO_PASSWORD@localhost:$MONGO_PORT/$MONGO_DB_NAME
+
+  docker exec "$CONTAINER_NAME" sh -c "mongorestore --archive=$RESTORE_FILE --gzip --drop --username=$MONGO_USER --password=$MONGO_PASSWORD --authenticationDatabase admin --db=$MONGO_DB_NAME"
 
   if [ $? -eq 0 ]; then
     echo "MongoDB restore completed successfully."
