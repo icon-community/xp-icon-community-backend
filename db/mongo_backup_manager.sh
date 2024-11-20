@@ -12,7 +12,7 @@ health_check() {
   echo "Performing health check..."
 
   # List of required variables
-  REQUIRED_VARS=("BACKUP_DIR" "CONTAINER_NAME" "S3_BUCKET_NAME" "MONGO_PORT" "MONGO_USER" "MONGO_PASSWORD" "MONGO_DB_NAME")
+  REQUIRED_VARS=("CONTAINER_NAME" "S3_BUCKET_NAME" "MONGO_PORT" "MONGO_USER" "MONGO_PASSWORD" "MONGO_DB_NAME")
 
   # Check if each variable is set
   for var in "${REQUIRED_VARS[@]}"; do
