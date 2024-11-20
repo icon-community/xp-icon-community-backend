@@ -113,7 +113,7 @@ restore() {
 
   # Run the MongoDB restore command inside the container
 
-  docker exec "$CONTAINER_NAME" sh -c "mongorestore --archive=/temp/$(basename $RESTORE_FILE) --gzip --drop --username=$MONGO_USER --password=$MONGO_PASSWORD --authenticationDatabase admin --db=$MONGO_DB_NAME"
+  docker exec "$CONTAINER_NAME" sh -c "mongorestore --archive=/tmp/$(basename $RESTORE_FILE) --gzip --drop --username=$MONGO_USER --password=$MONGO_PASSWORD --authenticationDatabase admin --db=$MONGO_DB_NAME"
 
   if [ $? -eq 0 ]; then
     echo "MongoDB restore completed successfully."
