@@ -27,9 +27,6 @@ health_check() {
   echo "Health check passed! All required variables are set."
 }
 
-# Call health_check function at the start of the script to ensure environment variables are loaded correctly
-health_check
-
 # Set the rest of the variables
 TIMESTAMP=$(date +%Y-%m-%d_%H-%M-%S)
 BACKUP_DIR="./backups"
@@ -177,7 +174,7 @@ help() {
   echo "  ./mongo_backup_manager.sh restore mongo_backup_2024-11-20.gz"
   echo "    Restores the backup 'mongo_backup_2024-11-20.gz' from the local directory or S3."
   echo
-  echo "  ./mongo_backup_manager.sh list_s3"
+  echo "  ./mongo_backup_manager.sh list_backups_s3"
   echo "    Lists all backups available in the S3 bucket."
   echo
   echo "  ./mongo_backup_manager.sh download mongo_backup_2024-11-20.gz"
@@ -192,4 +189,34 @@ help() {
 if [ $# -eq 0 ] || [[ "$1" == "help" ]] || [[ "$1" == "-h" ]]; then
   help
   exit 0
+fi
+
+# Main logic to parse arguments and call the corresponding function
+if [ "$1" == "backup" ]; then
+  # Call the backup function
+  health_check
+  backup
+elif [ "$1" == "list_backups_s3" ]; then
+  # Call the list_backups_s3 function
+  health_check
+  list_backups_s3
+elif [ "$1" == "list_backups_local" ]; then
+  # Call the list_backups_local function
+  health_check
+  list_backups_local
+elif [ "$1" == "restore" ]; then
+  # Call the restore function
+  health_check
+  restore "$2"
+elif [ "$1" == "download_backup" ]; then
+  # Call the download_backup function
+  health_check
+  download_backup "$2"
+elif [ "$1" == "help" ]; then
+  # Call the help function
+  help
+else
+  # If the command is invalid, print usage
+  echo "Usage: $0 {backup|restore|download} [file]"
+  exit 1
 fi

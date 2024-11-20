@@ -76,10 +76,10 @@ S3_BACKUP_PATH=s3://${S3_BUCKET_NAME}/mongodb-backups/
 ---
 
 ## How to Use
-1. Clone or download the Script. Save the script file as `mongodb_backup.sh`.
+1. Clone or download the Script. Save the script file as `mongo_backup_manager.sh`.
 2. Make the script executable:
    ```bash
-   chmod +x mongodb_backup.sh
+   chmod +x mongo_backup_manager.sh
    ```
 3. Edit the script and update the variables as needed.
 
@@ -90,5 +90,5 @@ crontab -e
 ```
 * Add the following line
 ```bash
-0 * * * * /path/to/mongodb_backup.sh >> /var/log/mongodb_backup.log 2>&1
+0 * * * * /path/to/mongo_backup_manager.sh >> /var/log/mongo_backup_manager.log 2>&1
 ```
