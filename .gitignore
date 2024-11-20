@@ -5,6 +5,7 @@ node_modules
 local
 *.bkp
 db/data
+db/backups
 .gradle
 .idea
 build
