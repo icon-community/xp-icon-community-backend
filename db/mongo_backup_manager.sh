@@ -31,7 +31,8 @@ health_check() {
 TIMESTAMP=$(date +%Y-%m-%d_%H-%M-%S)
 BACKUP_DIR="./backups"
 S3_BACKUP_DIR_TEMP="./backups_temp"
-BACKUP_FILE="${BACKUP_DIR}/mongo_backup_${TIMESTAMP}.gz"
+BACKUP_FILE_NAME="mongo_backup_${TIMESTAMP}.gz"
+BACKUP_FILE="${BACKUP_DIR}/${BACKUP_FILE_NAME}"
 S3_BACKUP_PATH=s3://${S3_BUCKET_NAME}/mongodb-backups/
 
 
@@ -45,7 +46,7 @@ backup() {
   fi
 
   # Run the MongoDB dump command inside the container
-  docker exec "$CONTAINER_NAME" sh -c "mongodump --archive=$BACKUP_FILE --gzip --username=$MONGO_USER --password=$MONGO_PASSWORD --authenticationDatabase admin --db=$MONGO_DB_NAME"
+  docker exec "$CONTAINER_NAME" sh -c "mongodump --archive=$BACKUP_FILE_NAME --gzip --username=$MONGO_USER --password=$MONGO_PASSWORD --authenticationDatabase admin --db=$MONGO_DB_NAME"
 
   if [ $? -eq 0 ]; then
     echo "MongoDB dump completed successfully."
@@ -55,7 +56,7 @@ backup() {
   fi
 
   # Copy the backup from the container to the host
-  docker cp $CONTAINER_NAME:/data/backup $BACKUP_FILE
+  docker cp $CONTAINER_NAME:$BACKUP_FILE_NAME $BACKUP_FILE
 
   # Upload the backup to S3
   aws s3 cp $BACKUP_FILE $S3_BACKUP_PATH
