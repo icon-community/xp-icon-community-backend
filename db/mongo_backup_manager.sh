@@ -19,8 +19,6 @@ health_check() {
     if [ -z "${!var}" ]; then
       echo "Error: $var is not set in the .env file."
       exit 1
-    else
-      echo "$var is set to ${!var}"
     fi
   done
 
