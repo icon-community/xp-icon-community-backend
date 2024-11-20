@@ -123,7 +123,7 @@ restore() {
   fi
 
   echo "Cleaning up temporary backup file in the container..."
-  docker exec "$CONTAINER_NAME" sh -c "rm /temp/$(basename $RESTORE_FILE)"
+  docker exec "$CONTAINER_NAME" sh -c "rm /tmp/$(basename $RESTORE_FILE)"
 
   if [ $? -ne 0 ]; then
     echo "Warning: Failed to clean up temporary backup file in the container."
