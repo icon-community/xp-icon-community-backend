@@ -1,3 +1,10 @@
+x-global-env: &global-env
+  MONGO_USER: ${MONGO_USER}
+  MONGO_PASSWORD: ${MONGO_PASSWORD}
+  MONGO_PORT: ${MONGO_PORT}
+  MONGO_DB_NAME: ${MONGO_DB_NAME}
+  MONGO_CONTAINER: mongodb-dev
+
 services:
   auth-server:
     image: "iconcommunity/icon-wallet-auth-backend-app:1.0.2"
@@ -42,11 +49,13 @@ services:
       - mynetworkdev
     command: ["node", "blockchain-scraper.js"]
     environment:
-      MONGO_USER: ${MONGO_USER}
-      MONGO_PASSWORD: ${MONGO_PASSWORD}
-      MONGO_PORT: ${MONGO_PORT}
-      MONGO_DB_NAME: ${MONGO_DB_NAME}
-      MONGO_CONTAINER: mongodb-dev
+      <<: *global-env
+      DB_MANAGER_PORT: ${DB_MANAGER_PORT}
+      USER_COLLECTION: ${USER_COLLECTION}
+      TASK_COLLECTION: ${TASK_COLLECTION}
+      SEASON_COLLECTION: ${SEASON_COLLECTION}
+      USER_TASK_COLLECTION: ${USER_TASK_COLLECTION}
+      REFERRALS_COLLECTION: ${REFERRALS_COLLECTION}
       USE_TEST_SEASON: true # set to true to use the test season
 
   rest-server:
@@ -62,14 +71,10 @@ services:
     networks:
       - mynetworkdev
     environment:
+      <<: *global-env
       NODE_ENV: prod
       LOG_LEVEL: debug
       PORT: 3500
-      MONGO_USER: ${MONGO_USER}
-      MONGO_PASSWORD: ${MONGO_PASSWORD}
-      MONGO_PORT: ${MONGO_PORT}
-      MONGO_DB_NAME: ${MONGO_DB_NAME}
-      MONGO_CONTAINER: mongodb-dev
       USE_TEST_SEASON: true # set to true to use the test season
       ICON_NETWORK: mainnet
       AUTH_URL: http://auth-server:3005
