@@ -1,3 +1,18 @@
+x-global-env: &global-env
+  MONGO_USER: ${MONGO_USER}
+  MONGO_PASSWORD: ${MONGO_PASSWORD}
+  MONGO_PORT: ${MONGO_PORT}
+  MONGO_DB_NAME: ${MONGO_DB_NAME}
+  MONGO_CONTAINER: mongodb-prod
+
+x-common-rest-server-env: &common-rest-server-env
+  <<: *global-env
+  NODE_ENV: prod
+  LOG_LEVEL: debug
+  PORT: 3500
+  ICON_NETWORK: mainnet
+  AUTH_URL: http://auth-server:3005
+
 services:
   auth-server:
     image: "iconcommunity/icon-wallet-auth-backend-app:1.0.2"
@@ -46,11 +61,13 @@ services:
       - mynetworkprod
     command: ["node", "blockchain-scraper.js"]
     environment:
-      MONGO_USER: ${MONGO_USER}
-      MONGO_PASSWORD: ${MONGO_PASSWORD}
-      MONGO_PORT: ${MONGO_PORT}
-      MONGO_DB_NAME: ${MONGO_DB_NAME}
-      MONGO_CONTAINER: mongodb-prod
+      <<: *global-env
+      DB_MANAGER_PORT: ${DB_MANAGER_PORT}
+      USER_COLLECTION: ${USER_COLLECTION}
+      TASK_COLLECTION: ${TASK_COLLECTION}
+      SEASON_COLLECTION: ${SEASON_COLLECTION}
+      USER_TASK_COLLECTION: ${USER_TASK_COLLECTION}
+      REFERRALS_COLLECTION: ${REFERRALS_COLLECTION}
 
   rest-server1:
     container_name: rest-server1
@@ -64,17 +81,7 @@ services:
       - auth-server
     networks:
       - mynetworkprod
-    environment:
-      NODE_ENV: prod
-      LOG_LEVEL: debug
-      PORT: 3500
-      MONGO_USER: ${MONGO_USER}
-      MONGO_PASSWORD: ${MONGO_PASSWORD}
-      MONGO_PORT: ${MONGO_PORT}
-      MONGO_DB_NAME: ${MONGO_DB_NAME}
-      MONGO_CONTAINER: mongodb-prod
-      ICON_NETWORK: mainnet
-      AUTH_URL: http://auth-server:3005
+    environment: *common-rest-server-env
 
   rest-server2:
     container_name: rest-server2
@@ -88,17 +95,7 @@ services:
       - auth-server
     networks:
       - mynetworkprod
-    environment:
-      NODE_ENV: prod
-      LOG_LEVEL: debug
-      PORT: 3500
-      MONGO_USER: ${MONGO_USER}
-      MONGO_PASSWORD: ${MONGO_PASSWORD}
-      MONGO_PORT: ${MONGO_PORT}
-      MONGO_DB_NAME: ${MONGO_DB_NAME}
-      MONGO_CONTAINER: mongodb-prod
-      ICON_NETWORK: mainnet
-      AUTH_URL: http://auth-server:3005
+    environment: *common-rest-server-env
 
   rest-server3:
     container_name: rest-server3
@@ -112,17 +109,7 @@ services:
       - auth-server
     networks:
       - mynetworkprod
-    environment:
-      NODE_ENV: prod
-      LOG_LEVEL: debug
-      PORT: 3500
-      MONGO_USER: ${MONGO_USER}
-      MONGO_PASSWORD: ${MONGO_PASSWORD}
-      MONGO_PORT: ${MONGO_PORT}
-      MONGO_DB_NAME: ${MONGO_DB_NAME}
-      MONGO_CONTAINER: mongodb-prod
-      ICON_NETWORK: mainnet
-      AUTH_URL: http://auth-server:3005
+    environment: *common-rest-server-env
 
 networks:
   mynetworkprod:
