@@ -96,6 +96,7 @@ export interface IUser {
   referralCode: string;
   createdAt: Date;
   updatedAt: Date;
+  _id: Types.ObjectId;
 }
 
 export type UserDocument = HydratedDocument<IUser>;

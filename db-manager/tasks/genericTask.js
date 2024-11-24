@@ -192,6 +192,10 @@ async function genericTask(taskInput, db, seedId, callback) {
               }
             }
           }
+          // if the task is referral, do nothing
+        } else if (targetTask.type === "referral") {
+          // get the referral documents
+          // TODO: implement referral logic
         } else {
           const userTaskDoc = userTaskDocArr.find((doc) => {
             return doc.walletAddress === validUser.walletAddress;
@@ -254,11 +258,10 @@ async function userTaskMainLogic(
       if (targetTask.type === "non-recursive") {
         console.log("--- non-recursive task");
         // if the task is non-recursive, do nothing
-        // and continue to the next user,
+        // and return so that the next user is processed,
         // to be in this step in the logic means
         // that the user has already earned XP
         // for this task
-        // continue;
         return;
       }
       // find if an entry for the prepTerm exists in the 'xpEarned' array
@@ -268,11 +271,11 @@ async function userTaskMainLogic(
       });
 
       if (alreadyExists != null) {
-        // if the entry exists, do nothing and continue to the next user
+        // if the entry exists, do nothing and return
+        // so that the next user is processed
         console.log(
           `--- UserTask document for user ${validUser._id} and task ${targetTask._id} and season ${activeSeason._id} already has an entry for prepTerm ${prepTerm}, with marked block height of ${alreadyExists.block}, and earned XP of ${alreadyExists.xp}`,
         );
-        // continue;
         return;
       } else {
         // if the entry does not exist, fetch all the existing entries (these are for the previous terms)

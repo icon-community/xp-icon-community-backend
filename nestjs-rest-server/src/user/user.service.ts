@@ -235,15 +235,6 @@ export class UserService {
   }
 
   async registerUser(publicAddress: string, referralCode?: string): Promise<UserResponseDto> {
-    // handle referral first
-    if (referralCode) {
-      try {
-        await this.referralService.createUserReferral(referralCode, publicAddress);
-      } catch {
-        throw new InternalServerErrorException("Failed to create referral");
-      }
-    }
-
     try {
       const createUserDto: CreateUserDto = {
         walletAddress: publicAddress,
@@ -251,7 +242,25 @@ export class UserService {
         referralCode: this.generateReferralCode(publicAddress),
       };
 
-      return formatUser(await this.userDb.createUser(createUserDto));
+      const rawUser = await this.userDb.createUser(createUserDto);
+
+      // handle referral after user creation
+      // TODO: logic has been changed because we need the id of the newly
+      // created user to create the referral
+      // but if the referral creation process fails, the user will
+      // still be created, do we in this case just continue and the
+      // user will not earn the referral bonus? or do we delete the user
+      // and return an error?
+      // for now we will just continue and the user will not earn
+      // the referral bonus
+      if (referralCode) {
+        try {
+          await this.referralService.createUserReferral(referralCode, publicAddress, rawUser._id);
+        } catch {
+          throw new InternalServerErrorException("Failed to create referral");
+        }
+      }
+      return formatUser(rawUser);
     } catch (e) {
       if (e?.code === MongoDbErrorCode.DUPLICATE) {
         throw new BadRequestException(UserErrorCodes.USER_ALREADY_EXISTS);

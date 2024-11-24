@@ -3,7 +3,7 @@
     "seedId": "t1",
     "type": "onchain",
     "description": "for depositing SICX collateral, the user will receive 1 XP per USD value of the collateral deposited that day. It will be done daily (per chain period)",
-    "criteria": {},
+    "criteria": [],
     "title": "deposit sICX collateral",
     "rewardFormula": ["amount", "return amount * 1"],
     "chain": "icon"
@@ -12,7 +12,7 @@
     "seedId": "t2",
     "type": "onchain",
     "description": "for minting bnUSD, the user will receive 3 XP per bnUSD loan held per day. It will be done daily (per chain period)",
-    "criteria": {},
+    "criteria": [],
     "title": "holding a loan",
     "rewardFormula": ["amount", "return amount * 3"],
     "chain": "icon"
@@ -21,7 +21,7 @@
     "seedId": "t3",
     "type": "onchain",
     "description": "for locking into the saving rates, the user will receive 1 XP per USD value locked per day. It will be done daily (per chain period)",
-    "criteria": {},
+    "criteria": [],
     "title": "locking into saving rates",
     "rewardFormula": ["amount", "return amount * 1"],
     "chain": "icon"
@@ -30,7 +30,7 @@
     "seedId": "t4",
     "type": "non-recursive",
     "description": "One time reward for registering",
-    "criteria": {},
+    "criteria": [],
     "title": "registration",
     "rewardFormula": ["amount", "return 420"],
     "chain": "icon"
@@ -39,7 +39,7 @@
     "seedId": "t5",
     "type": "onchain",
     "description": "for depositing AVAX collateral, the user will receive 1 XP per USD value of the collateral deposited that day. It will be done daily (per chain period)",
-    "criteria": {},
+    "criteria": [],
     "title": "deposit AVAX collateral",
     "rewardFormula": ["amount", "return amount * 1"],
     "chain": "icon"
@@ -48,7 +48,7 @@
     "seedId": "t6",
     "type": "xchain",
     "description": "for depositing native crosschain collateral, the user will receive 1 XP per USD value of the collateral deposited that day. It will be done daily (per chain period)",
-    "criteria": {},
+    "criteria": [],
     "title": "deposit native crosschain collateral",
     "rewardFormula": ["amount", "return amount * 1"],
     "chain": "icon"
@@ -57,9 +57,37 @@
     "seedId": "t7",
     "type": "xchain",
     "description": "for minting bnUSD crosschain, the user will receive 3 XP per bnUSD loan held per day. It will be done daily (per chain period)",
-    "criteria": {},
+    "criteria": [],
     "title": "holding a crosschain loan",
     "rewardFormula": ["amount", "return amount * 3"],
+    "chain": "icon"
+  },
+  {
+    "seedId": "t8",
+    "type": "referral",
+    "description": "One-time reward for using a referral code during registration.",
+    "criteria": [
+      {
+        "description": "gains the xp after the new user accumulates 100 XP",
+        "conditionFormula": ["amount", "return amount >= 100"]
+      }
+    ],
+    "title": "use referral code",
+    "rewardFormula": ["amount", "return 100"],
+    "chain": "icon"
+  },
+  {
+    "seedId": "t9",
+    "type": "referral",
+    "description": "One-time reward for creating a referral code and having it used by a new user.",
+    "criteria": [
+      {
+        "description": "gains the xp after the new user uses the referral code and accumulates 100 XP",
+        "conditionFormula": ["amount", "return amount >= 100"]
+      }
+    ],
+    "title": "referral code used",
+    "rewardFormula": ["amount", "return 150"],
     "chain": "icon"
   }
 ]

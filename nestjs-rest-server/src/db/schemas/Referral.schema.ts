@@ -1,6 +1,6 @@
 import { Prop, Schema, SchemaFactory } from "@nestjs/mongoose";
 import { Collections } from "../../shared/models/enum/Collections";
-import { HydratedDocument } from "mongoose";
+import { HydratedDocument, Types } from "mongoose";
 
 @Schema({
   collection: Collections.REFERRALS,
@@ -31,8 +31,21 @@ export class Referral {
     index: true,
   })
   referralCode: string;
-
   createdAt: Date;
+
+  @Prop({
+    type: Types.ObjectId,
+    isRequired: true,
+    ref: Collections.USERS,
+  })
+  referrerUserId: Types.ObjectId; // Id of the user who owns the referral code
+
+  @Prop({
+    type: Types.ObjectId,
+    isRequired: true,
+    ref: Collections.USERS,
+  })
+  referredUserId: Types.ObjectId; // Id of the user who was referred
 }
 
 export type ReferralDocument = HydratedDocument<Referral>;
