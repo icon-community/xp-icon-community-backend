@@ -1,6 +1,8 @@
 import { plainToClass } from "class-transformer";
 import { validateSync } from "class-validator";
 import { ClassConstructor } from "class-transformer/types/interfaces";
+import { StrKey } from "@stellar/stellar-base";
+import { isEthereumAddress } from "class-validator";
 
 export function validateUtil<Type extends object>(
   config: Record<string, unknown>,
@@ -36,6 +38,24 @@ export function isEoaAddress(address: string): boolean {
  */
 export function isScoreAddress(address: string): boolean {
   return /^(cx)[0-9a-f]{40}$/g.test(address) && /\S/g.test(address);
+}
+
+/**
+ * Check if input value is a Stellar address.
+ * @param {any} address - the input value.
+ * @return {boolean} returns true if the input value is a Stellar address.
+ */
+export function isStellarAddress(address: string): boolean {
+  return StrKey.isValidEd25519PublicKey(address);
+}
+
+/**
+ * Check if input value is a EVM address.
+ * @param {any} address - the input value.
+ * @return {boolean} returns true if the input value is a EVM address.
+ */
+export function isEvmAddress(address: string): boolean {
+  return isEthereumAddress(address);
 }
 
 /**

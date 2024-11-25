@@ -1,7 +1,8 @@
 services:
   auth-server:
-    image: 'iconcommunity/icon-wallet-auth-backend-app:1.0.0'
+    image: "iconcommunity/icon-wallet-auth-backend-app:1.0.2"
     container_name: auth-server
+    restart: always
     ports:
       - "3005:3005"
     networks:
@@ -18,6 +19,7 @@ services:
   mongodb:
     image: mongo:latest
     container_name: mongodb-dev
+    restart: always
     ports:
       - "27017:27017"
     networks:
@@ -29,9 +31,10 @@ services:
       - ./dev-db/data:/data/db
 
   blockchain-scraper:
+    container_name: blockchain-scraper
     build:
       context: ./db-manager
-    container_name: blockchain-scraper
+    restart: always
     depends_on:
       - mongodb
       - rest-server
@@ -39,6 +42,10 @@ services:
       - mynetworkdev
     command: ["node", "blockchain-scraper.js"]
     environment:
+      MONGO_USER: ${MONGO_USER}
+      MONGO_PASSWORD: ${MONGO_PASSWORD}
+      MONGO_PORT: ${MONGO_PORT}
+      MONGO_DB_NAME: ${MONGO_DB_NAME}
       MONGO_CONTAINER: mongodb-dev
       USE_TEST_SEASON: true # set to true to use the test season
 
@@ -58,7 +65,12 @@ services:
       NODE_ENV: prod
       LOG_LEVEL: debug
       PORT: 3500
-      MONGO_CONFIG: ${MONGO_CONFIG}
+      MONGO_USER: ${MONGO_USER}
+      MONGO_PASSWORD: ${MONGO_PASSWORD}
+      MONGO_PORT: ${MONGO_PORT}
+      MONGO_DB_NAME: ${MONGO_DB_NAME}
+      MONGO_CONTAINER: mongodb-dev
+      USE_TEST_SEASON: true # set to true to use the test season
       ICON_NETWORK: mainnet
       AUTH_URL: http://auth-server:3005
 

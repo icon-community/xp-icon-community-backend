@@ -22,7 +22,8 @@ import { FormattedUserSeason } from "../shared/models/types/FormattedTypes";
 import { ValidationPipe } from "../shared/pipes/validation.pipe";
 import { UserResponseDto } from "./dto/user-response.dto";
 import { LinkSocialDataDto } from "./dto/link-social-data.dto";
-import { LinkEvmWalletDto } from "./dto/link-evm-wallet.dto";
+import { LinkWalletDto } from "./dto/link-wallet.dto";
+import { RegisterSeasonDto } from "./dto/register-season.dto";
 
 @Controller("user")
 export class UserController {
@@ -46,6 +47,21 @@ export class UserController {
     @Query("referralCode") referralCode?: string,
   ): Promise<UserResponseDto> {
     return this.userService.registerUser(publicAddress, referralCode);
+  }
+
+  @Post("/register-season")
+  @UseGuards(JwtAuthGuard)
+  @ApiHeader({
+    name: "authorization",
+    description: "JWT Authorization header. E.g. 'Bearer {Token}'",
+  })
+  @UsePipes(new ValidationPipe())
+  async registerSeason(
+    @UserAddress() publicAddress: string,
+    @Body() body: RegisterSeasonDto,
+  ): Promise<UserResponseDto> {
+    const { seasonLabel } = body;
+    return this.userService.registerSeason(publicAddress, seasonLabel);
   }
 
   @Post("/link-social")
@@ -75,11 +91,8 @@ export class UserController {
     description: "JWT Authorization header. E.g. 'Bearer {Token}'",
   })
   @UsePipes(new ValidationPipe())
-  async linkUserEvmWallet(
-    @UserAddress() address: string,
-    @Body() linkEvmWalletDto: LinkEvmWalletDto,
-  ): Promise<UserResponseDto> {
-    const data = await this.userService.linkUserEvmWallet(linkEvmWalletDto, address);
+  async linkUserWallet(@UserAddress() address: string, @Body() linkWalletDto: LinkWalletDto): Promise<UserResponseDto> {
+    const data = await this.userService.linkUserWallet(linkWalletDto, address);
 
     if (data instanceof HttpException) {
       throw data;
@@ -111,6 +124,13 @@ export class UserController {
     }
   }
 
+  //TODO: fix this endpoint, due to the change in logic
+  // that now we dont use smart contracts to track the
+  // user registration to a season, this endpoint is broken
+  // is returning values for user and season when the user
+  // is not registered to the season.
+  // create a check that validates that the user is
+  // registered to the season before returning the data
   @Get("/:userWallet/season/:season")
   async getUserBySeason(
     @Param("userWallet") userWallet: string,

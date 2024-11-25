@@ -12,7 +12,7 @@ const config = require("./config");
 class MainDb {
   constructor({ uri: uri } = {}) {
     this.connection = null;
-    this.uri = uri == null ? config.db.uri : uri;
+    this.uri = uri == null ? config.mongoParams.uri : uri;
   }
 
   async createConnection() {

@@ -1,5 +1,5 @@
 import { Injectable } from "@nestjs/common";
-import IconService, { BigNumber } from "icon-sdk-js";
+import IconService, { BigNumber, Block } from "icon-sdk-js";
 import { XpgoConfigService } from "../config/xpgo-config.service";
 import { iconChainConfigs } from "../config/configuration";
 import { Hash } from "icon-sdk-js/build/types/hash";
@@ -20,6 +20,11 @@ export class IconConnectorService {
       return res.div(10 ** 18);
     }
 
+    return res;
+  }
+
+  async getLastBlock(): Promise<Block> {
+    const res = await this.iconService.getLastBlock().execute();
     return res;
   }
 }

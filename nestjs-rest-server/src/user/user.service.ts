@@ -29,9 +29,10 @@ import { ReferralService } from "../referral/referral.service";
 import { UserErrorCodes } from "./error/user-error-codes";
 import { UserResponseDto } from "./dto/user-response.dto";
 import { LinkSocialDataDto } from "./dto/link-social-data.dto";
-import { LinkEvmWalletDto } from "./dto/link-evm-wallet.dto";
+import { LinkWalletDto } from "./dto/link-wallet.dto";
 import { AuthService } from "../auth/auth.service";
 import { SeasonErrorCodes } from "./error/season-error-codes";
+import { IconConnectorService } from "../chain-connectors/icon-connector.service";
 
 @Injectable()
 export class UserService {
@@ -45,6 +46,7 @@ export class UserService {
     private rankingService: RankingService,
     private referralService: ReferralService,
     private authService: AuthService,
+    private iconConnector: IconConnectorService,
   ) {}
 
   async getUser(address: string): Promise<UserResponseDto> {
@@ -72,18 +74,15 @@ export class UserService {
     }
   }
 
-  async linkUserEvmWallet(
-    linkEvmWalletDto: LinkEvmWalletDto,
-    address: string,
-  ): Promise<UserResponseDto | HttpException> {
+  async linkUserWallet(linkWalletDto: LinkWalletDto, address: string): Promise<UserResponseDto | HttpException> {
     try {
-      const authData = await this.authService.authenticateUser(linkEvmWalletDto.evmAccessToken);
+      const authData = await this.authService.authenticateUser(linkWalletDto.accessToken);
 
-      if (authData.publicAddress != linkEvmWalletDto.address) {
-        return new BadRequestException("Invalid evmAccessToken for given address");
+      if (authData.publicAddress != linkWalletDto.address) {
+        return new BadRequestException("Invalid accessToken for given address");
       }
 
-      const updatedUser = await this.userDb.linkUserEvmWallet(linkEvmWalletDto, address);
+      const updatedUser = await this.userDb.linkUserWallet(linkWalletDto, address);
 
       if (!updatedUser) {
         return new BadRequestException("User not found or social already linked");
@@ -109,10 +108,30 @@ export class UserService {
       throw new BadRequestException(UserErrorCodes.USER_NOT_FOUND);
     }
 
+    // from the user data fetch the seasons that the
+    // user is registered in
+    const userSeasons = user.seasons;
+
+    // fetch the season by the provided season label
     const season = await this.seasonDb.getSeasonByNumberId(seasonDbLabel);
 
+    // if the season is not found, throw an error
     if (!season) {
       throw new BadRequestException(SeasonErrorCodes.SEASON_NOT_FOUND);
+    }
+
+    // verify that the user is registered in the season
+    // by checking if the id of season is inside the
+    // userSeasons array
+    let flag = false;
+    userSeasons.forEach((registeredSeasons) => {
+      if (registeredSeasons.seasonId.equals(season._id)) {
+        flag = true;
+      }
+    });
+
+    if (flag === false) {
+      throw new BadRequestException(SeasonErrorCodes.SEASON_NOT_REGISTERED);
     }
 
     const formattedSeason = formatSeasonDocument(season);
@@ -239,6 +258,53 @@ export class UserService {
       }
 
       this.logger.error(`Failed to register user: ${JSON.stringify(e, null, 2)}`);
+      throw new InternalServerErrorException(UserErrorCodes.REGISTRATION_FAILED);
+    }
+  }
+
+  async registerSeason(publicAddress: string, seasonLabel: SeasonLabel): Promise<UserResponseDto> {
+    try {
+      // find season by SeasonLabel
+      const seasonDbLabel = seasonsConfig.routes[seasonLabel];
+
+      if (!seasonDbLabel) {
+        throw new Error("Invalid season");
+      }
+
+      const season = await this.seasonDb.getSeasonByNumberId(seasonDbLabel);
+
+      if (!season) {
+        throw new BadRequestException(SeasonErrorCodes.SEASON_NOT_FOUND);
+      }
+
+      // fetch current block height on ICON chain
+      const latestBlock = await this.iconConnector.getLastBlock();
+
+      if (!latestBlock) {
+        throw new InternalServerErrorException("Failed to fetch latest block");
+      }
+
+      if (!("height" in latestBlock)) {
+        throw new InternalServerErrorException("Failed to fetch latest block height");
+      }
+
+      // add season to user
+      const newSeason: { seasonId: any; registrationBlock: any } = {
+        seasonId: season._id,
+        registrationBlock: latestBlock.height,
+      };
+      const result = await this.userDb.addSeasonToUser(publicAddress, newSeason);
+
+      if (result == null) {
+        throw new BadRequestException(UserErrorCodes.ADDING_SEASON_FAILED);
+      }
+      return formatUser(result);
+    } catch (e) {
+      if (e?.code === MongoDbErrorCode.DUPLICATE) {
+        throw new BadRequestException(UserErrorCodes.USER_ALREADY_EXISTS);
+      }
+
+      this.logger.error(`Failed to add season to user: ${JSON.stringify(e, null, 2)}`);
       throw new InternalServerErrorException(UserErrorCodes.REGISTRATION_FAILED);
     }
   }

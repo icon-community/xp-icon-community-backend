@@ -1,6 +1,6 @@
 import { Controller, Get, Post, Body, Param, UsePipes, ValidationPipe, Req, UseGuards } from "@nestjs/common";
 import { AuthService } from "./auth.service";
-import { AddressValidationPipe } from "../shared/pipes/icon-eoa-address-validation-pipe.service";
+import { AddressValidationPipe } from "../shared/pipes/address-validation-pipe.service";
 import { ChallengeRequestDto } from "./dto/ChallengeRequestDto";
 import { ChallengeResponseDto } from "./dto/ChallengeResponseDto";
 import { TokenDto } from "./dto/token.dto";
