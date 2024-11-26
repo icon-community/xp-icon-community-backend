@@ -123,6 +123,9 @@ const mongoContainer =
       ? "mongodb"
       : config.db.containerName;
 
-config.mongoParams.uri = `mongodb://${config.db.user}:${config.db.pwd}@${mongoContainer}:${config.db.port}`;
+config.mongoParams.uri =
+  process.env.USE_LOCALHOST === true || process.env.USE_LOCALHOST === "true"
+    ? "mongodb://127.0.0.1:27017"
+    : `mongodb://${config.db.user}:${config.db.pwd}@${mongoContainer}:${config.db.port}`;
 
 module.exports = config;
