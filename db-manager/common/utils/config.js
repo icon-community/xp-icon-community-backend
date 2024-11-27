@@ -39,7 +39,6 @@ const config = {
     lineBreak: "\n------------------------------------",
   },
   ports: {
-    backend: process.env.REST_PORT,
     dbManager: process.env.DB_MANAGER_PORT,
   },
   collections: {
@@ -47,6 +46,7 @@ const config = {
     task: process.env.TASK_COLLECTION,
     season: process.env.SEASON_COLLECTION,
     userTask: process.env.USER_TASK_COLLECTION,
+    referrals: process.env.REFERRALS_COLLECTION,
   },
   db: {
     user: process.env.MONGO_USER,
@@ -55,9 +55,7 @@ const config = {
     dbName: process.env.MONGO_DB_NAME,
     containerName: process.env.MONGO_CONTAINER,
   },
-  flags: {
-    useMockDb: process.env.USE_MOCK_DB,
-  },
+  flags: {},
   jvm: {
     routes: {
       v3: "/api/v3",
@@ -125,6 +123,9 @@ const mongoContainer =
       ? "mongodb"
       : config.db.containerName;
 
-config.mongoParams.uri = `mongodb://${config.db.user}:${config.db.pwd}@${mongoContainer}:${config.db.port}`;
+config.mongoParams.uri =
+  process.env.USE_LOCALHOST === true || process.env.USE_LOCALHOST === "true"
+    ? "mongodb://127.0.0.1:27017"
+    : `mongodb://${config.db.user}:${config.db.pwd}@${mongoContainer}:${config.db.port}`;
 
 module.exports = config;
