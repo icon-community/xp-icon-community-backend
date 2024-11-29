@@ -269,8 +269,6 @@ async function userReferralTaskMainLogic(
         validUser._id,
         db.connection,
       );
-      console.log("--- referralDocs");
-      console.log(referralDocs);
 
       // if there are no documents in the returned array
       // do nothing and return
@@ -319,8 +317,26 @@ async function userReferralTaskMainLogic(
               return acc + taskXp;
             }, 0);
 
-      console.log("DEBUG userXpTotal");
-      console.log(userXpTotal);
+      // get all the task for the user for the current season
+      const userTasks = await getUserTasksBySeasonAndUserId(
+        validUser._id,
+        activeSeason._id,
+        db.connection,
+      );
+
+      // calculate the total amount of XP earned by the
+      // user so far
+      const userXpTotal =
+        userTasks == null
+          ? 0
+          : userTasks.reduce((acc, task) => {
+              const taskXp = task.xpEarned.reduce(
+                (acc2, entry) => acc2 + Number(entry.xp),
+                0,
+              );
+              return acc + taskXp;
+            }, 0);
+
       // get the criteria field from the task document
       // to know the amount of XP required to have before
       // this task is done
@@ -371,7 +387,95 @@ async function userReferralTaskMainLogic(
       // in the referral collection on which this user
       // is the referrer and the isProcessed
       // field is false
-      // TODO: implement this logic
+      const referralDocs = await referralService.getReferralByReferrerId(
+        validUser._id,
+        db.connection,
+      );
+
+      // if there are no documents in the returned array
+      // do nothing and return
+      if (referralDocs.length === 0) {
+        console.log(
+          `--- No referral documents found for user ${validUser._id}`,
+        );
+        return;
+      }
+
+      // if the returned document has the isProcessed field
+      // set to true, do nothing and return
+      if (
+        referralDocs[0].isProcessed === true ||
+        referralDocs[0].isProcessed === "true"
+      ) {
+        console.log(
+          `--- Referral document for user ${validUser._id} has already been processed`,
+        );
+        return;
+      }
+
+      // if the returned document has the isProcessed field
+      // set to false, it means the referral has not been
+      // yet processed.
+      // Get all the task for the referred user for the current season
+      const referredUserTasks = await getUserTasksBySeasonAndUserId(
+        referralDocs[0].referredUserId,
+        activeSeason._id,
+        db.connection,
+      );
+
+      // calculate the total amount of XP earned by the
+      // user so far
+      const referredUserXpTotal =
+        userTasks == null
+          ? 0
+          : referredUserTasks.reduce((acc, task) => {
+              const taskXp = task.xpEarned.reduce(
+                (acc2, entry) => acc2 + Number(entry.xp),
+                0,
+              );
+              return acc + taskXp;
+            }, 0);
+      // get the criteria field from the task document
+      // to know the amount of XP required to have before
+      // this task is done
+      let allCriteriaMet = true;
+      for (const eachCriteria of targetTask.criteria) {
+        const conditionFormula = new Function(...eachCriteria.conditionFormula);
+        const criteriaMet = conditionFormula(referredUserXpTotal);
+        if (criteriaMet === false) {
+          allCriteriaMet = false;
+          break;
+        }
+      }
+      if (allCriteriaMet === true) {
+        // if the user meets the criteria, update the
+        // referral document with the isProcessed field
+        // set to true
+        await referralService.updateOrCreateReferral(
+          referralDocs[0]._id,
+          { isProcessed: true },
+          db.connection,
+        );
+        // award the user with the amount of XP defined
+        // in the reward formula of the task
+        // NOTE: if there is an error thrown here, the
+        // referral document will be marked as processed
+        // but the user will not be awarded with XP
+        const rewardFormula = new Function(...targetTask.rewardFormula);
+
+        xpArray.push({
+          period: prepTerm,
+          block: height,
+          xp: rewardFormula(),
+        });
+      } else {
+        // if the user does not meet the criteria, do
+        // nothing and return
+        console.log(
+          `--- User ${validUser._id} does not meet the criteria to earn XP for this task`,
+        );
+        return;
+      }
     }
 
     // Update userTask document with new xpEarned array
