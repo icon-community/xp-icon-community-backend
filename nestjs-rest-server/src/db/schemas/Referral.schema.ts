@@ -46,6 +46,13 @@ export class Referral {
     ref: Collections.USERS,
   })
   referredUserId: Types.ObjectId; // Id of the user who was referred
+
+  @Prop({
+    type: Boolean,
+    isRequired: true,
+    default: false,
+  })
+  isProcessed: boolean; // Whether the referral has been processed or not
 }
 
 export type ReferralDocument = HydratedDocument<Referral>;

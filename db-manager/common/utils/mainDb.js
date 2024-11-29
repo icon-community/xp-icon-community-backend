@@ -6,6 +6,7 @@ const {
   taskSchema,
   seasonSchema,
   userTasksSchema,
+  referralSchema,
 } = require("../models");
 const config = require("./config");
 
@@ -23,10 +24,11 @@ class MainDb {
 
       // setup models
       console.log("Connection to main database created.");
-      this.connection.model(process.env.USER_COLLECTION, userSchema);
-      this.connection.model(process.env.TASK_COLLECTION, taskSchema);
-      this.connection.model(process.env.SEASON_COLLECTION, seasonSchema);
-      this.connection.model(process.env.USER_TASK_COLLECTION, userTasksSchema);
+      this.connection.model(config.collections.users, userSchema);
+      this.connection.model(config.collections.task, taskSchema);
+      this.connection.model(config.collections.season, seasonSchema);
+      this.connection.model(config.collections.userTask, userTasksSchema);
+      this.connection.model(config.collections.referrals, referralSchema);
     } catch (err) {
       console.log("error creating connection to main database: ");
       console.log(err);

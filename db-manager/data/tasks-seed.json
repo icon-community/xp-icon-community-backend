@@ -73,21 +73,21 @@
       }
     ],
     "title": "use referral code",
-    "rewardFormula": ["amount", "return 100"],
+    "rewardFormula": ["", "return 100"],
     "chain": "icon"
   },
   {
     "seedId": "t9",
     "type": "referral",
-    "description": "One-time reward for creating a referral code and having it used by a new user.",
+    "description": "Once per user using a referral code. The referrer will receive 150 XP for each new user that uses their referral code.",
     "criteria": [
       {
-        "description": "gains the xp after the new user uses the referral code and accumulates 100 XP",
-        "conditionFormula": ["amount", "return amount >= 100"]
+        "description": "gains the xp after the new user uses the referral code and accumulates 150 XP",
+        "conditionFormula": ["amount", "return amount >= 150"]
       }
     ],
     "title": "referral code used",
-    "rewardFormula": ["amount", "return 150"],
+    "rewardFormula": ["", "return 150"],
     "chain": "icon"
   }
 ]

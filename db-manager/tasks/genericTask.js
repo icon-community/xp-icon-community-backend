@@ -8,11 +8,16 @@ const {
   taskService,
   seasonService,
   userTaskService,
+  referralService,
 } = require("../common/services/v1/");
 const { getUsersBySeason } = userService;
 const { getActiveSeason } = seasonService;
 const { getTaskBySeedId } = taskService;
-const { getUserTaskByAllIds, updateOrCreateUserTask } = userTaskService;
+const {
+  getUserTaskByAllIds,
+  updateOrCreateUserTask,
+  getUserTasksBySeasonAndUserId,
+} = userTaskService;
 
 async function genericTask(taskInput, db, seedId, callback) {
   const { height, prepTerm } = taskInput;
@@ -75,8 +80,6 @@ async function genericTask(taskInput, db, seedId, callback) {
         continue;
       }
 
-      const rewardFormula = new Function(...targetTask.rewardFormula);
-
       // FIRST fetch data from the database
       // Fetch all the users with a defined seasonId
       console.log("-- Fetching users from DB");
@@ -104,6 +107,8 @@ async function genericTask(taskInput, db, seedId, callback) {
       const filteredUsers = [];
 
       for (const user of usersFromDb) {
+        console.log("DEBUG");
+        console.log(user);
         const targetSeason = user.seasons.find((season) =>
           season.seasonId.equals(activeSeason._id),
         );
@@ -185,7 +190,6 @@ async function genericTask(taskInput, db, seedId, callback) {
                   activeSeason,
                   callback,
                   height,
-                  rewardFormula,
                   userWallet,
                   db,
                 );
@@ -196,6 +200,17 @@ async function genericTask(taskInput, db, seedId, callback) {
         } else if (targetTask.type === "referral") {
           // get the referral documents
           // TODO: implement referral logic
+
+          console.log("--- referral task");
+          await userReferralTaskMainLogic(
+            userTaskDocArr,
+            targetTask,
+            prepTerm,
+            validUser,
+            activeSeason,
+            height,
+            db,
+          );
         } else {
           const userTaskDoc = userTaskDocArr.find((doc) => {
             return doc.walletAddress === validUser.walletAddress;
@@ -210,7 +225,6 @@ async function genericTask(taskInput, db, seedId, callback) {
             activeSeason,
             callback,
             height,
-            rewardFormula,
             userWallet,
             db,
           );
@@ -232,6 +246,154 @@ async function genericTask(taskInput, db, seedId, callback) {
   }
 }
 
+async function userReferralTaskMainLogic(
+  userTaskDoc,
+  targetTask,
+  prepTerm,
+  validUser,
+  activeSeason,
+  height,
+  db,
+) {
+  try {
+    const xpArray = [];
+    if (targetTask.seedId === "t8") {
+      // this is the task for the case when this user is
+      // the one using a referral code
+      //
+      // with the validUser._id fetch all the documents
+      // in the referral collection on which this user
+      // is the referred and the isProcessed
+      // field is false
+      const referralDocs = await referralService.getReferralByReferredId(
+        validUser._id,
+        db.connection,
+      );
+      console.log("--- referralDocs");
+      console.log(referralDocs);
+
+      // if there are no documents in the returned array
+      // do nothing and return
+      if (referralDocs.length === 0) {
+        console.log(
+          `--- No referral documents found for user ${validUser._id}`,
+        );
+        return;
+      }
+
+      // if the returned document has the isProcessed field
+      // set to true, do nothing and return
+      if (
+        referralDocs[0].isProcessed === true ||
+        referralDocs[0].isProcessed === "true"
+      ) {
+        console.log(
+          `--- Referral document for user ${validUser._id} has already been processed`,
+        );
+        return;
+      }
+
+      // if the returned document has the isProcessed field
+      // set to false, it means the referral has not been
+      // yet processed, get the criteria field from the
+      // task document to know the amount of XP required to
+      // have before this task is done
+
+      // get all the task for the user for the current season
+      const userTasks = await getUserTasksBySeasonAndUserId(
+        validUser._id,
+        activeSeason._id,
+        db.connection,
+      );
+
+      // calculate the total amount of XP earned by the
+      // user so far
+      const userXpTotal =
+        userTasks == null
+          ? 0
+          : userTasks.reduce((acc, task) => {
+              const taskXp = task.xpEarned.reduce(
+                (acc2, entry) => acc2 + Number(entry.xp),
+                0,
+              );
+              return acc + taskXp;
+            }, 0);
+
+      console.log("DEBUG userXpTotal");
+      console.log(userXpTotal);
+      // get the criteria field from the task document
+      // to know the amount of XP required to have before
+      // this task is done
+      let allCriteriaMet = true;
+      for (const eachCriteria of targetTask.criteria) {
+        const conditionFormula = new Function(...eachCriteria.conditionFormula);
+        const criteriaMet = conditionFormula(userXpTotal);
+        if (criteriaMet === false) {
+          allCriteriaMet = false;
+          break;
+        }
+      }
+      if (allCriteriaMet === true) {
+        // if the user meets the criteria, update the
+        // referral document with the isProcessed field
+        // set to true
+        await referralService.updateOrCreateReferral(
+          referralDocs[0]._id,
+          { isProcessed: true },
+          db.connection,
+        );
+        // award the user with the amount of XP defined
+        // in the reward formula of the task
+        // NOTE: if there is an error thrown here, the
+        // referral document will be marked as processed
+        // but the user will not be awarded with XP
+        const rewardFormula = new Function(...targetTask.rewardFormula);
+
+        xpArray.push({
+          period: prepTerm,
+          block: height,
+          xp: rewardFormula(),
+        });
+      } else {
+        // if the user does not meet the criteria, do
+        // nothing and return
+        console.log(
+          `--- User ${validUser._id} does not meet the criteria to earn XP for this task`,
+        );
+        return;
+      }
+    } else if (targetTask.seedId === "t9") {
+      // this is the task for the case when this user is
+      // the one who has a referral code being used by
+      // another user
+      //
+      // with the validUser._id fetch all the documents
+      // in the referral collection on which this user
+      // is the referrer and the isProcessed
+      // field is false
+      // TODO: implement this logic
+    }
+
+    // Update userTask document with new xpEarned array
+    await updateOrCreateUserTask(
+      {
+        userId: validUser._id,
+        taskId: targetTask._id,
+        seasonId: activeSeason._id,
+        // TODO: update this to support xchain wallets
+        walletAddress: validUser.walletAddress,
+      },
+      { xpEarned: xpArray },
+      db.connection,
+    );
+    console.log("--- UserTask document updated");
+  } catch (err) {
+    console.log("> Error running userReferralTaskMainLogic ");
+    console.log(err);
+    throw new Error(err.message);
+  }
+}
+
 async function userTaskMainLogic(
   userTaskDoc,
   targetTask,
@@ -240,7 +402,6 @@ async function userTaskMainLogic(
   activeSeason,
   callback,
   height,
-  rewardFormula,
   userWallet,
   db,
 ) {
@@ -304,6 +465,7 @@ async function userTaskMainLogic(
 
     console.log("--- Updating userTask document with new xpEarned array");
     // here we are adding the new entry for the current term to the xpEarned array. At this point the xpEarned array contains all the previous terms and we are adding the current term to it
+    const rewardFormula = new Function(...targetTask.rewardFormula);
     xpArray.push({
       period: prepTerm,
       block: height,

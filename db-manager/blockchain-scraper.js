@@ -18,6 +18,8 @@ const {
   fetchNewUsersAndGiveRegistrationReward,
   fetchXChainLoansAndUpdateDb,
   fetchXChainCollateralsAndUpdateDb,
+  fetchNewReferrersAndUpdateDb,
+  fetchNewReferredAndUpdateDb,
 } = require("./tasks");
 const config = require("./common/utils/config");
 
@@ -112,6 +114,14 @@ async function main() {
 
     // Run task that fetches cross chain collaterals deposited by each user and updates the db
     tasks.push(taskRunner(fetchXChainCollateralsAndUpdateDb, db));
+
+    // Run task that fetches new referrers and new referred and
+    // updates the db
+    // These tasks should be run last, they depends on the earned
+    // rewards from the previous tasks
+    tasks.push(taskRunner(fetchNewReferrersAndUpdateDb, db));
+    tasks.push(taskRunner(fetchNewReferredAndUpdateDb, db));
+
     // create monitor instance
     monitor = new Monitor(
       JVM_SERVICE,

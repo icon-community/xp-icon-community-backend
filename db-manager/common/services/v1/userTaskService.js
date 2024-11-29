@@ -28,6 +28,16 @@ async function getUserTaskByAllIds(userId, taskId, seasonId, connection) {
   );
 }
 
+async function getUserTasksBySeasonAndUserId(userId, seasonId, connection) {
+  return await getEntryByParam(
+    {
+      userId,
+      seasonId,
+    },
+    USER_TASK,
+    connection,
+  );
+}
 async function updateOrCreateUserTask(query, update, connection) {
   return await updateOrCreateEntry(query, update, USER_TASK, connection);
 }
@@ -37,4 +47,5 @@ module.exports = {
   getAllUserTasks,
   getUserTaskByAllIds,
   updateOrCreateUserTask,
+  getUserTasksBySeasonAndUserId,
 };
