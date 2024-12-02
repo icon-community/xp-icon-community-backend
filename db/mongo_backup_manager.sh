@@ -1,4 +1,13 @@
 #!/bin/bash
+#!/bin/bash
+
+# Define log file
+LOG_FILE="/home/ubuntu/xp-icon-community-backend/db/logs/mongo_manager.log"
+
+# Add a separator for each run
+echo "===================================" >> "$LOG_FILE"
+echo "Backup started at $(date '+%Y-%m-%d %H:%M:%S')" >> "$LOG_FILE"
+echo "===================================" >> "$LOG_FILE"
 
 # Load environment variables from .env file
 ENV_FILE="/home/ubuntu/xp-icon-community-backend/db/.env"
@@ -241,3 +250,8 @@ else
   echo "Usage: $0 {backup|restore|download} [file]"
   exit 1
 fi
+
+# At the end of the script
+echo "-----------------------------------" >> "$LOG_FILE"
+echo "Backup ended at $(date '+%Y-%m-%d %H:%M:%S')" >> "$LOG_FILE"
+echo "-----------------------------------" >> "$LOG_FILE"
