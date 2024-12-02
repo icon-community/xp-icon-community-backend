@@ -107,8 +107,6 @@ async function genericTask(taskInput, db, seedId, callback) {
       const filteredUsers = [];
 
       for (const user of usersFromDb) {
-        console.log("DEBUG");
-        console.log(user);
         const targetSeason = user.seasons.find((season) =>
           season.seasonId.equals(activeSeason._id),
         );
@@ -317,26 +315,6 @@ async function userReferralTaskMainLogic(
               return acc + taskXp;
             }, 0);
 
-      // get all the task for the user for the current season
-      const userTasks = await getUserTasksBySeasonAndUserId(
-        validUser._id,
-        activeSeason._id,
-        db.connection,
-      );
-
-      // calculate the total amount of XP earned by the
-      // user so far
-      const userXpTotal =
-        userTasks == null
-          ? 0
-          : userTasks.reduce((acc, task) => {
-              const taskXp = task.xpEarned.reduce(
-                (acc2, entry) => acc2 + Number(entry.xp),
-                0,
-              );
-              return acc + taskXp;
-            }, 0);
-
       // get the criteria field from the task document
       // to know the amount of XP required to have before
       // this task is done
@@ -426,7 +404,7 @@ async function userReferralTaskMainLogic(
       // calculate the total amount of XP earned by the
       // user so far
       const referredUserXpTotal =
-        userTasks == null
+        referredUserTasks == null
           ? 0
           : referredUserTasks.reduce((acc, task) => {
               const taskXp = task.xpEarned.reduce(
