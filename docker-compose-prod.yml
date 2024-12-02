@@ -75,7 +75,7 @@ services:
       context: ./nestjs-rest-server
     restart: always
     ports:
-      - "3500:3500"
+      - "3501:3500"
     depends_on:
       - mongodb-prod
       - auth-server
@@ -89,7 +89,7 @@ services:
       context: ./nestjs-rest-server
     restart: always
     ports:
-      - "3501:3500"
+      - "3502:3500"
     depends_on:
       - mongodb-prod
       - auth-server
