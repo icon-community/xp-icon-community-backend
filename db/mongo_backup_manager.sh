@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Load environment variables from .env file
-ENV_FILE="/home/ubuntu/xp-icon-community-backend/.env"
+ENV_FILE="/home/ubuntu/xp-icon-community-backend/db/.env"
 if [ -f "$ENV_FILE" ]; then
   set -a
   source "$ENV_FILE"
