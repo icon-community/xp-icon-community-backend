@@ -1,10 +1,14 @@
 #!/bin/bash
 
 # Load environment variables from .env file
-if [ -f .env ]; then
+ENV_FILE="/home/ubuntu/xp-icon-community-backend/.env"
+if [ -f "$ENV_FILE" ]; then
   set -a
-  source .env
+  source "$ENV_FILE"
   set +a
+else
+  echo "Error: The .env file is missing. Please create the .env file with the required environment variables."
+  exit 1
 fi
 
 # Function to check if the required environment variables are set correctly
