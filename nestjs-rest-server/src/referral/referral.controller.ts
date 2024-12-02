@@ -1,21 +1,9 @@
-import {
-  Controller,
-  Get,
-  InternalServerErrorException,
-  Param,
-  Post,
-  Query,
-  UseGuards,
-  ValidationPipe,
-} from "@nestjs/common";
+import { Controller, Get, Param, Query, ValidationPipe } from "@nestjs/common";
 import { ReferralService } from "./referral.service";
 import { Referral } from "../db/schemas/Referral.schema";
 import { AddressValidationPipe } from "../shared/pipes/address-validation-pipe.service";
 import { UsersDbService } from "../db/services/users-db/users-db.service";
 import { FindUserReferralsQueryDTO } from "./dto/FindUserReferralsQueryDTO";
-import { UserAddress } from "../user/decorator/user.decorators";
-import { JwtAuthGuard } from "../auth/guards/jwt-auth.guard";
-import { ApiHeader } from "@nestjs/swagger";
 
 @Controller("referral")
 export class ReferralController {
@@ -42,24 +30,5 @@ export class ReferralController {
     query: FindUserReferralsQueryDTO,
   ): Promise<Referral[]> {
     return this.referralService.findAllUserReferralsForPeriod(address, query.start, query.end);
-  }
-
-  @Post(":address")
-  @UseGuards(JwtAuthGuard)
-  @ApiHeader({
-    name: "authorization",
-    description: "JWT Authorization header. E.g. 'Bearer {Token}'",
-  })
-  async createUserReferral(@Query("referralCode") referralCode: string, @UserAddress() address: string): Promise<void> {
-    try {
-      const referredUser = await this.userDb.getUserByAddress(address);
-
-      if (!referredUser) {
-        throw new InternalServerErrorException("User not found");
-      }
-      return await this.referralService.createUserReferral(referralCode, address, referredUser._id);
-    } catch (e) {
-      throw new InternalServerErrorException(e);
-    }
   }
 }

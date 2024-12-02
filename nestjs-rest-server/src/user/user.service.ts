@@ -257,7 +257,7 @@ export class UserService {
         try {
           await this.referralService.createUserReferral(referralCode, publicAddress, rawUser._id);
         } catch {
-          throw new InternalServerErrorException("Failed to create referral");
+          this.logger.error("Failed to create referral");
         }
       }
       return formatUser(rawUser);

@@ -318,15 +318,10 @@ async function userReferralTaskMainLogic(
       // get the criteria field from the task document
       // to know the amount of XP required to have before
       // this task is done
-      let allCriteriaMet = true;
-      for (const eachCriteria of targetTask.criteria) {
+      const allCriteriaMet = targetTask.criteria.every((eachCriteria) => {
         const conditionFormula = new Function(...eachCriteria.conditionFormula);
-        const criteriaMet = conditionFormula(userXpTotal);
-        if (criteriaMet === false) {
-          allCriteriaMet = false;
-          break;
-        }
-      }
+        return conditionFormula(userXpTotal);
+      });
       if (allCriteriaMet === true) {
         // if the user meets the criteria, update the
         // referral document with the isProcessed field
@@ -416,15 +411,11 @@ async function userReferralTaskMainLogic(
       // get the criteria field from the task document
       // to know the amount of XP required to have before
       // this task is done
-      let allCriteriaMet = true;
-      for (const eachCriteria of targetTask.criteria) {
+      const allCriteriaMet = targetTask.criteria.every((eachCriteria) => {
         const conditionFormula = new Function(...eachCriteria.conditionFormula);
-        const criteriaMet = conditionFormula(referredUserXpTotal);
-        if (criteriaMet === false) {
-          allCriteriaMet = false;
-          break;
-        }
-      }
+        return conditionFormula(referredUserXpTotal);
+      });
+
       if (allCriteriaMet === true) {
         // if the user meets the criteria, update the
         // referral document with the isProcessed field
