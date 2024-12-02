@@ -2,7 +2,7 @@
 #!/bin/bash
 
 # Define log file
-LOG_FILE="/home/ubuntu/xp-icon-community-backend/db/logs/mongo_manager.log"
+LOG_FILE="/home/ubuntu/xp-icon-community-backend/db/logs/mongo_backup_manager.log"
 
 # Add a separator for each run
 echo "===================================" >> "$LOG_FILE"
