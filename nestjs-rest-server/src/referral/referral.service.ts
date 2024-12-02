@@ -1,4 +1,5 @@
 import { BadRequestException, Injectable, InternalServerErrorException } from "@nestjs/common";
+import { Types } from "mongoose";
 import { ReferralDbService } from "../db/services/users-db/referral-db.service";
 import { CreateReferralDto } from "./dto/create-referral.dto";
 import { Referral } from "../db/schemas/Referral.schema";
@@ -19,7 +20,7 @@ export class ReferralService {
     return this.referralDb.getUserReferralsForPeriod(address, start, end);
   }
 
-  async createUserReferral(referralCode: string, publicAddress: string): Promise<void> {
+  async createUserReferral(referralCode: string, publicAddress: string, referredId: Types.ObjectId): Promise<void> {
     // find referrer user
     const referrerUser = await this.userDb.getUsersByReferralCode(referralCode);
 
@@ -30,8 +31,10 @@ export class ReferralService {
     try {
       await this.createReferral({
         referrerUserAddress: referrerUser.walletAddress,
+        referrerUserId: referrerUser._id,
         referralCode: referralCode,
         referredUserAddress: publicAddress,
+        referredUserId: referredId,
       });
     } catch {
       throw new InternalServerErrorException("Failed to create referral");
