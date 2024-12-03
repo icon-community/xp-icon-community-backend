@@ -2,15 +2,11 @@ import { Controller, Get, Param, Query, ValidationPipe } from "@nestjs/common";
 import { ReferralService } from "./referral.service";
 import { Referral } from "../db/schemas/Referral.schema";
 import { AddressValidationPipe } from "../shared/pipes/address-validation-pipe.service";
-import { UsersDbService } from "../db/services/users-db/users-db.service";
 import { FindUserReferralsQueryDTO } from "./dto/FindUserReferralsQueryDTO";
 
 @Controller("referral")
 export class ReferralController {
-  constructor(
-    private readonly referralService: ReferralService,
-    private userDb: UsersDbService,
-  ) {}
+  constructor(private readonly referralService: ReferralService) {}
 
   @Get(":address")
   findUserReferrals(@Param("address", AddressValidationPipe) address: string): Promise<Referral[]> {

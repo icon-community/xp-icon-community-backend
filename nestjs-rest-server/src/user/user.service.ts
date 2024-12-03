@@ -8,12 +8,12 @@ import {
 } from "@nestjs/common";
 import { seasonsConfig } from "../config/configuration";
 import { SeasonLabel } from "../shared/models/enum/SeasonLabel";
-import { UsersDbService } from "../db/services/users-db/users-db.service";
-import { SeasonDbService } from "../db/services/users-db/season-db.service";
-import { UsersTaskDbService } from "../db/services/users-db/user-task-db.service";
+import { UsersDbService } from "../db/services/users-db.service";
+import { SeasonDbService } from "../db/services/season-db.service";
+import { UsersTaskDbService } from "../db/services/user-task-db.service";
 import { sha3_256 } from "js-sha3";
 import { Types } from "mongoose";
-import { TaskDbService } from "../db/services/users-db/task-db.service";
+import { TaskDbService } from "../db/services/task-db.service";
 import { formatSeasonDocument, formatUser, formatUserDocument, formatUserTaskDocuments } from "../shared/utils/mapper";
 import { calculateTaskTotalXp, sumXp24hrs, sumXpTotal } from "../shared/utils/xp-util";
 import { RankingService } from "../ranking/service/ranking.service";
@@ -245,18 +245,11 @@ export class UserService {
       const rawUser = await this.userDb.createUser(createUserDto);
 
       // handle referral after user creation
-      // TODO: logic has been changed because we need the id of the newly
-      // created user to create the referral
-      // but if the referral creation process fails, the user will
-      // still be created, do we in this case just continue and the
-      // user will not earn the referral bonus? or do we delete the user
-      // and return an error?
-      // for now we will just continue and the user will not earn
-      // the referral bonus
       if (referralCode) {
         try {
           await this.referralService.createUserReferral(referralCode, publicAddress, rawUser._id);
         } catch {
+          // gracefully log an error but do not throw
           this.logger.error("Failed to create referral");
         }
       }

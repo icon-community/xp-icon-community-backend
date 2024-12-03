@@ -1,12 +1,12 @@
 import { Injectable, InternalServerErrorException } from "@nestjs/common";
 import { SeasonLabel } from "../shared/models/enum/SeasonLabel";
 import { seasonsConfig } from "../config/configuration";
-import { SeasonDbService } from "../db/services/users-db/season-db.service";
+import { SeasonDbService } from "../db/services/season-db.service";
 import { formatSeasonDocument } from "../shared/utils/mapper";
-import { UsersDbService } from "../db/services/users-db/users-db.service";
-import { TaskDbService } from "../db/services/users-db/task-db.service";
+import { UsersDbService } from "../db/services/users-db.service";
+import { TaskDbService } from "../db/services/task-db.service";
 import { IconConnectorService } from "../chain-connectors/icon-connector.service";
-import { UsersTaskDbService } from "../db/services/users-db/user-task-db.service";
+import { UsersTaskDbService } from "../db/services/user-task-db.service";
 import { RankingService } from "../ranking/service/ranking.service";
 import { getRankingOfSeasonReduced } from "../shared/utils/ranking-utils";
 import { SeasonDto } from "./dto/season.dto";
