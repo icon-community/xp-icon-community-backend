@@ -3,6 +3,7 @@ const taskService = require("./taskService");
 const seasonService = require("./seasonService");
 const userTaskService = require("./userTaskService");
 const referralService = require("./referralService");
+const dailyCheckInService = require("./dailyCheckInService");
 const multi = require("./multi");
 
 module.exports = {
@@ -10,6 +11,7 @@ module.exports = {
   taskService,
   seasonService,
   userTaskService,
+  dailyCheckInService,
   multi,
   referralService,
 };

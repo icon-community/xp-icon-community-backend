@@ -1,9 +1,9 @@
 import { BadRequestException, Injectable, InternalServerErrorException } from "@nestjs/common";
 import { Types } from "mongoose";
-import { ReferralDbService } from "../db/services/users-db/referral-db.service";
 import { CreateReferralDto } from "./dto/create-referral.dto";
 import { Referral } from "../db/schemas/Referral.schema";
-import { UsersDbService } from "../db/services/users-db/users-db.service";
+import { UsersDbService } from "../db/services/users-db.service";
+import { ReferralDbService } from "../db/services/referral-db.service";
 
 @Injectable()
 export class ReferralService {

@@ -20,12 +20,13 @@ const {
   fetchXChainCollateralsAndUpdateDb,
   fetchNewReferrersAndUpdateDb,
   fetchNewReferredAndUpdateDb,
+  dailyCheckInTask,
 } = require("./tasks");
 const config = require("./common/utils/config");
 
 const lineBreak = config.misc.lineBreak;
 const RUN_TIME = parseInt(process.env.TIME);
-const NO_TASK_RUN = process.env.NO_TASK == null ? false : true;
+const NO_TASK_RUN = process.env.NO_TASK != null;
 // const CHAIN = process.env.CHAIN;
 // void CHAIN;
 
@@ -121,6 +122,9 @@ async function main() {
     // rewards from the previous tasks
     tasks.push(taskRunner(fetchNewReferrersAndUpdateDb, db));
     tasks.push(taskRunner(fetchNewReferredAndUpdateDb, db));
+
+    // Run task that fetches cross chain collaterals deposited by each user and updates the db
+    tasks.push(taskRunner(dailyCheckInTask, db));
 
     // create monitor instance
     monitor = new Monitor(

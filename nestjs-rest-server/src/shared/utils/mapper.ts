@@ -11,11 +11,21 @@ import { UserDocument, IUserSeasonRegistration } from "../../db/schemas/User.sch
 import { SeasonsDocument } from "../../db/schemas/Seasons.schema";
 import { UserSeasonResDto } from "../../user/dto/user-season-res.dto";
 import { UserResponseDto } from "../../user/dto/user-response.dto";
+import { DailyCheckInDocument } from "../../db/schemas/DailyCheckIn.schema";
+import { DailyCheckinDto } from "../../daily-check-in/dto/DailyCheckinDto";
 
 export function formatUserSeason(value: IUserSeasonRegistration): UserSeasonResDto {
   return {
     seasonId: value.seasonId.toString(),
     registrationBlock: value.registrationBlock,
+  };
+}
+
+export function formatDailyCheckIn(dailyCheckIn: DailyCheckInDocument): DailyCheckinDto {
+  return {
+    walletAddress: dailyCheckIn.walletAddress,
+    streakCounter: dailyCheckIn.streakCounter,
+    lastCheckIn: dailyCheckIn.lastCheckIn,
   };
 }
 

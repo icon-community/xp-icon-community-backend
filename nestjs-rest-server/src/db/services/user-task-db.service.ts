@@ -1,9 +1,9 @@
 import { Injectable } from "@nestjs/common";
 import { InjectModel } from "@nestjs/mongoose";
 import { Model, Types } from "mongoose";
-import { CreateUserTaskDto, UpdateUserTaskDto } from "../../db-models";
-import { IUserTask, UserTaskDocument, UserTaskQuery } from "../../schemas/UserTask.schema";
-import { Collections } from "../../../shared/models/enum/Collections";
+import { CreateUserTaskDto, UpdateUserTaskDto } from "../db-models";
+import { IUserTask, UserTaskDocument, UserTaskQuery } from "../schemas/UserTask.schema";
+import { Collections } from "../../shared/models/enum/Collections";
 
 @Injectable()
 export class UsersTaskDbService {
