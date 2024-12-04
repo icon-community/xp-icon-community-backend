@@ -1,10 +1,23 @@
 #!/bin/bash
+#!/bin/bash
+
+# Define log file
+LOG_FILE="/home/ubuntu/xp-icon-community-backend/db/logs/mongo_backup_manager.log"
+
+# Add a separator for each run
+echo "===================================" >> "$LOG_FILE"
+echo "Backup started at $(date '+%Y-%m-%d %H:%M:%S')" >> "$LOG_FILE"
+echo "===================================" >> "$LOG_FILE"
 
 # Load environment variables from .env file
-if [ -f .env ]; then
+ENV_FILE="/home/ubuntu/xp-icon-community-backend/db/.env"
+if [ -f "$ENV_FILE" ]; then
   set -a
-  source .env
+  source "$ENV_FILE"
   set +a
+else
+  echo "Error: The .env file is missing. Please create the .env file with the required environment variables."
+  exit 1
 fi
 
 # Function to check if the required environment variables are set correctly
@@ -237,3 +250,8 @@ else
   echo "Usage: $0 {backup|restore|download} [file]"
   exit 1
 fi
+
+# At the end of the script
+echo "-----------------------------------" >> "$LOG_FILE"
+echo "Backup ended at $(date '+%Y-%m-%d %H:%M:%S')" >> "$LOG_FILE"
+echo "-----------------------------------" >> "$LOG_FILE"
