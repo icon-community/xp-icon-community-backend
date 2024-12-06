@@ -3,6 +3,7 @@ import { validateSync } from "class-validator";
 import { ClassConstructor } from "class-transformer/types/interfaces";
 import { StrKey } from "@stellar/stellar-base";
 import { isEthereumAddress } from "class-validator";
+import { isValidSuiAddress } from "@mysten/sui/utils";
 
 export function validateUtil<Type extends object>(
   config: Record<string, unknown>,
@@ -47,6 +48,15 @@ export function isScoreAddress(address: string): boolean {
  */
 export function isStellarAddress(address: string): boolean {
   return StrKey.isValidEd25519PublicKey(address);
+}
+
+/**
+ * Check if input value is a Sui address.
+ * @param {string} address - the input value.
+ * @return {boolean} returns true if the input value is a Sui address.
+ */
+export function isSuiAddress(address: string): boolean {
+  return isValidSuiAddress(address);
 }
 
 /**

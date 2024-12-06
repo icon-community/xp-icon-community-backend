@@ -7,7 +7,7 @@ x-global-env: &global-env
 
 services:
   auth-server:
-    image: "iconcommunity/icon-wallet-auth-backend-app:1.0.2"
+    image: "iconcommunity/icon-wallet-auth-backend-app:1.0.3"
     container_name: auth-server
     restart: always
     ports:

@@ -9,7 +9,7 @@ import { LinkSocialDataDto } from "../../../user/dto/link-social-data.dto";
 import { LinkWalletDto } from "../../../user/dto/link-wallet.dto";
 import { MAX_LINKED_EVM_WALLETS } from "../../../constants";
 import { Collections } from "../../../shared/models/enum/Collections";
-import { isStellarAddress, isEvmAddress } from "../../../shared/utils/validate-util";
+import { isStellarAddress, isEvmAddress, isSuiAddress } from "../../../shared/utils/validate-util";
 
 @Injectable()
 export class UsersDbService {
@@ -63,6 +63,11 @@ export class UsersDbService {
         case ChainType.stellar:
           if (!isStellarAddress(linkWalletDto.address)) {
             throw new Error("Invalid Stellar wallet address");
+          }
+          break;
+        case ChainType.sui:
+          if (!isSuiAddress(linkWalletDto.address)) {
+            throw new Error("Invalid Sui wallet address");
           }
           break;
         default:
