@@ -1,9 +1,9 @@
 import { Injectable } from "@nestjs/common";
 import { InjectModel } from "@nestjs/mongoose";
 import { Model, Types } from "mongoose";
-import { CreateSeasonDto } from "../../db-models";
-import { ISeason, SeasonsDocument } from "../../schemas/Seasons.schema";
-import { Collections } from "../../../shared/models/enum/Collections";
+import { CreateSeasonDto } from "../db-models";
+import { ISeason, SeasonsDocument } from "../schemas/Seasons.schema";
+import { Collections } from "../../shared/models/enum/Collections";
 
 @Injectable()
 export class SeasonDbService {

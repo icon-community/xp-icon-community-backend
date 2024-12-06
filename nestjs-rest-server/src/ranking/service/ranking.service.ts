@@ -1,7 +1,7 @@
 import { Injectable } from "@nestjs/common";
-import { UsersDbService } from "../../db/services/users-db/users-db.service";
-import { SeasonDbService } from "../../db/services/users-db/season-db.service";
-import { UsersTaskDbService } from "../../db/services/users-db/user-task-db.service";
+import { UsersDbService } from "../../db/services/users-db.service";
+import { SeasonDbService } from "../../db/services/season-db.service";
+import { UsersTaskDbService } from "../../db/services/user-task-db.service";
 import { RankData, TaskXp } from "../../shared/models/types/RankedTypes";
 import { calculateTaskTotalXp } from "../../shared/utils/xp-util";
 

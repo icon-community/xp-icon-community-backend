@@ -10,6 +10,7 @@ const fetchXChainLoansAndUpdateDb = require("./fetchXChainLoansAndUpdateDb");
 const fetchXChainCollateralsAndUpdateDb = require("./fetchXChainCollateralsAndUpdateDb");
 const fetchNewReferrersAndUpdateDb = require("./fetchNewReferrersAndUpdateDb");
 const fetchNewReferredAndUpdateDb = require("./fetchNewReferredAndUpdateDb");
+const dailyCheckInTask = require("./dailyCheckInTask");
 
 module.exports = {
   fetchRegisteredUsersAndUpdateDb,
@@ -24,4 +25,5 @@ module.exports = {
   fetchXChainCollateralsAndUpdateDb,
   fetchNewReferrersAndUpdateDb,
   fetchNewReferredAndUpdateDb,
+  dailyCheckInTask
 };

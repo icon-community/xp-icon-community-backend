@@ -13,6 +13,7 @@ import { AddressValidationPipe } from "./shared/pipes/address-validation-pipe.se
 import { MongooseModule } from "@nestjs/mongoose";
 import { XpgoConfigService } from "./config/xpgo-config.service";
 import { ReferralModule } from "./referral/referral.module";
+import { DailyCheckInModule } from "./daily-check-in/daily-check-in.module";
 
 @Module({
   imports: [
@@ -34,6 +35,7 @@ import { ReferralModule } from "./referral/referral.module";
     ChainConnectorsModule,
     RankingModule,
     ReferralModule,
+    DailyCheckInModule,
   ],
   controllers: [AppController],
   providers: [AppService, Logger, ValidationPipe, AddressValidationPipe],

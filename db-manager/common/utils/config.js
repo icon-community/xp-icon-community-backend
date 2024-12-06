@@ -47,6 +47,7 @@ const config = {
     season: process.env.SEASON_COLLECTION,
     userTask: process.env.USER_TASK_COLLECTION,
     referrals: process.env.REFERRALS_COLLECTION,
+    dailyCheckIn: process.env.DAILY_CHECK_IN_COLLECTION ?? "daily_check_in",
   },
   db: {
     user: process.env.MONGO_USER,

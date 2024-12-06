@@ -5,4 +5,5 @@ export enum Collections {
   SEASONS = "seasons",
   USER_TASKS = "user_tasks",
   REFERRALS = "referrals",
+  DAILY_CHECK_IN = "daily_check_in",
 }

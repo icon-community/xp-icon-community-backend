@@ -1,15 +1,15 @@
 import { Injectable, Logger } from "@nestjs/common";
 import { InjectModel } from "@nestjs/mongoose";
-import { IUser, UserDocument } from "../../schemas/User.schema";
+import { IUser, UserDocument } from "../schemas/User.schema";
 import { Model, Types } from "mongoose";
-import { CreateUserDto, UserSeasonDto } from "../../db-models";
-import { MongoDbErrorCode } from "../../../shared/models/enum/MongoDbErrorCode";
-import { ChainType } from "../../../shared/models/enum/ChainType";
-import { LinkSocialDataDto } from "../../../user/dto/link-social-data.dto";
-import { LinkWalletDto } from "../../../user/dto/link-wallet.dto";
-import { MAX_LINKED_EVM_WALLETS } from "../../../constants";
-import { Collections } from "../../../shared/models/enum/Collections";
-import { isStellarAddress, isEvmAddress, isSuiAddress } from "../../../shared/utils/validate-util";
+import { CreateUserDto, UserSeasonDto } from "../db-models";
+import { MongoDbErrorCode } from "../../shared/models/enum/MongoDbErrorCode";
+import { ChainType } from "../../shared/models/enum/ChainType";
+import { LinkSocialDataDto } from "../../user/dto/link-social-data.dto";
+import { LinkWalletDto } from "../../user/dto/link-wallet.dto";
+import { MAX_LINKED_EVM_WALLETS } from "../../constants";
+import { Collections } from "../../shared/models/enum/Collections";
+import { isStellarAddress, isEvmAddress, isSuiAddress } from "../../shared/utils/validate-util";
 
 @Injectable()
 export class UsersDbService {
