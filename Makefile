@@ -43,3 +43,11 @@ run-dev-rest-api:
 stop-dev-rest-api:
 	@echo "Running dev mongodb server"
 	@docker compose -f docker-compose-dev.yml down rest-server
+
+update-dev-rest-server:
+	@echo "Updating dev server (rest-server)"
+	@docker compose -f docker-compose-dev.yml up -d --no-deps --build rest-server
+
+update-dev-auth-server:
+	@echo "Updating dev server (rest-server)"
+	@docker compose -f docker-compose-dev.yml up -d --no-deps --build auth-server
