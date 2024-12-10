@@ -1,7 +1,7 @@
 import { Type } from "class-transformer";
 import { IsDate } from "class-validator";
 
-export class FindUserReferralsQueryDTO {
+export class FindUserReferralsQuery {
   @Type(() => Date)
   @IsDate()
   start: Date;

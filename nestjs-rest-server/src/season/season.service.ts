@@ -1,4 +1,4 @@
-import { Injectable, InternalServerErrorException } from "@nestjs/common";
+import { BadRequestException, Injectable, InternalServerErrorException, NotFoundException } from "@nestjs/common";
 import { SeasonLabel } from "../shared/models/enum/SeasonLabel";
 import { seasonsConfig } from "../config/configuration";
 import { SeasonDbService } from "../db/services/season-db.service";
@@ -12,6 +12,7 @@ import { getRankingOfSeasonReduced } from "../shared/utils/ranking-utils";
 import { SeasonDto } from "./dto/season.dto";
 import { CalculateSeasonReqDto } from "./dto/calculate-season-req.dto";
 import { RewardsDto } from "./dto/rewards.dto";
+import { SeasonsDocument } from "../db/schemas/Seasons.schema";
 
 @Injectable()
 export class SeasonService {
@@ -90,17 +91,33 @@ export class SeasonService {
     });
   }
 
-  async getSeason(seasonLabel: SeasonLabel): Promise<SeasonDto> {
-    const seasonDbLabel = seasonsConfig.routes[seasonLabel];
+  async getSeasonDocument(seasonLabel: SeasonLabel): Promise<SeasonsDocument> {
+    const seasonNumberId = seasonsConfig.routes[seasonLabel];
 
-    if (seasonDbLabel == null) {
-      throw new Error("Invalid season");
+    if (seasonNumberId == null) {
+      throw new BadRequestException("Invalid season label");
     }
 
-    const season = await this.seasonDb.getSeasonByNumberId(seasonDbLabel);
+    const season = await this.seasonDb.getSeasonByNumberId(seasonNumberId);
 
     if (!season) {
-      throw new Error("Season not found");
+      throw new NotFoundException("Season not found");
+    }
+
+    return season;
+  }
+
+  async getSeason(seasonLabel: SeasonLabel): Promise<SeasonDto> {
+    const seasonNumberId = seasonsConfig.routes[seasonLabel];
+
+    if (seasonNumberId == null) {
+      throw new BadRequestException("Invalid season label");
+    }
+
+    const season = await this.seasonDb.getSeasonByNumberId(seasonNumberId);
+
+    if (!season) {
+      throw new NotFoundException("Season not found");
     }
 
     const seasonFormatted = formatSeasonDocument(season);
@@ -157,7 +174,7 @@ export class SeasonService {
       });
     }
 
-    const rankings = await this.rankingService.getRankingOfSeason(seasonDbLabel);
+    const rankings = await this.rankingService.getRankingOfSeason(seasonNumberId);
     const rankingsReduced = getRankingOfSeasonReduced(rankings);
 
     return {

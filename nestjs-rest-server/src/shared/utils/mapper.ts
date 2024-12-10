@@ -13,6 +13,16 @@ import { UserSeasonResDto } from "../../user/dto/user-season-res.dto";
 import { UserResponseDto } from "../../user/dto/user-response.dto";
 import { DailyCheckInDocument } from "../../db/schemas/DailyCheckIn.schema";
 import { DailyCheckinDto } from "../../daily-check-in/dto/DailyCheckinDto";
+import { SubscriberObject } from "@mailerlite/mailerlite-nodejs";
+import { MaileriteSubscriberDto } from "../../user/dto/mailerite-subscriber.dto";
+
+export function formatMailerliteSubscriber(value: SubscriberObject): MaileriteSubscriberDto {
+  return {
+    email: value.email,
+    created_at: value.created_at,
+    status: value.status,
+  };
+}
 
 export function formatUserSeason(value: IUserSeasonRegistration): UserSeasonResDto {
   return {

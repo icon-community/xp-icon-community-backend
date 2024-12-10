@@ -14,7 +14,13 @@ import { UsersTaskDbService } from "../db/services/user-task-db.service";
 import { sha3_256 } from "js-sha3";
 import { Types } from "mongoose";
 import { TaskDbService } from "../db/services/task-db.service";
-import { formatSeasonDocument, formatUser, formatUserDocument, formatUserTaskDocuments } from "../shared/utils/mapper";
+import {
+  formatMailerliteSubscriber,
+  formatSeasonDocument,
+  formatUser,
+  formatUserDocument,
+  formatUserTaskDocuments,
+} from "../shared/utils/mapper";
 import { calculateTaskTotalXp, sumXp24hrs, sumXpTotal } from "../shared/utils/xp-util";
 import { RankingService } from "../ranking/service/ranking.service";
 import {
@@ -33,6 +39,14 @@ import { LinkWalletDto } from "./dto/link-wallet.dto";
 import { AuthService } from "../auth/auth.service";
 import { SeasonErrorCodes } from "./error/season-error-codes";
 import { IconConnectorService } from "../chain-connectors/icon-connector.service";
+import { UserDocument } from "../db/schemas/User.schema";
+import { CreateOrUpdateSubscriberParams, SingleSubscriberResponse } from "@mailerlite/mailerlite-nodejs";
+import { UserLinkedSocial } from "./dto/user-linked-socials.dto";
+import { AxiosResponse } from "axios";
+import { TasksService } from "../tasks/tasks.service";
+import { XpgoConfigService } from "../config/xpgo-config.service";
+import { retry } from "../shared/utils/general-util";
+import { MaileriteSubscriberDto } from "./dto/mailerite-subscriber.dto";
 
 @Injectable()
 export class UserService {
@@ -47,6 +61,8 @@ export class UserService {
     private referralService: ReferralService,
     private authService: AuthService,
     private iconConnector: IconConnectorService,
+    private taskService: TasksService,
+    private config: XpgoConfigService,
   ) {}
 
   async getUser(address: string): Promise<UserResponseDto> {
@@ -309,6 +325,101 @@ export class UserService {
       this.logger.error(`Failed to add season to user: ${JSON.stringify(e, null, 2)}`);
       throw new InternalServerErrorException(UserErrorCodes.REGISTRATION_FAILED);
     }
+  }
+
+  async getMailerLiteSubscriber(email: string, publicAddress: string): Promise<MaileriteSubscriberDto> {
+    let user: UserDocument | null = null;
+
+    try {
+      user = await this.userDb.getUserByAddress(publicAddress);
+    } catch (e) {
+      this.logger.error(`Failed to fetch user from db: ${JSON.stringify(e, null, 2)}`);
+      throw new InternalServerErrorException(UserErrorCodes.FAILED_TO_RETRIEVE_USER);
+    }
+
+    if (!user) {
+      throw new NotFoundException(UserErrorCodes.USER_NOT_FOUND);
+    }
+
+    const social: UserLinkedSocial | undefined = user.linkedSocials.find((v) => v.email === email);
+
+    if (!social) {
+      throw new BadRequestException("Linked social not found for given email");
+    }
+
+    if (!social.email) {
+      throw new BadRequestException(`Email undefined`);
+    }
+
+    try {
+      const response: AxiosResponse<SingleSubscriberResponse> = await this.config.mailerlite.subscribers.find(email);
+
+      if (response.status < 300) {
+        return formatMailerliteSubscriber(response.data.data);
+      } else {
+        throw new Error(JSON.stringify(response.data.data));
+      }
+    } catch (e: any) {
+      if (e?.response?.status === 404) {
+        throw new NotFoundException(`Email ${email} not found`);
+      }
+
+      this.logger.error(`Failed to get Mailerlite Subscriber: ${JSON.stringify(e, null, 2)}`);
+      throw new InternalServerErrorException(`Failed to get Mailerlite Subscriber`);
+    }
+  }
+
+  async subscribeUserToMailerLite(
+    seasonLabel: SeasonLabel,
+    email: string,
+    publicAddress: string,
+  ): Promise<MaileriteSubscriberDto> {
+    const user: UserDocument | null = await this.userDb.getUserByAddress(publicAddress);
+
+    if (!user) {
+      throw new NotFoundException(UserErrorCodes.USER_NOT_FOUND);
+    }
+
+    const social: UserLinkedSocial | undefined = user.linkedSocials.find((v) => v.email === email);
+
+    if (!social) {
+      throw new BadRequestException("Linked social not found for given email");
+    }
+
+    if (!social.email) {
+      throw new BadRequestException(`Email undefined`);
+    }
+
+    const params = {
+      email: social.email,
+      fields: {},
+      groups: [this.config.mailerliteGroupId],
+      status: "active",
+      subscribed_at: new Date().toISOString().replace(/T/, " ").replace(/\..+/, ""),
+    } satisfies CreateOrUpdateSubscriberParams;
+
+    const response: AxiosResponse<SingleSubscriberResponse, CreateOrUpdateSubscriberParams> =
+      await this.config.mailerlite.subscribers.createOrUpdate(params);
+
+    if (response.status > 300) {
+      throw new InternalServerErrorException(
+        `Error occurred while creating Mailerlite Subscriber. Details: ${JSON.stringify(response.data)}`,
+      );
+    }
+
+    this.logger.log(`Successfully subscribed ${email} in season ${seasonLabel} of user ${user._id}`);
+
+    try {
+      // issue XP
+      await retry(() => this.taskService.issueHanaNewsletterSubscriptionXp(seasonLabel, email, user));
+    } catch (e) {
+      this.logger.error(JSON.stringify(e, null, 2));
+      this.logger.error(
+        `Failed issueHanaNewsletterSubscriptionXp for user${user._id.toString()}, season=${seasonLabel}, email=${email}`,
+      );
+    }
+
+    return formatMailerliteSubscriber(response.data.data);
   }
 
   private generateReferralCode(publicAddress: string): string {

@@ -98,5 +98,14 @@
     "title": "daily check in",
     "rewardFormula": ["amount", "return amount * 1"],
     "chain": "icon"
+  },
+  {
+    "seedId": "HANA_NEWSLETTER",
+    "type": "non-recursive",
+    "description": "One time reward for subscribing linked email to hana newsletter",
+    "criteria": [],
+    "title": "hana newsletter",
+    "rewardFormula": ["amount", "return 420"],
+    "chain": "icon"
   }
 ]

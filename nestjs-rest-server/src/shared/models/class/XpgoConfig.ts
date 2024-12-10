@@ -47,5 +47,14 @@ export class XpgoConfig {
   iconNetwork: IconNetwork;
 
   @IsString()
+  @IsNotEmpty()
   authServerUrl: string;
+
+  @IsString()
+  @IsNotEmpty()
+  mailerliteGroupId: string;
+
+  @IsString()
+  @IsNotEmpty()
+  mailerliteApiKey: string;
 }

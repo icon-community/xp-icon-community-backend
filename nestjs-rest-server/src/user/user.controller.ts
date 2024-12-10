@@ -1,4 +1,5 @@
 import {
+  BadRequestException,
   Body,
   Controller,
   Get,
@@ -24,10 +25,55 @@ import { UserResponseDto } from "./dto/user-response.dto";
 import { LinkSocialDataDto } from "./dto/link-social-data.dto";
 import { LinkWalletDto } from "./dto/link-wallet.dto";
 import { RegisterSeasonDto } from "./dto/register-season.dto";
+import { TaskLabel } from "../tasks/tasks.config";
+import { SubscribeHanaNewsletterDto } from "./dto/subscribe-hana-newsletter.dto";
+import { EmailQueryParam } from "./user-queries";
+import { MaileriteSubscriberDto } from "./dto/mailerite-subscriber.dto";
 
 @Controller("user")
 export class UserController {
   constructor(private readonly userService: UserService) {}
+
+  @Get("/hana-newsletter/subscriber")
+  @UseGuards(JwtAuthGuard)
+  @ApiHeader({
+    name: "authorization",
+    description: "JWT Authorization header. E.g. 'Bearer {Token}'",
+  })
+  async getMailerLiteSubscriber(
+    @UserAddress() publicAddress: string,
+    @Query(new ValidationPipe()) emailParam: EmailQueryParam,
+  ): Promise<MaileriteSubscriberDto> {
+    try {
+      return await this.userService.getMailerLiteSubscriber(emailParam.email, publicAddress);
+    } catch (e) {
+      if (e instanceof NotFoundException) {
+        throw e;
+      } else {
+        console.error(e);
+        throw new InternalServerErrorException(e.message);
+      }
+    }
+  }
+
+  @Post("/tasks/non-recursive")
+  @UseGuards(JwtAuthGuard)
+  @ApiHeader({
+    name: "authorization",
+    description: "JWT Authorization header. E.g. 'Bearer {Token}'",
+  })
+  @UsePipes(new ValidationPipe())
+  async submitNonRecursiveTask(
+    @Body() dto: SubscribeHanaNewsletterDto,
+    @UserAddress() publicAddress: string,
+  ): Promise<MaileriteSubscriberDto> {
+    switch (dto.taskLabel) {
+      case TaskLabel.HANA_NEWSLETTER:
+        return await this.userService.subscribeUserToMailerLite(dto.season, dto.email, publicAddress);
+      default:
+        throw new BadRequestException(`Unknown taskLabel: ${dto.taskLabel}`);
+    }
+  }
 
   @Post("/register")
   @UseGuards(JwtAuthGuard)

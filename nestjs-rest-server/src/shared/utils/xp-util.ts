@@ -27,5 +27,14 @@ export function calculateTaskTotalXp(userTasks: (UserTaskDocument | FormattedUse
     return 0;
   }
 
-  return userTasks.reduce((sum, task) => sum + task.xpEarned.reduce((a, b) => a + Number(b.xp), 0), 0);
+  let totalXp = 0;
+  for (const userTask of userTasks) {
+    let taskXpSum = 0;
+    for (const xpEarned of userTask.xpEarned) {
+      taskXpSum += xpEarned.xp;
+    }
+    totalXp += taskXpSum;
+  }
+
+  return totalXp;
 }

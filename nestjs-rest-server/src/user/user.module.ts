@@ -8,9 +8,19 @@ import { HttpModule } from "@nestjs/axios";
 import { XpgoConfigModule } from "../config/xpgo-config.module";
 import { ReferralModule } from "../referral/referral.module";
 import { ChainConnectorsModule } from "../chain-connectors/chain-connectors.module";
+import { TasksModule } from "../tasks/tasks.module";
 
 @Module({
-  imports: [HttpModule, XpgoConfigModule, DbModule, RankingModule, AuthModule, ReferralModule, ChainConnectorsModule],
+  imports: [
+    HttpModule,
+    XpgoConfigModule,
+    DbModule,
+    RankingModule,
+    AuthModule,
+    ReferralModule,
+    ChainConnectorsModule,
+    TasksModule,
+  ],
   controllers: [UserController],
   providers: [UserService],
 })

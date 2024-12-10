@@ -17,6 +17,10 @@ const xpEarnedSchema = new Schema({
     type: Number,
     required: true,
   },
+  details: {
+    type: Schema.Types.Mixed,
+    required: false,
+  },
 });
 /*
  *

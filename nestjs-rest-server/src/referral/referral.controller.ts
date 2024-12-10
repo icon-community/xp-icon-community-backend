@@ -2,7 +2,7 @@ import { Controller, Get, Param, Query, ValidationPipe } from "@nestjs/common";
 import { ReferralService } from "./referral.service";
 import { Referral } from "../db/schemas/Referral.schema";
 import { AddressValidationPipe } from "../shared/pipes/address-validation-pipe.service";
-import { FindUserReferralsQueryDTO } from "./dto/FindUserReferralsQueryDTO";
+import { FindUserReferralsQuery } from "./referral-queries";
 
 @Controller("referral")
 export class ReferralController {
@@ -23,7 +23,7 @@ export class ReferralController {
         forbidNonWhitelisted: true,
       }),
     )
-    query: FindUserReferralsQueryDTO,
+    query: FindUserReferralsQuery,
   ): Promise<Referral[]> {
     return this.referralService.findAllUserReferralsForPeriod(address, query.start, query.end);
   }

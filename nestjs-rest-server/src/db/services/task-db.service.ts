@@ -14,11 +14,11 @@ export class TaskDbService {
     return createdUserTask.save();
   }
 
-  async getAllUserTasks(): Promise<TaskDocument[]> {
+  async getAllTasks(): Promise<TaskDocument[]> {
     return this.taskModel.find().exec();
   }
 
-  async getTaskBySeedId(seedId: Types.ObjectId): Promise<TaskDocument | null> {
+  async getTaskBySeedId(seedId: string): Promise<TaskDocument | null> {
     return this.taskModel
       .findOne({
         seedId: seedId,

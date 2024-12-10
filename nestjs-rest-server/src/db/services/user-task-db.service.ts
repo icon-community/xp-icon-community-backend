@@ -1,7 +1,7 @@
 import { Injectable } from "@nestjs/common";
 import { InjectModel } from "@nestjs/mongoose";
 import { Model, Types } from "mongoose";
-import { CreateUserTaskDto, UpdateUserTaskDto } from "../db-models";
+import { UpdateUserTaskDto } from "../db-models";
 import { IUserTask, UserTaskDocument, UserTaskQuery } from "../schemas/UserTask.schema";
 import { Collections } from "../../shared/models/enum/Collections";
 
@@ -9,7 +9,7 @@ import { Collections } from "../../shared/models/enum/Collections";
 export class UsersTaskDbService {
   constructor(@InjectModel(Collections.USER_TASKS) private userTaskModel: Model<IUserTask>) {}
 
-  async createUserTask(task: CreateUserTaskDto): Promise<UserTaskDocument> {
+  async createUserTask(task: IUserTask): Promise<UserTaskDocument> {
     const createdUserTask: UserTaskDocument = new this.userTaskModel(task);
     return createdUserTask.save();
   }

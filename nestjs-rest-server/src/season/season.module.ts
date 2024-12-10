@@ -9,5 +9,6 @@ import { ChainConnectorsModule } from "../chain-connectors/chain-connectors.modu
   imports: [DbModule, RankingModule, ChainConnectorsModule],
   controllers: [SeasonController],
   providers: [SeasonService],
+  exports: [SeasonService],
 })
 export class SeasonModule {}
