@@ -46,7 +46,7 @@ const config = {
     task: process.env.TASK_COLLECTION,
     season: process.env.SEASON_COLLECTION,
     userTask: process.env.USER_TASK_COLLECTION,
-    referrals: process.env.REFERRALS_COLLECTION,
+    referrals: process.env.REFERRALS_COLLECTION ?? "referral",
     dailyCheckIn: process.env.DAILY_CHECK_IN_COLLECTION ?? "daily_check_in",
   },
   db: {
