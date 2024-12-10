@@ -17,6 +17,8 @@ const evnConfig: Record<string, unknown> = {
   port: process.env.PORT,
   iconNetwork: process.env.ICON_NETWORK,
   authServerUrl: process.env.AUTH_URL,
+  mailerliteGroupId: process.env.MAILERLITE_GROUP_ID,
+  mailerliteApiKey: process.env.MAILERLITE_API_KEY,
   mongoConfig: {
     url:
       process.env.USE_LOCALHOST === "true"

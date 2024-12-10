@@ -6,7 +6,8 @@
   "scripts": {
     "start": "echo 'not implemented' && exit 1",
     "dev": "echo 'not implemented' && exit 1",
-    "test": "echo 'not implemented' && exit 1"
+    "test": "echo 'not implemented' && exit 1",
+    "run-scraper:dev": "NODE_ENV=dev USE_TEST_SEASON=false node blockchain-scraper.js"
   },
   "repository": {
     "type": "git",

@@ -1,6 +1,7 @@
 import { Types } from "mongoose";
 import { Status } from "../shared/models/enum/Status";
 import { Chains } from "../shared/models/enum/Chains";
+import { HanaNewsletterXpDetails } from "./schemas/UserTask.schema";
 
 export class UserSeasonDto {
   constructor(
@@ -22,23 +23,14 @@ export class XpEarnedDto {
     public xp: number,
     public block: number,
     public period: number,
-  ) {}
-}
-
-export class CreateUserTaskDto {
-  constructor(
-    public userId: Types.ObjectId,
-    public taskId: Types.ObjectId,
-    public seasonId: Types.ObjectId,
-    public status: Status,
-    public xpEarned: [XpEarnedDto],
+    public details: HanaNewsletterXpDetails | undefined,
   ) {}
 }
 
 export class UpdateUserTaskDto {
   constructor(
     public status: Status,
-    public xpEarned: [XpEarnedDto],
+    public xpEarned: XpEarnedDto[],
   ) {}
 }
 

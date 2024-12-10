@@ -14,6 +14,7 @@ import { MongooseModule } from "@nestjs/mongoose";
 import { XpgoConfigService } from "./config/xpgo-config.service";
 import { ReferralModule } from "./referral/referral.module";
 import { DailyCheckInModule } from "./daily-check-in/daily-check-in.module";
+import { TasksModule } from "./tasks/tasks.module";
 
 @Module({
   imports: [
@@ -36,6 +37,7 @@ import { DailyCheckInModule } from "./daily-check-in/daily-check-in.module";
     RankingModule,
     ReferralModule,
     DailyCheckInModule,
+    TasksModule,
   ],
   controllers: [AppController],
   providers: [AppService, Logger, ValidationPipe, AddressValidationPipe],

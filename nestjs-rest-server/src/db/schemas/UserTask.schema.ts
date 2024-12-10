@@ -1,10 +1,16 @@
 import { HydratedDocument, Types, Schema } from "mongoose";
 import { Status } from "../../shared/models/enum/Status";
 
+export interface HanaNewsletterXpDetails {
+  email: string;
+  issuedAt: Date;
+}
+
 export interface IXpEarned {
   xp: number;
   block: number;
   period: number;
+  details: HanaNewsletterXpDetails | undefined;
 }
 
 export const XpEarnedSchema = new Schema<IXpEarned>({
@@ -19,6 +25,10 @@ export const XpEarnedSchema = new Schema<IXpEarned>({
   period: {
     type: Number,
     required: true,
+  },
+  details: {
+    type: Schema.Types.Mixed,
+    required: false,
   },
 });
 
