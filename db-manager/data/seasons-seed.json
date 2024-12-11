@@ -1,10 +1,10 @@
 [
   {
     "number": 1,
-    "blockStart": 90000000,
-    "blockEnd": 95396675,
+    "blockStart": 90611958,
+    "blockEnd": 91735157,
     "active": true,
-    "tasks": ["t4", "t8", "t9"],
+    "tasks": ["t3", "t4", "t6", "t7", "t8", "t9", "t10", "HANA_NEWSLETTER"],
     "contract": "cx0ac2a377138d38364ae79b1553ac05cc2e911456"
   }
 ]
