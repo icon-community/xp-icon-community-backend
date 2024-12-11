@@ -12,6 +12,8 @@ x-common-rest-server-env: &common-rest-server-env
   PORT: 3500
   ICON_NETWORK: mainnet
   AUTH_URL: http://auth-server:3005
+  MAILERLITE_GROUP_ID: ${MAILERLITE_GROUP_ID}
+  MAILERLITE_API_KEY: ${MAILERLITE_API_KEY}
 
 services:
   auth-server:

@@ -78,6 +78,8 @@ services:
       USE_TEST_SEASON: true # set to true to use the test season
       ICON_NETWORK: mainnet
       AUTH_URL: http://auth-server:3005
+      MAILERLITE_GROUP_ID: ${MAILERLITE_GROUP_ID}
+      MAILERLITE_API_KEY: ${MAILERLITE_API_KEY}
 
     # mount the current directory into the container
     # to allow for hot-reloading
