@@ -4,6 +4,8 @@ import { CreateReferralDto } from "./dto/create-referral.dto";
 import { Referral } from "../db/schemas/Referral.schema";
 import { UsersDbService } from "../db/services/users-db.service";
 import { ReferralDbService } from "../db/services/referral-db.service";
+import { formatReferral } from "../shared/utils/mapper";
+import { ReferralDto } from "./dto/referral.dto";
 
 @Injectable()
 export class ReferralService {
@@ -12,8 +14,8 @@ export class ReferralService {
     private readonly userDb: UsersDbService,
   ) {}
 
-  findAllUserReferrals(address: string): Promise<Referral[]> {
-    return this.referralDb.getUserReferrals(address);
+  async findAllUserReferrals(address: string): Promise<ReferralDto[]> {
+    return (await this.referralDb.getUserReferrals(address)).map(v => formatReferral(v));
   }
 
   findAllUserReferralsForPeriod(address: string, start: Date, end: Date): Promise<Referral[]> {

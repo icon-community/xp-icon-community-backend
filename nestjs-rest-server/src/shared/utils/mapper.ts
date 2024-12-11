@@ -15,6 +15,17 @@ import { DailyCheckInDocument } from "../../db/schemas/DailyCheckIn.schema";
 import { DailyCheckinDto } from "../../daily-check-in/dto/DailyCheckinDto";
 import { SubscriberObject } from "@mailerlite/mailerlite-nodejs";
 import { MaileriteSubscriberDto } from "../../user/dto/mailerite-subscriber.dto";
+import { Referral } from "../../db/schemas/Referral.schema";
+import { ReferralDto } from "../../referral/dto/referral.dto";
+
+export function formatReferral(value: Referral): ReferralDto {
+  return {
+    referrerUserAddress: value.referrerUserAddress,
+    referredUserAddress: value.referredUserAddress,
+    createdAt: value.createdAt,
+    isProcessed: value.isProcessed,
+  }
+}
 
 export function formatMailerliteSubscriber(value: SubscriberObject): MaileriteSubscriberDto {
   return {
