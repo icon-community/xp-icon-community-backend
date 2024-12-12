@@ -116,7 +116,7 @@ async function dailyCheckInTask(taskInput, db) {
             }
           }
 
-          // calculate total daily check in xp as: XP = 1 + (streak count/100) * (value of deposited collateral in USD)
+          // calculate total daily check in xp as: XP = 1 + (streak count/100) * (value of deposited collateral in USD) / 2
           let totalDailyXp = 0;
 
           // TODO update for SUI in future
@@ -135,7 +135,7 @@ async function dailyCheckInTask(taskInput, db) {
                   }
 
                   // add collateral
-                  totalDailyXp += 1 + (dailyCheckInDoc.streakCounter / 100) * depositedCollateralUsd;
+                  totalDailyXp += Math.round(1 + (dailyCheckInDoc.streakCounter / 100) * (depositedCollateralUsd / 2));
                 } else {
                   console.log(`-- depositedCollateralUsd undefined or 0 --`)
                 }
