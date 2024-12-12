@@ -56,10 +56,10 @@
   {
     "seedId": "t7",
     "type": "xchain",
-    "description": "for minting bnUSD crosschain, the user will receive 3 XP per bnUSD loan held per day. It will be done daily (per chain period)",
+    "description": "for minting bnUSD crosschain, the user will receive 2 XP per bnUSD loan held per day. It will be done daily (per chain period)",
     "criteria": [],
     "title": "holding a crosschain loan",
-    "rewardFormula": ["amount", "return amount * 3"],
+    "rewardFormula": ["amount", "return amount * 2"],
     "chain": "icon"
   },
   {
@@ -68,26 +68,26 @@
     "description": "One-time reward for using a referral code during registration.",
     "criteria": [
       {
-        "description": "gains the xp after the new user accumulates 100 XP",
-        "conditionFormula": ["amount", "return amount >= 100"]
+        "description": "gains the xp after the new user accumulates 5000 XP",
+        "conditionFormula": ["amount", "return amount >= 5000"]
       }
     ],
     "title": "use referral code",
-    "rewardFormula": ["", "return 100"],
+    "rewardFormula": ["", "return 5000"],
     "chain": "icon"
   },
   {
     "seedId": "t9",
     "type": "referral",
-    "description": "Once per user using a referral code. The referrer will receive 150 XP for each new user that uses their referral code.",
+    "description": "Once per user using a referral code. The referrer will receive 5000 XP for each new user that uses their referral code.",
     "criteria": [
       {
-        "description": "gains the xp after the new user uses the referral code and accumulates 150 XP",
-        "conditionFormula": ["amount", "return amount >= 150"]
+        "description": "gains the xp after the new user uses the referral code and accumulates 5000 XP",
+        "conditionFormula": ["amount", "return amount >= 5000"]
       }
     ],
     "title": "referral code used",
-    "rewardFormula": ["", "return 150"],
+    "rewardFormula": ["", "return 5000"],
     "chain": "icon"
   },
   {
