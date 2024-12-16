@@ -84,7 +84,7 @@ async function getInitBlock(db) {
   try {
     console.log("> Fetching last block from seed file");
     // first try to fetch from seed file
-    const mainSeed = JSON.parse(fs.readFileSync(customPath(config.seeds.main)));
+    const mainSeed = config.seeds.main;
 
     if (mainSeed != null && mainSeed.lastBlock != null) {
       console.log("> Last block found in seed file. Returning block.");

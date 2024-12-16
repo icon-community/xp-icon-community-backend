@@ -10,10 +10,7 @@ const {
   getAllTasks,
   updateTask,
 } = require("../common/services/v1/taskService");
-const fs = require("fs");
-const customPath = require("../common/utils/customPath");
 const config = require("../common/utils/config");
-const TASK_SEED = config.seeds.tasks;
 
 async function feedTaskSeedDataToDb(db, forceUpdate = false) {
   console.log("> Running feedTaskSeedDataToDb");
@@ -22,7 +19,7 @@ async function feedTaskSeedDataToDb(db, forceUpdate = false) {
     await db.createConnection();
 
     console.log("Reading tasks-seed.json");
-    const tasks = JSON.parse(fs.readFileSync(customPath(TASK_SEED), "utf8"));
+    const tasks = config.seeds.tasks;
 
     // DEBUG PRINT
     // console.log("Tasks in seed file");

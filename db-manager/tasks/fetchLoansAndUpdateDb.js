@@ -1,9 +1,10 @@
 // This task is defined for the purpose of fetching loans (debt) from the blockchain and updating the database with the latest debt amounts.
 // This task is hardcoded to run with a task with a
 // task id in the seed labeled as "t2" (seedId === "t2");
-const SEED_ID = "t2";
 const genericTask = require("./genericTask");
 const { getTotalDebtInUSDValue } = require("../common/utils/json-rpc-services");
+const { tasks } = require("../common/utils/config");
+const SEED_ID = tasks.mintingBnusdICON;
 
 async function fetchLoansAndUpdateDb(taskInput, db) {
   try {

@@ -2,11 +2,9 @@
 // referrers from the database and allocating the
 // earned XP
 //
-// This task is hardcoded to run with a task id in the seed
-// labeled as "t9" (seedId === "t9");
-const SEED_ID = "t9";
 const genericTask = require("./genericTask");
-
+const { tasks } = require("../common/utils/config");
+const SEED_ID = tasks.referringUser;
 function dummy(...params) {
   void params;
   return null;

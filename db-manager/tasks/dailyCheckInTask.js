@@ -7,15 +7,17 @@ const {
   seasonService,
   userTaskService,
 } = require("../common/services/v1/");
-const { chains } = require("../common/utils/config");
-const { getUserDailyCheckIn } = require("../common/services/v1/dailyCheckInService");
+const { chains, tasks } = require("../common/utils/config");
+const {
+  getUserDailyCheckIn,
+} = require("../common/services/v1/dailyCheckInService");
 const { getActiveSeason } = seasonService;
 const { getTaskBySeedId } = taskService;
 const { getUsersBySeason } = userService;
 const { getUserTaskByAllIds, updateOrCreateUserTask } = userTaskService;
 
 // Daily check in task using consecutive streak count and deposited cross-chain collateral to calculate daily xp
-const SEED_ID = "t10";
+const SEED_ID = tasks.dailyCheckIn;
 
 async function dailyCheckInTask(taskInput, db) {
   try {
@@ -35,7 +37,10 @@ async function dailyCheckInTask(taskInput, db) {
       for (const activeSeason of activeSeasonArr) {
         console.log(`-- Active season: ${activeSeason._id}`);
 
-        if (height < activeSeason.blockStart || height > activeSeason.blockEnd) {
+        if (
+          height < activeSeason.blockStart ||
+          height > activeSeason.blockEnd
+        ) {
           console.log(
             `-- Current block height ${height} is not within the range of active season ${activeSeason._id} with start block height ${activeSeason.blockStart} and end block height ${activeSeason.blockEnd}`,
           );
@@ -44,14 +49,19 @@ async function dailyCheckInTask(taskInput, db) {
 
         console.log(`-- Find target task with seedId === ${SEED_ID}`);
         const targetTaskArr = await getTaskBySeedId(SEED_ID, db.connection);
-        const targetTask = targetTaskArr && targetTaskArr.length > 0  ? targetTaskArr[0] : undefined;
+        const targetTask =
+          targetTaskArr && targetTaskArr.length > 0
+            ? targetTaskArr[0]
+            : undefined;
 
         if (!targetTask) {
           console.error("Target task not found");
           continue;
         }
 
-        const taskFound = activeSeason.tasks.find((taskId) => taskId.equals(targetTask._id))
+        const taskFound = activeSeason.tasks.find((taskId) =>
+          taskId.equals(targetTask._id),
+        );
 
         if (!taskFound) {
           console.log(
@@ -60,7 +70,10 @@ async function dailyCheckInTask(taskInput, db) {
           continue;
         }
 
-        const usersFromDb = await getUsersBySeason(activeSeason._id, db.connection);
+        const usersFromDb = await getUsersBySeason(
+          activeSeason._id,
+          db.connection,
+        );
 
         if (usersFromDb.length === 0) {
           console.log("--- No users found in DB with specified seasonId");
@@ -70,8 +83,11 @@ async function dailyCheckInTask(taskInput, db) {
         console.log("-- Filtering users by registration block");
         const filteredUsers = [];
         for (const user of usersFromDb) {
-          const targetSeason = user.seasons.find((season) => season.seasonId.equals(activeSeason._id));
-          const registrationBlock = targetSeason == null ? null : targetSeason.registrationBlock;
+          const targetSeason = user.seasons.find((season) =>
+            season.seasonId.equals(activeSeason._id),
+          );
+          const registrationBlock =
+            targetSeason == null ? null : targetSeason.registrationBlock;
 
           if (registrationBlock == null) {
             throw new Error("---- registrationBlock is null");
@@ -83,15 +99,22 @@ async function dailyCheckInTask(taskInput, db) {
         }
 
         if (filteredUsers.length === 0) {
-          console.log("--- No users found in DB with registration block less than or equal to current block height");
+          console.log(
+            "--- No users found in DB with registration block less than or equal to current block height",
+          );
           continue;
         }
 
         for (const validUser of filteredUsers) {
           const xpArray = [];
 
-          if (!validUser.linkedWallets || validUser.linkedWallets.length === 0) {
-            console.log(`--- User ${validUser._id} does not have any linked wallet`);
+          if (
+            !validUser.linkedWallets ||
+            validUser.linkedWallets.length === 0
+          ) {
+            console.log(
+              `--- User ${validUser._id} does not have any linked wallet`,
+            );
             continue;
           }
 
@@ -102,11 +125,17 @@ async function dailyCheckInTask(taskInput, db) {
             db.connection,
           );
 
-          if (userTaskDocArr && userTaskDocArr[0] && userTaskDocArr[0].xpEarned != null
-            && userTaskDocArr[0].xpEarned.length) {
-            const alreadyExists = userTaskDocArr[0].xpEarned.find((xpEarned) => {
-              return xpEarned.period === prepTerm;
-            });
+          if (
+            userTaskDocArr &&
+            userTaskDocArr[0] &&
+            userTaskDocArr[0].xpEarned != null &&
+            userTaskDocArr[0].xpEarned.length
+          ) {
+            const alreadyExists = userTaskDocArr[0].xpEarned.find(
+              (xpEarned) => {
+                return xpEarned.period === prepTerm;
+              },
+            );
 
             if (!alreadyExists) {
               xpArray.push(...userTaskDocArr[0].xpEarned);
@@ -124,20 +153,33 @@ async function dailyCheckInTask(taskInput, db) {
             if (xChainWallet.type === "evm") {
               for (const chain of chains.evm) {
                 const xCallEvmWalletAdddres = `${chain}/${xChainWallet.address}`;
-                const depositedCollateralUsd = await getXChainCollateralInUSDValue(xCallEvmWalletAdddres, height)
+                const depositedCollateralUsd =
+                  await getXChainCollateralInUSDValue(
+                    xCallEvmWalletAdddres,
+                    height,
+                  );
 
                 if (depositedCollateralUsd && depositedCollateralUsd > 0) {
-                  const dailyCheckInDoc = await getUserDailyCheckIn(validUser._id, db.connection)
+                  const dailyCheckInDoc = await getUserDailyCheckIn(
+                    validUser._id,
+                    db.connection,
+                  );
 
                   if (!dailyCheckInDoc || dailyCheckInDoc.streakCounter === 0) {
-                    console.log(`-- dailyCheckInDoc undefined or streakCounter is 0, skipping ${xCallEvmWalletAdddres} --`)
+                    console.log(
+                      `-- dailyCheckInDoc undefined or streakCounter is 0, skipping ${xCallEvmWalletAdddres} --`,
+                    );
                     continue;
                   }
 
                   // add collateral
-                  totalDailyXp += Math.round(1 + (dailyCheckInDoc.streakCounter / 100) * (depositedCollateralUsd / 2));
+                  totalDailyXp += Math.round(
+                    1 +
+                      (dailyCheckInDoc.streakCounter / 100) *
+                        (depositedCollateralUsd / 2),
+                  );
                 } else {
-                  console.log(`-- depositedCollateralUsd undefined or 0 --`)
+                  console.log(`-- depositedCollateralUsd undefined or 0 --`);
                 }
               }
             }

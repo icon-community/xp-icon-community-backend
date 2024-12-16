@@ -4,7 +4,16 @@
     "blockStart": 90611958,
     "blockEnd": 91735157,
     "active": true,
-    "tasks": ["t3", "t4", "t6", "t7", "t8", "t9", "t10", "HANA_NEWSLETTER"],
+    "tasks": [
+      "LOCKING_SAVINGS_RATE_ICON",
+      "REGISTER_NEW_USER",
+      "DEPOSIT_NATIVE_CROSSCHAIN_COLLATERAL",
+      "MINTING_BNUSD_CROSSCHAIN",
+      "USING_REFERRAL_CODE",
+      "REFERRING_USER",
+      "DAILY_CHECK_IN",
+      "HANA_NEWSLETTER"
+    ],
     "contract": "cx0ac2a377138d38364ae79b1553ac05cc2e911456"
   }
 ]

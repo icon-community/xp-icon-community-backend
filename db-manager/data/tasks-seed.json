@@ -77,8 +77,8 @@
     "chain": "icon"
   },
   {
-    "seedId": "",
-    "type": "REFERRING_USER",
+    "seedId": "REFERRING_USER",
+    "type": "referral",
     "description": "Once per user using a referral code. The referrer will receive 5000 XP for each new user that uses their referral code.",
     "criteria": [
       {
