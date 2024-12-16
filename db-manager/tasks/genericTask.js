@@ -2,7 +2,7 @@
 // balanced related data (collateral, loans, etc) from
 // the blockchain and updating the database with the
 // latest amounts.
-const { chains } = require("../common/utils/config");
+const { chains, tasks: TASKS_LABELS } = require("../common/utils/config");
 const {
   userService,
   taskService,
@@ -172,13 +172,11 @@ async function genericTask(taskInput, db, seedId, callback) {
           for (const xChainWallet of linkedWallets) {
             if (xChainWallet.type === "evm") {
               for (const chain of chains.evm) {
+                const userWallet = `${chain}/${xChainWallet.address}`;
                 const userTaskDoc = userTaskDocArr.filter((doc) => {
-                  return (
-                    doc.walletAddress === `${chain}/${xChainWallet.address}`
-                  );
+                  return doc.walletAddress === userWallet;
                 });
 
-                const userWallet = `${chain}/${xChainWallet.address}`;
                 console.log(`--- xChainWallet found: ${userWallet}`);
                 await userTaskMainLogic(
                   userTaskDoc,
@@ -192,6 +190,28 @@ async function genericTask(taskInput, db, seedId, callback) {
                   db,
                 );
               }
+            } else if (["sui", "stellar"].includes(xChainWallet.type)) {
+              const userWallet = `${xChainWallet.type}/${xChainWallet.address}`;
+              const userTaskDoc = userTaskDocArr.filter((doc) => {
+                return doc.walletAddress === userWallet;
+              });
+
+              console.log(`--- xChainWallet found: ${userWallet}`);
+              await userTaskMainLogic(
+                userTaskDoc[0],
+                targetTask,
+                prepTerm,
+                validUser,
+                activeSeason,
+                callback,
+                height,
+                userWallet,
+                db,
+              );
+            } else {
+              console.log(
+                `--- xChainWallet type ${xChainWallet.type} not supported`,
+              );
             }
           }
           // if the task is referral, do nothing
@@ -255,7 +275,7 @@ async function userReferralTaskMainLogic(
 ) {
   try {
     const xpArray = [];
-    if (targetTask.seedId === "t8") {
+    if (targetTask.seedId === TASKS_LABELS.usingReferralCode) {
       // this is the task for the case when this user is
       // the one using a referral code
       //
@@ -351,7 +371,7 @@ async function userReferralTaskMainLogic(
         );
         return;
       }
-    } else if (targetTask.seedId === "t9") {
+    } else if (targetTask.seedId === TASKS_LABELS.referringUser) {
       // this is the task for the case when this user is
       // the one who has a referral code being used by
       // another user
