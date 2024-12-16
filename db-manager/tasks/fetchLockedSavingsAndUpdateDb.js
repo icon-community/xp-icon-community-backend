@@ -1,10 +1,10 @@
 // This task is defined for the purpose of fetching saving rates data from the blockchain and updating the database with the latest data.
-// This task is hardcoded to run with a task with a
-// task id in the seed labeled as "t3" (seedId === "t3");
-const SEED_ID = "t3";
 const genericTask = require("./genericTask");
-const { getLockedAmountAsDecimal } = require("../common/utils/json-rpc-services");
-
+const {
+  getLockedAmountAsDecimal,
+} = require("../common/utils/json-rpc-services");
+const { tasks } = require("../common/utils/config");
+const SEED_ID = tasks.lockingSavingsRateICON;
 async function fetchLockedSavingsAndUpdateDb(taskInput, db) {
   try {
     console.log("========");

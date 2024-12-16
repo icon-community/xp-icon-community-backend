@@ -8,7 +8,7 @@ const db = new MainDb(params);
 
 async function main() {
   try {
-    await feedTaskSeedDataToDb(db);
+    await feedTaskSeedDataToDb(db, config.flags.forceUpdateTasks);
   } catch (err) {
     console.log("Error in updateTasks.js:");
     console.log(err);

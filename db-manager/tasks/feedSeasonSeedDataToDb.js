@@ -14,13 +14,10 @@ const {
   updateSeason,
 } = require("../common/services/v1/seasonService");
 const { getAllTasks } = require("../common/services/v1/taskService");
-const fs = require("fs");
-const customPath = require("../common/utils/customPath");
 const config = require("../common/utils/config");
-const SEASON_SEED = config.seeds.seasons;
 
 async function feedSeasonSeedDataToDb(db, useSeed = null, update = false) {
-  const seed = useSeed == null ? SEASON_SEED : useSeed;
+  const seed = useSeed == null ? config.seeds.seasons : useSeed;
   console.log("> Running feedSeasonSeedDataToDb");
   console.log(`> Seed file: ${seed}`);
   try {
@@ -28,11 +25,7 @@ async function feedSeasonSeedDataToDb(db, useSeed = null, update = false) {
     await db.createConnection();
 
     console.log("Reading seasons seed file");
-    // const seasons = JSON.parse(
-    //   fs.readFileSync(customPath(seed)),
-    //   "utf8",
-    // );
-    const seasons = JSON.parse(fs.readFileSync(customPath(seed), "utf8"));
+    const seasons = seed;
 
     // DEBUG PRINT
     // console.log("Seasons seed data:");

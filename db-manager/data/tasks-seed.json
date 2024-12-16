@@ -1,6 +1,6 @@
 [
   {
-    "seedId": "t1",
+    "seedId": "DEPOSIT_SICX_COLLATERAL_ICON",
     "type": "onchain",
     "description": "for depositing SICX collateral, the user will receive 1 XP per USD value of the collateral deposited that day. It will be done daily (per chain period)",
     "criteria": [],
@@ -9,7 +9,7 @@
     "chain": "icon"
   },
   {
-    "seedId": "t2",
+    "seedId": "MINTING_BNUSD_ICON",
     "type": "onchain",
     "description": "for minting bnUSD, the user will receive 3 XP per bnUSD loan held per day. It will be done daily (per chain period)",
     "criteria": [],
@@ -18,7 +18,7 @@
     "chain": "icon"
   },
   {
-    "seedId": "t3",
+    "seedId": "LOCKING_SAVINGS_RATE_ICON",
     "type": "onchain",
     "description": "for locking into the saving rates, the user will receive 1 XP per USD value locked per day. It will be done daily (per chain period)",
     "criteria": [],
@@ -27,7 +27,7 @@
     "chain": "icon"
   },
   {
-    "seedId": "t4",
+    "seedId": "REGISTER_NEW_USER",
     "type": "non-recursive",
     "description": "One time reward for registering",
     "criteria": [],
@@ -36,7 +36,7 @@
     "chain": "icon"
   },
   {
-    "seedId": "t5",
+    "seedId": "DEPOSIT_AVAX_COLLATERAL_ICON",
     "type": "onchain",
     "description": "for depositing AVAX collateral, the user will receive 1 XP per USD value of the collateral deposited that day. It will be done daily (per chain period)",
     "criteria": [],
@@ -45,7 +45,7 @@
     "chain": "icon"
   },
   {
-    "seedId": "t6",
+    "seedId": "DEPOSIT_NATIVE_CROSSCHAIN_COLLATERAL",
     "type": "xchain",
     "description": "for depositing native crosschain collateral, the user will receive 1 XP per USD value of the collateral deposited that day. It will be done daily (per chain period)",
     "criteria": [],
@@ -54,7 +54,7 @@
     "chain": "icon"
   },
   {
-    "seedId": "t7",
+    "seedId": "MINTING_BNUSD_CROSSCHAIN",
     "type": "xchain",
     "description": "for minting bnUSD crosschain, the user will receive 2 XP per bnUSD loan held per day. It will be done daily (per chain period)",
     "criteria": [],
@@ -63,7 +63,7 @@
     "chain": "icon"
   },
   {
-    "seedId": "t8",
+    "seedId": "USING_REFERRAL_CODE",
     "type": "referral",
     "description": "One-time reward for using a referral code during registration.",
     "criteria": [
@@ -77,7 +77,7 @@
     "chain": "icon"
   },
   {
-    "seedId": "t9",
+    "seedId": "REFERRING_USER",
     "type": "referral",
     "description": "Once per user using a referral code. The referrer will receive 5000 XP for each new user that uses their referral code.",
     "criteria": [
@@ -91,7 +91,7 @@
     "chain": "icon"
   },
   {
-    "seedId": "t10",
+    "seedId": "DAILY_CHECK_IN",
     "type": "xchain",
     "description": "for depositing native crosschain collateral and making daily check in, the user will receive 1 + (streak count/100) * (value of deposited collateral in USD) XP. It will be done daily (per chain period)",
     "criteria": {},

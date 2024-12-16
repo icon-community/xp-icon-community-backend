@@ -1,10 +1,19 @@
 //
 const config = require("../../utils/config");
 const TASK = config.collections.task;
-const { createEntry, getAllEntries, getEntryByParam } = require("./common");
+const {
+  createEntry,
+  getAllEntries,
+  getEntryByParam,
+  updateOrCreateEntry,
+} = require("./common");
 
 async function createTask(task, connection) {
   return await createEntry(task, TASK, connection);
+}
+
+async function updateTask(query, task, connection) {
+  return await updateOrCreateEntry(query, task, TASK, connection);
 }
 
 async function getAllTasks(connection) {
@@ -22,6 +31,7 @@ async function getTaskById(taskId, connection) {
 module.exports = {
   createTask,
   getAllTasks,
-  getTaskBySeedId,
   getTaskById,
+  getTaskBySeedId,
+  updateTask,
 };

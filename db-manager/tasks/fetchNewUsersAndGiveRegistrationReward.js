@@ -1,10 +1,9 @@
 // This task is defined for the purpose of fetching new users
 // and giving them registration rewards.
 //
-// This task is hardcoded to run with a task id in the seed
-// labeled as "t4" (seedId === "t4");
-const SEED_ID = "t4";
 const genericTask = require("./genericTask");
+const { tasks } = require("../common/utils/config");
+const SEED_ID = tasks.registerNewUser;
 
 function dummy(...params) {
   void params;

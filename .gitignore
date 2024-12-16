@@ -6,6 +6,7 @@ local
 *.bkp
 db/data
 db/backups
+dev-db/data
 .gradle
 .idea
 build
@@ -13,4 +14,3 @@ out
 .vscode
 bin
 test-docker
-data

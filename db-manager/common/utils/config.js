@@ -1,8 +1,30 @@
 require("dotenv").config();
+const fs = require("fs");
+const customPath = require("./customPath");
+
+const TASKS_DATA_FILE = customPath("data/tasks-seed.json");
+const SEASONS_DATA_FILE = customPath("data/seasons-seed.json");
+const MAIN_DATA_FILE = customPath("data/main-seed.json");
+const SEASONS_DATA = JSON.parse(fs.readFileSync(SEASONS_DATA_FILE, "utf8"));
+const TASKS_DATA = JSON.parse(fs.readFileSync(TASKS_DATA_FILE, "utf8"));
+const MAIN_DATA = JSON.parse(fs.readFileSync(MAIN_DATA_FILE, "utf8"));
 
 const SELECTED_CHAIN =
   process.env.CHAIN == null ? "mainnet" : process.env.CHAIN;
 const config = {
+  tasks: {
+    depositSicxICON: TASKS_DATA[0].seedId,
+    mintingBnusdICON: TASKS_DATA[1].seedId,
+    lockingSavingsRateICON: TASKS_DATA[2].seedId,
+    registerNewUser: TASKS_DATA[3].seedId,
+    depositAvaxCollateral: TASKS_DATA[4].seedId,
+    depositNativeCrossChain: TASKS_DATA[5].seedId,
+    mintingBnusdCrossChain: TASKS_DATA[6].seedId,
+    usingReferralCode: TASKS_DATA[7].seedId,
+    referringUser: TASKS_DATA[8].seedId,
+    dailyCheckIn: TASKS_DATA[9].seedId,
+    hanaNewsletter: TASKS_DATA[10].seedId,
+  },
   chains: {
     evm: [
       "0x2105.base",
@@ -27,11 +49,11 @@ const config = {
     bnusd: "bnUSD",
   },
   seeds: {
-    seasons: "data/seasons-seed.json",
-    tasks: "data/tasks-seed.json",
-    main: "data/main-seed.json",
+    seasons: SEASONS_DATA,
+    tasks: TASKS_DATA,
+    main: MAIN_DATA,
     test: {
-      season: "data/seasons-seed.json",
+      season: SEASONS_DATA,
     },
   },
   misc: {
@@ -56,7 +78,10 @@ const config = {
     dbName: process.env.MONGO_DB_NAME,
     containerName: process.env.MONGO_CONTAINER,
   },
-  flags: {},
+  flags: {
+    forceUpdateTasks: process.env.FORCE_UPDATE_TASKS === "true" || false,
+    forceUpdateSeasons: process.env.FORCE_UPDATE_SEASONS === "true" || false,
+  },
   jvm: {
     routes: {
       v3: "/api/v3",
