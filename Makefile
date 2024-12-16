@@ -49,5 +49,16 @@ update-dev-rest-server:
 	@docker compose -f docker-compose-dev.yml up -d --no-deps --build rest-server
 
 update-dev-auth-server:
-	@echo "Updating dev server (rest-server)"
+	@echo "Updating dev server (auth-server)"
 	@docker compose -f docker-compose-dev.yml up -d --no-deps --build auth-server
+
+update-dev-blockchain-scraper:
+	@echo "Updating dev server (blockchain-scraper)"
+	@docker compose -f docker-compose-dev.yml up -d --no-deps --build blockchain-scraper
+
+test-force-update-tasks:
+	@echo "> Running script to force update tasks"
+	@echo "> Updating blockchain-scraper image"
+	$(MAKE) update-dev-blockchain-scraper
+	@echo "> Executing script to force update tasks"
+	docker exec -e MONGO_CONTAINER=mongodb-dev -e FORCE_UPDATE_TASKS=true blockchain-scraper node scripts/updateTasks.js

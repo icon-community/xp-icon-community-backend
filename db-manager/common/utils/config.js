@@ -56,7 +56,10 @@ const config = {
     dbName: process.env.MONGO_DB_NAME,
     containerName: process.env.MONGO_CONTAINER,
   },
-  flags: {},
+  flags: {
+    forceUpdateTasks: process.env.FORCE_UPDATE_TASKS === "true" || false,
+    forceUpdateSeasons: process.env.FORCE_UPDATE_SEASONS === "true" || false,
+  },
   jvm: {
     routes: {
       v3: "/api/v3",

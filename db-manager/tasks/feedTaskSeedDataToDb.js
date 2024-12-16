@@ -8,13 +8,14 @@
 const {
   createTask,
   getAllTasks,
+  updateTask,
 } = require("../common/services/v1/taskService");
 const fs = require("fs");
 const customPath = require("../common/utils/customPath");
 const config = require("../common/utils/config");
 const TASK_SEED = config.seeds.tasks;
 
-async function feedTaskSeedDataToDb(db) {
+async function feedTaskSeedDataToDb(db, forceUpdate = false) {
   console.log("> Running feedTaskSeedDataToDb");
   try {
     console.log("Creating connection to DB");
@@ -45,6 +46,14 @@ async function feedTaskSeedDataToDb(db) {
         console.log(`Task with seedId ${task.seedId} created`);
       } else {
         console.log(`Task with seedId ${task.seedId} already exists`);
+
+        if (forceUpdate) {
+          console.log(
+            `Force update enabled. Updating task with seedId ${task.seedId}`,
+          );
+          await updateTask({ seedId: task.seedId }, task, db.connection);
+          console.log(`Task with seedId ${task.seedId} updated`);
+        }
       }
     }
 
