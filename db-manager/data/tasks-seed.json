@@ -63,6 +63,24 @@
     "chain": "icon"
   },
   {
+    "seedId": "DEPOSIT_NATIVE_SUI_COLLATERAL",
+    "type": "xchain",
+    "description": "for depositing native SUI collateral, the user will receive 1 XP per USD value of the collateral deposited that day. It will be done daily (per chain period)",
+    "criteria": [],
+    "title": "deposit native crosschain collateral",
+    "rewardFormula": ["amount", "return amount * 1"],
+    "chain": "icon"
+  },
+  {
+    "seedId": "MINTING_BNUSD_SUI",
+    "type": "xchain",
+    "description": "for minting bnUSD on SUI, the user will receive 2 XP per bnUSD loan held per day. It will be done daily (per chain period)",
+    "criteria": [],
+    "title": "holding a SUI loan",
+    "rewardFormula": ["amount", "return amount * 2"],
+    "chain": "icon"
+  },
+  {
     "seedId": "USING_REFERRAL_CODE",
     "type": "referral",
     "description": "One-time reward for using a referral code during registration.",
@@ -91,9 +109,18 @@
     "chain": "icon"
   },
   {
-    "seedId": "DAILY_CHECK_IN",
+    "seedId": "DAILY_CHECK_IN_CROSS_CHAIN_COLLATERAL",
     "type": "xchain",
     "description": "for depositing native crosschain collateral and making daily check in, the user will receive 1 + (streak count/100) * (value of deposited collateral in USD) XP. It will be done daily (per chain period)",
+    "criteria": {},
+    "title": "daily check in",
+    "rewardFormula": ["amount", "return amount * 1"],
+    "chain": "icon"
+  },
+  {
+    "seedId": "DAILY_CHECK_IN_SUI_COLLATERAL",
+    "type": "xchain",
+    "description": "for depositing native SUI collateral and making daily check in, the user will receive 1 + (streak count/100) * (value of deposited collateral in USD) XP. It will be done daily (per chain period)",
     "criteria": {},
     "title": "daily check in",
     "rewardFormula": ["amount", "return amount * 1"],
@@ -106,6 +133,24 @@
     "criteria": [],
     "title": "hana newsletter",
     "rewardFormula": ["amount", "return 420"],
+    "chain": "icon"
+  },
+  {
+    "seedId": "LINK_TWITTER_X",
+    "type": "non-recursive",
+    "description": "One time reward for linking X account",
+    "criteria": [],
+    "title": "Link X account",
+    "rewardFormula": ["amount", "return 3000"],
+    "chain": "icon"
+  },
+  {
+    "seedId": "LINK_GOOGLE",
+    "type": "non-recursive",
+    "description": "One time reward for linking Google account",
+    "criteria": [],
+    "title": "One time reward for linking Google account",
+    "rewardFormula": ["amount", "return 3000"],
     "chain": "icon"
   }
 ]

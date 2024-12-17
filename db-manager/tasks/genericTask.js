@@ -162,24 +162,25 @@ async function genericTask(taskInput, db, seedId, callback) {
         if (targetTask.type === "xchain") {
           console.log("--- xchain task");
           const linkedWallets = validUser.linkedWallets;
-          if (linkedWallets.length === 0 || linkedWallets == null) {
+          if (linkedWallets.length === 0) {
             console.log(
               `--- User ${validUser._id} does not have any linked wallet`,
             );
             continue;
           }
-          // execute the logic per each xchain wallet
-          for (const xChainWallet of linkedWallets) {
-            if (xChainWallet.type === "evm") {
-              for (const chain of chains.evm) {
-                const userWallet = `${chain}/${xChainWallet.address}`;
+
+          if (targetTask.seedId === "MINTING_BNUSD_SUI" || targetTask.seedId === "DEPOSIT_NATIVE_SUI_COLLATERAL") {
+            // handle SUI specific tasks
+            for (const xChainWallet of linkedWallets) {
+              if (xChainWallet.type === "sui") {
+                const userWallet = `${xChainWallet.type}/${xChainWallet.address}`;
                 const userTaskDoc = userTaskDocArr.filter((doc) => {
                   return doc.walletAddress === userWallet;
                 });
 
-                console.log(`--- xChainWallet found: ${userWallet}`);
+                console.log(`--- xChainWallet SUI found: ${userWallet}`);
                 await userTaskMainLogic(
-                  userTaskDoc,
+                  userTaskDoc[0],
                   targetTask,
                   prepTerm,
                   validUser,
@@ -190,28 +191,53 @@ async function genericTask(taskInput, db, seedId, callback) {
                   db,
                 );
               }
-            } else if (["sui", "stellar"].includes(xChainWallet.type)) {
-              const userWallet = `${xChainWallet.type}/${xChainWallet.address}`;
-              const userTaskDoc = userTaskDocArr.filter((doc) => {
-                return doc.walletAddress === userWallet;
-              });
+            }
+          } else {
+            // execute the logic per each EVM xchain wallet
+            for (const xChainWallet of linkedWallets) {
+              if (xChainWallet.type === "evm") {
+                for (const chain of chains.evm) {
+                  const userWallet = `${chain}/${xChainWallet.address}`;
+                  const userTaskDoc = userTaskDocArr.filter((doc) => {
+                    return doc.walletAddress === userWallet;
+                  });
 
-              console.log(`--- xChainWallet found: ${userWallet}`);
-              await userTaskMainLogic(
-                userTaskDoc[0],
-                targetTask,
-                prepTerm,
-                validUser,
-                activeSeason,
-                callback,
-                height,
-                userWallet,
-                db,
-              );
-            } else {
-              console.log(
-                `--- xChainWallet type ${xChainWallet.type} not supported`,
-              );
+                  console.log(`--- xChainWallet found: ${userWallet}`);
+                  await userTaskMainLogic(
+                    userTaskDoc,
+                    targetTask,
+                    prepTerm,
+                    validUser,
+                    activeSeason,
+                    callback,
+                    height,
+                    userWallet,
+                    db,
+                  );
+                }
+              } else if (["sui", "stellar"].includes(xChainWallet.type)) {
+                const userWallet = `${xChainWallet.type}/${xChainWallet.address}`;
+                const userTaskDoc = userTaskDocArr.filter((doc) => {
+                  return doc.walletAddress === userWallet;
+                });
+
+                console.log(`--- xChainWallet found: ${userWallet}`);
+                await userTaskMainLogic(
+                  userTaskDoc[0],
+                  targetTask,
+                  prepTerm,
+                  validUser,
+                  activeSeason,
+                  callback,
+                  height,
+                  userWallet,
+                  db,
+                );
+              } else {
+                console.log(
+                  `--- xChainWallet type ${xChainWallet.type} not supported`,
+                );
+              }
             }
           }
           // if the task is referral, do nothing

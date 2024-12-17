@@ -13,17 +13,22 @@ const SELECTED_CHAIN =
   process.env.CHAIN == null ? "mainnet" : process.env.CHAIN;
 const config = {
   tasks: {
-    depositSicxICON: TASKS_DATA[0].seedId,
-    mintingBnusdICON: TASKS_DATA[1].seedId,
-    lockingSavingsRateICON: TASKS_DATA[2].seedId,
-    registerNewUser: TASKS_DATA[3].seedId,
-    depositAvaxCollateral: TASKS_DATA[4].seedId,
-    depositNativeCrossChain: TASKS_DATA[5].seedId,
-    mintingBnusdCrossChain: TASKS_DATA[6].seedId,
-    usingReferralCode: TASKS_DATA[7].seedId,
-    referringUser: TASKS_DATA[8].seedId,
-    dailyCheckIn: TASKS_DATA[9].seedId,
-    hanaNewsletter: TASKS_DATA[10].seedId,
+    depositSicxICON: "DEPOSIT_SICX_COLLATERAL_ICON",
+    mintingBnusdICON: "MINTING_BNUSD_ICON",
+    lockingSavingsRateICON: "LOCKING_SAVINGS_RATE_ICON",
+    registerNewUser: "REGISTER_NEW_USER",
+    depositAvaxCollateral: "DEPOSIT_AVAX_COLLATERAL_ICON",
+    depositNativeCrossChain: "DEPOSIT_NATIVE_CROSSCHAIN_COLLATERAL",
+    mintingBnusdCrossChain: "MINTING_BNUSD_CROSSCHAIN",
+    depositNativeSui: "DEPOSIT_NATIVE_SUI_COLLATERAL",
+    mintingBnusdSui: "MINTING_BNUSD_SUI",
+    usingReferralCode:"USING_REFERRAL_CODE",
+    referringUser: "REFERRING_USER",
+    dailyCheckInCrossChain: "DAILY_CHECK_IN_CROSS_CHAIN_COLLATERAL",
+    dailyCheckInSui: "DAILY_CHECK_IN_SUI_COLLATERAL",
+    hanaNewsletter: "HANA_NEWSLETTER",
+    linkTwitterX: "LINK_TWITTER_X",
+    linkGoogle: "LINK_GOOGLE",
   },
   chains: {
     evm: [

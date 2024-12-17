@@ -16,12 +16,18 @@ const { getTaskBySeedId } = taskService;
 const { getUsersBySeason } = userService;
 const { getUserTaskByAllIds, updateOrCreateUserTask } = userTaskService;
 
-// Daily check in task using consecutive streak count and deposited cross-chain collateral to calculate daily xp
-const SEED_ID = tasks.dailyCheckIn;
+// Daily check in task using consecutive streak count and deposited cross-chain/sui collateral to calculate daily xp
 
-async function dailyCheckInTask(taskInput, db) {
+async function dailyCheckInTask(taskInput, db, chain) {
   try {
-    console.log("========");
+    let SEED_ID;
+    if (chain === "sui") {
+      SEED_ID = tasks.dailyCheckInSui
+    } else if (chain === "cross-chain") {
+      SEED_ID = tasks.dailyCheckInCrossChain
+    }
+
+      console.log("========");
     console.log("> Running dailyCheckInTask task on block ${height}");
 
     const { height, prepTerm } = taskInput;
@@ -149,13 +155,22 @@ async function dailyCheckInTask(taskInput, db) {
           let totalDailyXp = 0;
 
           const allXCallAddresses = [];
-          validUser.linkedWallets.forEach(xChainWallet => {
-            if (xChainWallet.type === "evm") {
-              allXCallAddresses.push(...chains.evm.map(chain => `${chain}/${xChainWallet.address}`));
-            } else if (["sui", "stellar"].includes(xChainWallet.type)) {
-              allXCallAddresses.push(`${xChainWallet.type}/${xChainWallet.address}`)
-            }
-          })
+
+          if (SEED_ID === "DAILY_CHECK_IN_SUI_COLLATERAL") {
+            validUser.linkedWallets.forEach(xChainWallet => {
+              if (xChainWallet.type === "sui") {
+                allXCallAddresses.push(...chains.evm.map(chain => `${chain}/${xChainWallet.address}`));
+              }
+            })
+          } else {
+            validUser.linkedWallets.forEach(xChainWallet => {
+              if (xChainWallet.type === "evm") {
+                allXCallAddresses.push(...chains.evm.map(chain => `${chain}/${xChainWallet.address}`));
+              } else if (["sui", "stellar"].includes(xChainWallet.type)) {
+                allXCallAddresses.push(`${xChainWallet.type}/${xChainWallet.address}`)
+              }
+            })
+          }
 
           for (const xCallAddress of allXCallAddresses) {
             const depositedCollateralUsd =

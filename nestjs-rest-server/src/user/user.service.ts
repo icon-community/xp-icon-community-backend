@@ -411,7 +411,7 @@ export class UserService {
 
     try {
       // issue XP
-      await retry(() => this.taskService.issueHanaNewsletterSubscriptionXp(seasonLabel, email, user));
+      await retry(() => this.taskService.issueHanaNewsletterSubscriptionXp(seasonLabel, email, publicAddress, user));
     } catch (e) {
       this.logger.error(JSON.stringify(e, null, 2));
       this.logger.error(

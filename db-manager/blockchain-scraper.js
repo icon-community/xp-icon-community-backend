@@ -124,7 +124,7 @@ async function main() {
     tasks.push(taskRunner(fetchNewReferredAndUpdateDb, db));
 
     // Run task that fetches cross chain collaterals deposited by each user and updates the db
-    tasks.push(taskRunner(dailyCheckInTask, db));
+    tasks.push(taskRunner(dailyCheckInTask, db, "sui"));
 
     // create monitor instance
     monitor = new Monitor(
