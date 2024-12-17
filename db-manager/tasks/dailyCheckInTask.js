@@ -148,40 +148,40 @@ async function dailyCheckInTask(taskInput, db) {
           // calculate total daily check in xp as: XP = 1 + (streak count/100) * (value of deposited collateral in USD) / 2
           let totalDailyXp = 0;
 
-          // TODO update for SUI in future
-          for (const xChainWallet of validUser.linkedWallets) {
+          const allXCallAddresses = [];
+          validUser.linkedWallets.forEach(xChainWallet => {
             if (xChainWallet.type === "evm") {
-              for (const chain of chains.evm) {
-                const xCallEvmWalletAdddres = `${chain}/${xChainWallet.address}`;
-                const depositedCollateralUsd =
-                  await getXChainCollateralInUSDValue(
-                    xCallEvmWalletAdddres,
-                    height,
-                  );
+              allXCallAddresses.push(...chains.evm.map(chain => `${chain}/${xChainWallet.address}`));
+            } else if (["sui", "stellar"].includes(xChainWallet.type)) {
+              allXCallAddresses.push(`${xChainWallet.type}/${xChainWallet.address}`)
+            }
+          })
 
-                if (depositedCollateralUsd && depositedCollateralUsd > 0) {
-                  const dailyCheckInDoc = await getUserDailyCheckIn(
-                    validUser._id,
-                    db.connection,
-                  );
+          for (const xCallAddress of allXCallAddresses) {
+            const depositedCollateralUsd =
+              await getXChainCollateralInUSDValue(xCallAddress, height);
 
-                  if (!dailyCheckInDoc || dailyCheckInDoc.streakCounter === 0) {
-                    console.log(
-                      `-- dailyCheckInDoc undefined or streakCounter is 0, skipping ${xCallEvmWalletAdddres} --`,
-                    );
-                    continue;
-                  }
+            if (depositedCollateralUsd && depositedCollateralUsd > 0) {
+              const dailyCheckInDoc = await getUserDailyCheckIn(
+                validUser._id,
+                db.connection,
+              );
 
-                  // add collateral
-                  totalDailyXp += Math.round(
-                    1 +
-                      (dailyCheckInDoc.streakCounter / 100) *
-                        (depositedCollateralUsd / 2),
-                  );
-                } else {
-                  console.log(`-- depositedCollateralUsd undefined or 0 --`);
-                }
+              if (!dailyCheckInDoc || dailyCheckInDoc.streakCounter === 0) {
+                console.log(
+                  `-- dailyCheckInDoc undefined or streakCounter is 0, skipping ${xCallAddress} --`,
+                );
+                continue;
               }
+
+              // add collateral
+              totalDailyXp += Math.round(
+                1 +
+                (dailyCheckInDoc.streakCounter / 100) *
+                (depositedCollateralUsd / 2),
+              );
+            } else {
+              console.log(`-- depositedCollateralUsd undefined or 0 --`);
             }
           }
 
