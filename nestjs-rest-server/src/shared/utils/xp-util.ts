@@ -19,7 +19,15 @@ export function sumXp24hrs(
   if (arrayOfTasks.length === 0) {
     return 0;
   }
-  return arrayOfTasks.reduce((a, b) => a + b.xp.xpEarned[b.xp.xpEarned.length - 1].xp, 0);
+  return arrayOfTasks.reduce((a, b) => {
+    let bValidated = 0;
+    if (b.xp.xpEarned.length > 0) {
+      if (b.xp.xpEarned[b.xp.xpEarned.length - 1].xp != null) {
+        bValidated = b.xp.xpEarned[b.xp.xpEarned.length - 1].xp ?? 0;
+      }
+    }
+    return a + bValidated;
+  }, 0);
 }
 
 export function calculateTaskTotalXp(userTasks: (UserTaskDocument | FormattedUserTask)[] | null): number {
