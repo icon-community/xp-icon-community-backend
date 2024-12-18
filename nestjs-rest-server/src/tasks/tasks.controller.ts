@@ -76,23 +76,13 @@ export class TasksController {
         }
       case TaskLabel.LINK_TWITTER_X:
         if (isLinkSocialTaskDetailsDto(dto.details)) {
-          return await this.taskService.issueLinkSocialXp(
-            dto.season,
-            dto.taskLabel,
-            dto.details.provider,
-            publicAddress,
-          );
+          return await this.taskService.issueLinkSocialXp(dto.season, dto.details.provider, publicAddress);
         } else {
           throw new BadRequestException("Invalid details");
         }
       case TaskLabel.LINK_GOOGLE:
         if (isLinkSocialTaskDetailsDto(dto.details)) {
-          return await this.taskService.issueLinkSocialXp(
-            dto.season,
-            dto.taskLabel,
-            dto.details.provider,
-            publicAddress,
-          );
+          return await this.taskService.issueLinkSocialXp(dto.season, dto.details.provider, publicAddress);
         } else {
           throw new BadRequestException("Invalid details");
         }

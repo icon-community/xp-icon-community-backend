@@ -129,7 +129,7 @@ const config = {
     },
   },
   seasonsRoutes: {
-    balanced: 1,
+    sui: 1,
     // iconteam: "1",
     // ripdao: "2",
     // vybzdao: "3",

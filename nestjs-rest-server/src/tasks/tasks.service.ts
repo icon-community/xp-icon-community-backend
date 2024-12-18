@@ -22,6 +22,7 @@ import { Status } from "../shared/models/enum/Status";
 import { UsersDbService } from "../db/services/users-db.service";
 import { SocialProvider } from "../shared/models/enum/SocialProvider";
 import { CanClaimTaskDto } from "./dto/can-claim-task.dto";
+import { mapProviderToSocialTask } from "../shared/utils/mapper";
 
 @Injectable()
 export class TasksService {
@@ -83,12 +84,8 @@ export class TasksService {
     };
   }
 
-  async issueLinkSocialXp(
-    seasonLabel: SeasonLabel,
-    taskLabel: TaskLabel,
-    provider: SocialProvider,
-    address: string,
-  ): Promise<void> {
+  async issueLinkSocialXp(seasonLabel: SeasonLabel, provider: SocialProvider, address: string): Promise<void> {
+    const taskLabel: TaskLabel = mapProviderToSocialTask(provider);
     const taskConfig: TaskConfig = tasks[taskLabel];
 
     const [season, task, user] = await Promise.allSettled([
@@ -150,6 +147,9 @@ export class TasksService {
             taskId: task.value._id,
           },
           linkSocialTask,
+        );
+        this.logger.log(
+          `Issued link social xp for address=${address}, seasonLabel=${seasonLabel}, provider=${provider}`,
         );
       } catch (e: unknown) {
         this.logger.error(`Saving task failed. Failed xp object: ${JSON.stringify(xp, null, 2)}`);
@@ -289,6 +289,7 @@ export class TasksService {
           },
           hanaNewsLetterTask,
         );
+        this.logger.log(`Issued link social xp for address=${address}, seasonLabel=${seasonLabel}, email=${email}`);
       } catch (e: unknown) {
         this.logger.error(`Saving task failed. Failed xp object: ${JSON.stringify(xp, null, 2)}`);
         this.logger.error(JSON.stringify(e, null, 2));

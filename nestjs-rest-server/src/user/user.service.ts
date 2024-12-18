@@ -83,6 +83,16 @@ export class UserService {
         return new BadRequestException("User not found or social already linked");
       }
 
+      try {
+        // try issue XP immediately
+        await retry(() => this.taskService.issueLinkSocialXp(socialData.seasonLabel, socialData.provider, address));
+      } catch (e) {
+        this.logger.error(JSON.stringify(e, null, 2));
+        this.logger.error(
+          `Failed issueLinkSocialXp for address${address}, season=${socialData.seasonLabel}, provider=${socialData.provider}`,
+        );
+      }
+
       return formatUser(updatedUser);
     } catch (e: unknown) {
       console.error(e);
@@ -410,7 +420,7 @@ export class UserService {
     this.logger.log(`Successfully subscribed ${email} in season ${seasonLabel} of user ${user._id}`);
 
     try {
-      // issue XP
+      // try issue XP immediately
       await retry(() => this.taskService.issueHanaNewsletterSubscriptionXp(seasonLabel, email, publicAddress, user));
     } catch (e) {
       this.logger.error(JSON.stringify(e, null, 2));
