@@ -1,3 +1,3 @@
 export enum SeasonLabel {
-  balanced = "balanced",
+  sui = "sui",
 }

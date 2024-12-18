@@ -2,7 +2,7 @@ import { Chains } from "../enum/Chains";
 import { Status } from "../enum/Status";
 
 export type FormattedTask = {
-  // _id: task[0]._id,
+  seedId: string;
   type: string;
   title: string;
   description: string;

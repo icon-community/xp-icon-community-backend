@@ -1,5 +1,4 @@
 import {
-  BadRequestException,
   Body,
   Controller,
   Get,
@@ -25,7 +24,6 @@ import { UserResponseDto } from "./dto/user-response.dto";
 import { LinkSocialDataDto } from "./dto/link-social-data.dto";
 import { LinkWalletDto } from "./dto/link-wallet.dto";
 import { RegisterSeasonDto } from "./dto/register-season.dto";
-import { TaskLabel } from "../tasks/tasks.config";
 import { SubscribeHanaNewsletterDto } from "./dto/subscribe-hana-newsletter.dto";
 import { EmailQueryParam } from "./user-queries";
 import { MaileriteSubscriberDto } from "./dto/mailerite-subscriber.dto";
@@ -56,23 +54,18 @@ export class UserController {
     }
   }
 
-  @Post("/tasks/non-recursive")
+  @Post("/hana-newsletter/subscribe")
   @UseGuards(JwtAuthGuard)
   @ApiHeader({
     name: "authorization",
     description: "JWT Authorization header. E.g. 'Bearer {Token}'",
   })
   @UsePipes(new ValidationPipe())
-  async submitNonRecursiveTask(
+  async subscribeUserToMailerLite(
     @Body() dto: SubscribeHanaNewsletterDto,
     @UserAddress() publicAddress: string,
   ): Promise<MaileriteSubscriberDto> {
-    switch (dto.taskLabel) {
-      case TaskLabel.HANA_NEWSLETTER:
-        return await this.userService.subscribeUserToMailerLite(dto.season, dto.email, publicAddress);
-      default:
-        throw new BadRequestException(`Unknown taskLabel: ${dto.taskLabel}`);
-    }
+    return await this.userService.subscribeUserToMailerLite(dto.season, dto.email, publicAddress);
   }
 
   @Post("/register")

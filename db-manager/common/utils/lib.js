@@ -34,8 +34,8 @@ function isXChainWallet(wallet) {
   return wallet.includes("/");
 }
 
-function taskRunner(task, db) {
-  return async (input) => await task(input, db);
+function taskRunner(task, db, extra) {
+  return async (input) => await task(input, db, extra);
 }
 
 module.exports = {

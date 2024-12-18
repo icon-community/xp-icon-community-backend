@@ -1,16 +1,25 @@
 import { HydratedDocument, Types, Schema } from "mongoose";
 import { Status } from "../../shared/models/enum/Status";
+import { SeasonLabel } from "../../shared/models/enum/SeasonLabel";
 
 export interface HanaNewsletterXpDetails {
   email: string;
   issuedAt: Date;
 }
 
+export interface LinkSocialXpDetails {
+  provider: string;
+  issuedAt: Date;
+  seasonLabel: SeasonLabel;
+}
+
+export type XpDetailsType = HanaNewsletterXpDetails | LinkSocialXpDetails;
+
 export interface IXpEarned {
   xp: number;
   block: number;
   period: number;
-  details: HanaNewsletterXpDetails | undefined;
+  details: XpDetailsType | undefined;
 }
 
 export const XpEarnedSchema = new Schema<IXpEarned>({

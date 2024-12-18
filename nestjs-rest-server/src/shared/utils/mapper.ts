@@ -6,8 +6,8 @@ import {
   FormattedUserTask,
   FormattedXpEarned,
 } from "../models/types/FormattedTypes";
-import { UserTaskDocument, IXpEarned } from "../../db/schemas/UserTask.schema";
-import { UserDocument, IUserSeasonRegistration } from "../../db/schemas/User.schema";
+import { IXpEarned, UserTaskDocument } from "../../db/schemas/UserTask.schema";
+import { IUserSeasonRegistration, UserDocument } from "../../db/schemas/User.schema";
 import { SeasonsDocument } from "../../db/schemas/Seasons.schema";
 import { UserSeasonResDto } from "../../user/dto/user-season-res.dto";
 import { UserResponseDto } from "../../user/dto/user-response.dto";
@@ -17,6 +17,19 @@ import { SubscriberObject } from "@mailerlite/mailerlite-nodejs";
 import { MaileriteSubscriberDto } from "../../user/dto/mailerite-subscriber.dto";
 import { Referral } from "../../db/schemas/Referral.schema";
 import { ReferralDto } from "../../referral/dto/referral.dto";
+import { SocialProvider } from "../models/enum/SocialProvider";
+import { TaskLabel } from "../../tasks/tasks.config";
+
+export function mapProviderToSocialTask(provider: SocialProvider): TaskLabel {
+  switch (provider) {
+    case SocialProvider.google:
+      return TaskLabel.LINK_GOOGLE;
+    case SocialProvider.twitter:
+      return TaskLabel.LINK_TWITTER_X;
+    default:
+      throw new Error(`Unsupported provider: ${provider}. Enabled provider: ${Object.keys(SocialProvider)}`);
+  }
+}
 
 export function formatReferral(value: Referral): ReferralDto {
   return {
@@ -24,7 +37,7 @@ export function formatReferral(value: Referral): ReferralDto {
     referredUserAddress: value.referredUserAddress,
     createdAt: value.createdAt,
     isProcessed: value.isProcessed,
-  }
+  };
 }
 
 export function formatMailerliteSubscriber(value: SubscriberObject): MaileriteSubscriberDto {
@@ -77,7 +90,7 @@ export function formatTaskDocument(task: TaskDocument | null | undefined): Forma
   if (!task) return task;
 
   return {
-    // _id: task._id,
+    seedId: task.seedId,
     type: task.type,
     title: task.title,
     description: task.description,

@@ -1,7 +1,7 @@
 import { Types } from "mongoose";
 import { Status } from "../shared/models/enum/Status";
 import { Chains } from "../shared/models/enum/Chains";
-import { HanaNewsletterXpDetails } from "./schemas/UserTask.schema";
+import { XpDetailsType } from "./schemas/UserTask.schema";
 
 export class UserSeasonDto {
   constructor(
@@ -23,7 +23,7 @@ export class XpEarnedDto {
     public xp: number,
     public block: number,
     public period: number,
-    public details: HanaNewsletterXpDetails | undefined,
+    public details: XpDetailsType | undefined,
   ) {}
 }
 
