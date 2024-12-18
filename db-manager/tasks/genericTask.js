@@ -169,7 +169,7 @@ async function genericTask(taskInput, db, seedId, callback) {
             continue;
           }
 
-          if (targetTask.seedId === "MINTING_BNUSD_SUI" || targetTask.seedId === "DEPOSIT_NATIVE_SUI_COLLATERAL") {
+          if (targetTask.seedId === TASKS_LABELS.mintingBnusdSui || targetTask.seedId === TASKS_LABELS.depositNativeSui) {
             // handle SUI specific tasks
             for (const xChainWallet of linkedWallets) {
               if (xChainWallet.type === "sui") {

@@ -7,7 +7,7 @@ const {
   seasonService,
   userTaskService,
 } = require("../common/services/v1/");
-const { chains, tasks } = require("../common/utils/config");
+const { chains, tasks, TASKS_LABELS } = require("../common/utils/config");
 const {
   getUserDailyCheckIn,
 } = require("../common/services/v1/dailyCheckInService");
@@ -155,8 +155,7 @@ async function dailyCheckInTask(taskInput, db, chain) {
           let totalDailyXp = 0;
 
           const allXCallAddresses = [];
-
-          if (SEED_ID === "DAILY_CHECK_IN_SUI_COLLATERAL") {
+          if (SEED_ID === TASKS_LABELS.dailyCheckInSui) {
             validUser.linkedWallets.forEach(xChainWallet => {
               if (xChainWallet.type === "sui") {
                 allXCallAddresses.push(...chains.evm.map(chain => `${chain}/${xChainWallet.address}`));
