@@ -9,6 +9,7 @@ import { IconConnectorService } from "../chain-connectors/icon-connector.service
 import { UsersTaskDbService } from "../db/services/user-task-db.service";
 import { RankingService } from "../ranking/service/ranking.service";
 import { getRankingOfSeasonReduced } from "../shared/utils/ranking-utils";
+import { findTimeGivenBlock } from "../shared/utils/general-util";
 import { SeasonDto } from "./dto/season.dto";
 import { CalculateSeasonReqDto } from "./dto/calculate-season-req.dto";
 import { RewardsDto } from "./dto/rewards.dto";
@@ -181,6 +182,8 @@ export class SeasonService {
       number: seasonFormatted.number,
       blockStart: seasonFormatted.blockStart,
       blockEnd: seasonFormatted.blockEnd,
+      timeStart: findTimeGivenBlock(seasonFormatted.blockStart),
+      timeEnd: findTimeGivenBlock(seasonFormatted.blockEnd),
       userCount: userCount,
       balance_in_wallets: {
         icx: icxBalance,
