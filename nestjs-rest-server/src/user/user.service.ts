@@ -365,13 +365,19 @@ export class UserService {
       const response: AxiosResponse<SingleSubscriberResponse> = await this.config.mailerlite.subscribers.find(email);
 
       if (response.status < 300) {
-        return formatMailerliteSubscriber(response.data.data);
+        if (response.data.data.groups?.some((v) => v.id === this.config.mailerliteGroupId)) {
+          return formatMailerliteSubscriber(response.data.data);
+        } else {
+          throw new NotFoundException(`Email ${email} not found`);
+        }
       } else {
         throw new Error(JSON.stringify(response.data.data));
       }
     } catch (e: any) {
       if (e?.response?.status === 404) {
         throw new NotFoundException(`Email ${email} not found`);
+      } else if (e instanceof NotFoundException) {
+        throw e;
       }
 
       this.logger.error(`Failed to get Mailerlite Subscriber: ${JSON.stringify(e, null, 2)}`);
