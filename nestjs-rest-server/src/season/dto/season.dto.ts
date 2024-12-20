@@ -2,6 +2,8 @@ export class SeasonDto {
   number: number;
   blockStart: number;
   blockEnd: number;
+  timeStart: number | null;
+  timeEnd: number | null;
   userCount: number;
   balance_in_wallets: {
     icx: number;
