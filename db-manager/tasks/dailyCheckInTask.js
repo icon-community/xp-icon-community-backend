@@ -7,7 +7,7 @@ const {
   seasonService,
   userTaskService,
 } = require("../common/services/v1/");
-const { chains, tasks, TASKS_LABELS } = require("../common/utils/config");
+const { chains, tasks: TASKS_LABELS } = require("../common/utils/config");
 const {
   getUserDailyCheckIn,
 } = require("../common/services/v1/dailyCheckInService");
@@ -22,9 +22,9 @@ async function dailyCheckInTask(taskInput, db, chain) {
   try {
     let SEED_ID;
     if (chain === "sui") {
-      SEED_ID = tasks.dailyCheckInSui
+      SEED_ID = TASKS_LABELS.dailyCheckInSui
     } else if (chain === "cross-chain") {
-      SEED_ID = tasks.dailyCheckInCrossChain
+      SEED_ID = TASKS_LABELS.dailyCheckInCrossChain
     }
 
       console.log("========");
