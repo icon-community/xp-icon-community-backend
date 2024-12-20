@@ -1,4 +1,48 @@
-import { DEFAULT_MAX_RETRY, DEFAULT_RETRY_DELAY_MS } from "../../constants";
+import { DEFAULT_MAX_RETRY, DEFAULT_RETRY_DELAY_MS, SLOPE_POINT_VARIABLES } from "../../constants";
+
+/*
+ * This function calculates the time given the block number
+ * using the slope point formula.
+ * The formula is  y - y1 = m(x - x1)
+ * where:
+ * x1 = known block height
+ * y1 = known time
+ * x = block height input
+ * y = unknown time to be calculated
+ * m = slope (previously calculated and tested)
+ * @param block - block number
+ * @returns {number} time in seconds
+ */
+export function findTimeGivenBlock(block: number) {
+  try {
+    return Math.floor(SLOPE_POINT_VARIABLES.slope * (block - SLOPE_POINT_VARIABLES.x1) + SLOPE_POINT_VARIABLES.y1);
+  } catch (err) {
+    console.error(err);
+    return null;
+  }
+}
+
+/*
+ * This function calculates the block number given the time
+ * using the slope point formula.
+ * The formula is  y - y1 = m(x - x1)
+ * where:
+ * x1 = known block height
+ * y1 = known time
+ * x = block height input
+ * y = unknown time to be calculated
+ * m = slope (previously calculated and tested)
+ * @param time - time in unix timestamp (seconds)
+ * @returns {number} block number
+ */
+export function findblockGivenTime(time: number) {
+  try {
+    return Math.floor((time - SLOPE_POINT_VARIABLES.y1) / SLOPE_POINT_VARIABLES.slope + SLOPE_POINT_VARIABLES.x1);
+  } catch (err) {
+    console.error(err);
+    return null;
+  }
+}
 
 export function isValidHex(str: any): boolean {
   if (typeof str !== "string") {
