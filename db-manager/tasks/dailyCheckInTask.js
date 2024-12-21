@@ -27,10 +27,9 @@ async function dailyCheckInTask(taskInput, db, chain) {
       SEED_ID = TASKS_LABELS.dailyCheckInCrossChain
     }
 
-      console.log("========");
-    console.log("> Running dailyCheckInTask task on block ${height}");
-
     const { height, prepTerm } = taskInput;
+    console.log("========");
+    console.log(`> Running dailyCheckInTask task on block ${height}`);
 
     console.log("- Creating connection to DB");
     await db.createConnection();
@@ -119,9 +118,11 @@ async function dailyCheckInTask(taskInput, db, chain) {
             validUser.linkedWallets.length === 0
           ) {
             console.log(
-              `--- User ${validUser._id} does not have any linked wallet`,
+              `--- User ${validUser._id} does not have any linked wallet. Continuing to the next user`,
             );
             continue;
+          } else {
+            console.log(`--- User ${validUser._id} has linked wallets`);
           }
 
           const userTaskDocArr = await getUserTaskByAllIds(
@@ -147,6 +148,7 @@ async function dailyCheckInTask(taskInput, db, chain) {
               xpArray.push(...userTaskDocArr[0].xpEarned);
             } else {
               // user already earned xp in this term, skip
+              console.log(`--- User already earned xp in this term, skipping`);
               continue;
             }
           }
@@ -158,7 +160,7 @@ async function dailyCheckInTask(taskInput, db, chain) {
           if (SEED_ID === TASKS_LABELS.dailyCheckInSui) {
             validUser.linkedWallets.forEach(xChainWallet => {
               if (xChainWallet.type === "sui") {
-                allXCallAddresses.push(...chains.evm.map(chain => `${chain}/${xChainWallet.address}`));
+                allXCallAddresses.push(`${xChainWallet.type}/${xChainWallet.address}`)
               }
             })
           } else {
@@ -181,7 +183,9 @@ async function dailyCheckInTask(taskInput, db, chain) {
                 db.connection,
               );
 
-              if (!dailyCheckInDoc || dailyCheckInDoc.streakCounter === 0) {
+              if (!dailyCheckInDoc ||
+                dailyCheckInDoc.length === 0 || 
+                dailyCheckInDoc.streakCounter === 0) {
                 console.log(
                   `-- dailyCheckInDoc undefined or streakCounter is 0, skipping ${xCallAddress} --`,
                 );
