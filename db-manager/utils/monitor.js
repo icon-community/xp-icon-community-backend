@@ -108,11 +108,19 @@ class Monitor {
           this.tasksRunning = true;
           console.log("> Executing tasks:");
           for (const task of this.tasks) {
-            const taskInput = {
-              height: height,
-              prepTerm: this.latestTerm,
-            };
-            await task(taskInput);
+            try {
+              const taskInput = {
+                height: height,
+                prepTerm: this.latestTerm,
+              };
+              await task(taskInput);
+            } catch (err) {
+              console.log(
+                "\n> (CRITICAL) Block monitor: Error executing task, will continue executing other tasks:",
+              );
+              console.log(err);
+              // throw new Error("Error executing task");
+            }
           }
           this.tasksRunning = false;
         } else {
