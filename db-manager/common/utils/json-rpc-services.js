@@ -230,6 +230,14 @@ async function getSICXCollateralInUSDValue(wallet, height) {
   return getDataFromStandings(wallet, "sICX", "collateral_in_USD", height);
 }
 
+async function getSuiXChainDebtInUSDValue(wallet, height) {
+  return getDataFromStandings(wallet, "SUI", "total_debt_in_USD", height);
+}
+
+async function getSuiXChainCollateralInUSDValue(wallet, height) {
+  return getDataFromStandings(wallet, "SUI", "collateral_in_USD", height);
+}
+
 async function getLockedAmount(
   user,
   height = null,
@@ -345,4 +353,6 @@ module.exports = {
   getUsersList,
   getXChainCollateralInUSDValue,
   getXChainDebtInUSDValue,
+  getSuiXChainCollateralInUSDValue,
+  getSuiXChainDebtInUSDValue,
 };

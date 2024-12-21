@@ -18,6 +18,8 @@ const {
   fetchNewUsersAndGiveRegistrationReward,
   fetchXChainLoansAndUpdateDb,
   fetchXChainCollateralsAndUpdateDb,
+  fetchSuiXChainLoansAndUpdateDb,
+  fetchSuiXChainCollateralsAndUpdateDb,
   fetchNewReferrersAndUpdateDb,
   fetchNewReferredAndUpdateDb,
   dailyCheckInTask,
@@ -115,6 +117,14 @@ async function main() {
 
     // Run task that fetches cross chain collaterals deposited by each user and updates the db
     tasks.push(taskRunner(fetchXChainCollateralsAndUpdateDb, db));
+
+    // Run task that fetches cross chain loans on SUI
+    // taken by each user and updates the db
+    tasks.push(taskRunner(fetchSuiXChainLoansAndUpdateDb, db));
+
+    // Run task that fetches cross chain collaterals on SUI
+    // deposited by each user and updates the db
+    tasks.push(taskRunner(fetchSuiXChainCollateralsAndUpdateDb, db));
 
     // Run task that fetches new referrers and new referred and
     // updates the db

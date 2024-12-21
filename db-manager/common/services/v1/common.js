@@ -5,6 +5,9 @@ async function createEntry(param, collectionId, connection = null) {
     }
 
     const model = connection.model(collectionId);
+    if (!model) {
+      throw new Error(`Model ${collectionId} not found`);
+    }
     const entry = new model(param);
     return await entry.save();
   } catch (err) {
@@ -21,6 +24,9 @@ async function getAllEntries(collectionId, connection = null) {
     }
 
     const model = connection.model(collectionId);
+    if (!model) {
+      throw new Error(`Model ${collectionId} not found`);
+    }
     return await model.find();
   } catch (err) {
     console.log("Error on getAllEntries:");
@@ -36,6 +42,9 @@ async function getEntryById(id, collectionId, connection = null) {
     }
 
     const model = connection.model(collectionId);
+    if (!model) {
+      throw new Error(`Model ${collectionId} not found`);
+    }
     return await model.findById(id);
   } catch (err) {
     console.log("Error on getEntryById:");
@@ -44,13 +53,16 @@ async function getEntryById(id, collectionId, connection = null) {
   }
 }
 
-async function getEntryByParam(param, colletionId, connection = null) {
+async function getEntryByParam(param, collectionId, connection = null) {
   try {
     if (connection == null) {
       throw new Error("Connection not provided");
     }
 
-    const model = connection.model(colletionId);
+    const model = connection.model(collectionId);
+    if (!model) {
+      throw new Error(`Model ${collectionId} not found`);
+    }
     return await model.find(param);
   } catch (err) {
     console.log("Error on getEntryByParam:");
@@ -71,6 +83,9 @@ async function updateOrCreateEntry(
       throw new Error("Connection not provided");
     }
     const model = connection.model(collectionId);
+    if (!model) {
+      throw new Error(`Model ${collectionId} not found`);
+    }
     const result = await model.findOneAndUpdate(query, update, {
       new: true,
       upsert: upsert,
@@ -91,6 +106,11 @@ async function getDocumentCount(filter, collectionId, connection = null) {
     }
 
     const model = connection.model(collectionId);
+
+    if (!model) {
+      throw new Error(`Model ${collectionId} not found`);
+    }
+
     return await model.where(filter).countDocuments();
   } catch (err) {
     console.log("Error on getDocumentCount:");
