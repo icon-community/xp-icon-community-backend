@@ -85,33 +85,33 @@ services:
       - mynetworkprod
     environment: *common-rest-server-env
 
-  rest-server2:
-    container_name: rest-server2
-    build:
-      context: ./nestjs-rest-server
-    restart: always
-    ports:
-      - "3502:3500"
-    depends_on:
-      - mongodb-prod
-      - auth-server
-    networks:
-      - mynetworkprod
-    environment: *common-rest-server-env
+  # rest-server2:
+  #   container_name: rest-server2
+  #   build:
+  #     context: ./nestjs-rest-server
+  #   restart: always
+  #   ports:
+  #     - "3502:3500"
+  #   depends_on:
+  #     - mongodb-prod
+  #     - auth-server
+  #   networks:
+  #     - mynetworkprod
+  #   environment: *common-rest-server-env
 
-  rest-server3:
-    container_name: rest-server3
-    build:
-      context: ./nestjs-rest-server
-    restart: always
-    ports:
-      - "3503:3500"
-    depends_on:
-      - mongodb-prod
-      - auth-server
-    networks:
-      - mynetworkprod
-    environment: *common-rest-server-env
+  # rest-server3:
+  #   container_name: rest-server3
+  #   build:
+  #     context: ./nestjs-rest-server
+  #   restart: always
+  #   ports:
+  #     - "3503:3500"
+  #   depends_on:
+  #     - mongodb-prod
+  #     - auth-server
+  #   networks:
+  #     - mynetworkprod
+  #   environment: *common-rest-server-env
 
 networks:
   mynetworkprod:
