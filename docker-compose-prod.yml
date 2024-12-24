@@ -75,6 +75,7 @@ services:
     container_name: rest-server1
     build:
       context: ./nestjs-rest-server
+
     restart: always
     ports:
       - "3501:3500"
@@ -83,6 +84,8 @@ services:
       - auth-server
     networks:
       - mynetworkprod
+    volumes:
+      - ./logs:/logs
     environment: *common-rest-server-env
 
   # rest-server2:
