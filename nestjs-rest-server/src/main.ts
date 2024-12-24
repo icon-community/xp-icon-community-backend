@@ -35,7 +35,7 @@ async function bootstrap(): Promise<void> {
       transport,
       new winston.transports.Console({
         format: alignedWithColorsAndTime,
-        level: LOG_LEVEL,
+        level: LOG_LEVEL ?? "debug",
       }),
     ],
   });
