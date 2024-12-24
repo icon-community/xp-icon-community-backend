@@ -18,8 +18,6 @@ export class DailyCheckInService {
   constructor(private dailyCheckinDbService: DailyCheckInDbService) {}
 
   async getUserDailyCheckInStreak(address: string): Promise<DailyCheckinDto> {
-    if (1 === 1) throw new BadRequestException("TEST");
-
     const dailyCheckIn = await this.dailyCheckinDbService.getUserDailyCheckIn(address);
 
     if (dailyCheckIn) {
