@@ -205,7 +205,6 @@ export class UserService {
       );
 
       if (userTasks == null || userTasks.length == 0) {
-        console.log("User task not found");
         continue;
       }
 
