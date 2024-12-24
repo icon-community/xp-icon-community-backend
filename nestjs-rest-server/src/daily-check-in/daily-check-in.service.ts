@@ -9,7 +9,7 @@ import {
 import { formatDailyCheckIn } from "../shared/utils/mapper";
 import { DailyCheckInDbService } from "../db/services/daily-check-in-db.service";
 import { DailyCheckinDto } from "./dto/DailyCheckinDto";
-import { subtractDays } from "../shared/utils/general-util";
+import { addDays, subtractDays } from "../shared/utils/general-util";
 
 @Injectable()
 export class DailyCheckInService {
@@ -18,6 +18,8 @@ export class DailyCheckInService {
   constructor(private dailyCheckinDbService: DailyCheckInDbService) {}
 
   async getUserDailyCheckInStreak(address: string): Promise<DailyCheckinDto> {
+    if (1 === 1) throw new BadRequestException("TEST");
+
     const dailyCheckIn = await this.dailyCheckinDbService.getUserDailyCheckIn(address);
 
     if (dailyCheckIn) {
@@ -27,12 +29,18 @@ export class DailyCheckInService {
 
       // check if user last checked in at latest yesterday
       if (lastCheckInDay.getTime() >= yesterday.getTime()) {
-        return dailyCheckIn;
+        return {
+          walletAddress: dailyCheckIn.walletAddress,
+          streakCounter: dailyCheckIn.streakCounter,
+          lastCheckIn: dailyCheckIn.lastCheckIn.getTime(),
+          nextCheckIn: addDays(lastCheckInDay, 1).getTime(),
+        };
       } else {
         // streak counter is not valid, because last check in was before yesterday
         return {
           walletAddress: dailyCheckIn.walletAddress,
-          lastCheckIn: dailyCheckIn.lastCheckIn,
+          lastCheckIn: dailyCheckIn.lastCheckIn.getTime(),
+          nextCheckIn: addDays(lastCheckInDay, 1).getTime(),
           streakCounter: 0,
         };
       }
@@ -67,7 +75,12 @@ export class DailyCheckInService {
           throw new BadRequestException("Failed to find user daily streak and update it");
         }
 
-        return update;
+        return {
+          walletAddress: update.walletAddress,
+          streakCounter: update.streakCounter,
+          lastCheckIn: update.lastCheckIn.getTime(),
+          nextCheckIn: new Date(addDays(lastCheckInDay, 1).setHours(0, 0, 0, 0)).getTime(),
+        };
       } else if (lastCheckInDay.getTime() < yesterday.getTime()) {
         // late check in, set counter to 1
         const update = await this.dailyCheckinDbService.dailyCheckIn(address, 1);
@@ -76,7 +89,12 @@ export class DailyCheckInService {
           throw new BadRequestException("Failed to find user daily streak and update it");
         }
 
-        return update;
+        return {
+          walletAddress: update.walletAddress,
+          streakCounter: update.streakCounter,
+          lastCheckIn: update.lastCheckIn.getTime(),
+          nextCheckIn: new Date(addDays(lastCheckInDay, 1).setHours(0, 0, 0, 0)).getTime(),
+        };
       } else if (lastCheckInDay.getTime() >= today.getTime()) {
         // check in is happening today
         throw new BadRequestException("Daily check in already completed today.");

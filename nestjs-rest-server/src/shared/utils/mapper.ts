@@ -19,6 +19,7 @@ import { Referral } from "../../db/schemas/Referral.schema";
 import { ReferralDto } from "../../referral/dto/referral.dto";
 import { SocialProvider } from "../models/enum/SocialProvider";
 import { TaskLabel } from "../../tasks/tasks.config";
+import { addDays } from "./general-util";
 
 export function mapProviderToSocialTask(provider: SocialProvider): TaskLabel {
   switch (provider) {
@@ -59,7 +60,8 @@ export function formatDailyCheckIn(dailyCheckIn: DailyCheckInDocument): DailyChe
   return {
     walletAddress: dailyCheckIn.walletAddress,
     streakCounter: dailyCheckIn.streakCounter,
-    lastCheckIn: dailyCheckIn.lastCheckIn,
+    lastCheckIn: dailyCheckIn.lastCheckIn.getTime(),
+    nextCheckIn: new Date(addDays(dailyCheckIn.lastCheckIn, 1).setHours(0, 0, 0, 0)).getTime(),
   };
 }
 

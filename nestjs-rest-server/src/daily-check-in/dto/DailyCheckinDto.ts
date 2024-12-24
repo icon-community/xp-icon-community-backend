@@ -1,5 +1,6 @@
 export class DailyCheckinDto {
   walletAddress: string;
   streakCounter: number;
-  lastCheckIn: Date;
+  lastCheckIn: number;
+  nextCheckIn: number;
 }

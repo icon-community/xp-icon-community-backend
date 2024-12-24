@@ -15,7 +15,7 @@ export class ReferralService {
   ) {}
 
   async findAllUserReferrals(address: string): Promise<ReferralDto[]> {
-    return (await this.referralDb.getUserReferrals(address)).map(v => formatReferral(v));
+    return (await this.referralDb.getUserReferrals(address)).map((v) => formatReferral(v));
   }
 
   findAllUserReferralsForPeriod(address: string, start: Date, end: Date): Promise<Referral[]> {
