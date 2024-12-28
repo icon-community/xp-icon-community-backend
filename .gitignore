@@ -5,9 +5,12 @@ node_modules
 local
 *.bkp
 db/data
-db/backups
+db/backups*
+db/logs
+backups/
 dev-db/data
 .gradle
+logs/
 .idea
 build
 out
