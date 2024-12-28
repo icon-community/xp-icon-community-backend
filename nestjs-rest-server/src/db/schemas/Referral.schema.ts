@@ -52,7 +52,8 @@ export class Referral {
     isRequired: true,
     default: false,
   })
-  isProcessed: boolean; // Whether the referral has been processed or not
+  referredIsProcessed: boolean; // Whether the referred User has been processed or not
+  referrerIsProcessed: boolean; // Whether the referrer User has been processed or not
 }
 
 export type ReferralDocument = HydratedDocument<Referral>;

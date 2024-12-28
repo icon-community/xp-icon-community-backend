@@ -36,7 +36,12 @@ const referralSchema = new Schema({
     required: [true, "Please specify field"],
     ref: config.collections.users,
   },
-  isProcessed: {
+  referrerIsProcessed: {
+    type: Boolean,
+    default: false,
+    required: [true, "Please specify field"],
+  },
+  referredIsProcessed: {
     type: Boolean,
     default: false,
     required: [true, "Please specify field"],

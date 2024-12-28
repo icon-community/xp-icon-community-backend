@@ -37,7 +37,8 @@ export function formatReferral(value: Referral): ReferralDto {
     referrerUserAddress: value.referrerUserAddress,
     referredUserAddress: value.referredUserAddress,
     createdAt: value.createdAt,
-    isProcessed: value.isProcessed,
+    referrerIsProcessed: value.referrerIsProcessed,
+    referredIsProcessed: value.referredIsProcessed,
   };
 }
 

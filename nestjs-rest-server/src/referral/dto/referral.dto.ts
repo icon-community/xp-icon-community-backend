@@ -3,6 +3,7 @@ export class ReferralDto {
     public referrerUserAddress: string,
     public referredUserAddress: string,
     public createdAt: Date,
-    public isProcessed: boolean,
+    public referredIsProcessed: boolean,
+    public referrerIsProcessed: boolean,
   ) {}
 }
