@@ -1,0 +1,46 @@
+version: '3.8'
+
+services:
+  hana-rewards-backend-scraper:
+    build: .
+    container_name: hana-rewards-backend-scraper
+    ports:
+      - '3005:3005'
+    environment:
+      - NODE_ENV=production
+      - RABBITMQ_URL=amqp://rabbitmq:5672
+    depends_on:
+      - rabbitmq
+    networks:
+      - app-network
+    volumes:
+      - ./logs:/usr/src/app/logs # Persist log data
+
+    command:
+      [
+        '/usr/src/app/wait-for-it.sh',
+        'rabbitmq',
+        '5672',
+        '--',
+        'npm',
+        'run',
+        'start',
+      ]
+  rabbitmq:
+    image: 'rabbitmq:3-management'
+    container_name: rabbitmq
+    ports:
+      - '15672:15672' # RabbitMQ management interface
+      - '5672:5672' # RabbitMQ messaging port
+    volumes:
+      - ./rabbitmq-data:/var/lib/rabbitmq # Persist RabbitMQ data
+    networks:
+      - app-network
+
+volumes:
+  rabbitmq-data: # Persistent storage for RabbitMQ
+  logs: # Persistent storage for logs
+
+networks:
+  app-network:
+    driver: bridge
