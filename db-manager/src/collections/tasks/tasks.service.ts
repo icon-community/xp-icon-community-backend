@@ -3,7 +3,7 @@ import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Tasks } from './tasks.interface';
 import { CreateTaskDto, UpdateTaskDto } from './dto';
-import { TASKS_MODEL } from '../../constants';
+import MONGO_CONFIG from '../../config/mongo.config';
 import { BaseService } from '../../shared/base/base.service';
 
 @Injectable()
@@ -13,7 +13,7 @@ export class TasksService extends BaseService<
   UpdateTaskDto
 > {
   constructor(
-    @InjectModel(TASKS_MODEL)
+    @InjectModel(MONGO_CONFIG.collections.tasks)
     private readonly tasksModel: Model<Tasks>,
   ) {
     super(tasksModel);
