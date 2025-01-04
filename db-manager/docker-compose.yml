@@ -1,4 +1,9 @@
-version: '3.8'
+x-global-env: &global-env
+  MONGO_USER: ${MONGO_USER}
+  MONGO_PASSWORD: ${MONGO_PASSWORD}
+  MONGO_PORT: ${MONGO_PORT}
+  MONGO_DB_NAME: ${MONGO_DB_NAME}
+  MONGO_CONTAINER: mongodb-dev
 
 services:
   hana-rewards-backend-scraper:
@@ -7,10 +12,19 @@ services:
     ports:
       - '3005:3005'
     environment:
-      - NODE_ENV=production
-      - RABBITMQ_URL=amqp://rabbitmq:5672
+      <<: *global-env
+      DB_MANAGER_PORT: ${DB_MANAGER_PORT}
+      USER_COLLECTION: ${USER_COLLECTION}
+      TASK_COLLECTION: ${TASK_COLLECTION}
+      SEASON_COLLECTION: ${SEASON_COLLECTION}
+      USER_TASK_COLLECTION: ${USER_TASK_COLLECTION}
+      REFERRALS_COLLECTION: ${REFERRALS_COLLECTION}
+      DAILY_CHECK_IN_COLLECTION: ${DAILY_CHECK_IN_COLLECTION}
+      NODE_ENV: 'production'
+      RABBITMQ_URL: 'amqp://rabbitmq:5672'
     depends_on:
       - rabbitmq
+      - mongodb
     networks:
       - app-network
     volumes:
@@ -26,6 +40,7 @@ services:
         'run',
         'start',
       ]
+
   rabbitmq:
     image: 'rabbitmq:3-management'
     container_name: rabbitmq
@@ -37,9 +52,18 @@ services:
     networks:
       - app-network
 
-volumes:
-  rabbitmq-data: # Persistent storage for RabbitMQ
-  logs: # Persistent storage for logs
+  mongodb:
+    image: 'mongo:latest'
+    container_name: mongodb-dev
+    ports:
+      - '27017:27017'
+    volumes:
+      - ./db-dev:/data/db # Persist MongoDB data
+    networks:
+      - app-network
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: ${MONGO_USER}
+      MONGO_INITDB_ROOT_PASSWORD: ${MONGO_PASSWORD}
 
 networks:
   app-network:

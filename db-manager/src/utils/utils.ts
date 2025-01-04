@@ -36,3 +36,45 @@ export function isTagInLogs(tag: string, folderPath: string = ''): boolean {
   }
   return false;
 }
+
+/**
+ * This function is used to get the full path of a file or folder in the project.
+ * It is used to avoid using relative paths in the project.
+ * It works by finding the main folder of the project and then calculating the path from there.
+ * @param relativePath The path of the file or folder relative to the main folder of the project.
+ * @returns The full path of the file or folder.
+ */
+export function customPath(relativePath: string): string {
+  const fullPath = path.dirname(require.main.filename);
+  const fullPathArray = fullPath.split('/');
+  fullPathArray[0] = '/';
+  let MAIN_FOLDER = null;
+
+  let maxLoops = 100;
+  while (MAIN_FOLDER === null && maxLoops > 0) {
+    maxLoops--;
+    const folderPath = path.join(...fullPathArray);
+    const packageJsonPath = path.join(folderPath, 'package.json');
+    try {
+      fs.accessSync(packageJsonPath, fs.constants.F_OK);
+      const folderSplit = folderPath.split('/');
+      MAIN_FOLDER = folderSplit[folderSplit.length - 1];
+    } catch (err) {
+      void err;
+      fullPathArray.pop();
+    }
+  }
+  const parsedPath = path.parse(__filename);
+  const fullPathSplit = parsedPath.dir.split('/');
+
+  while (fullPathSplit.length > 0) {
+    if (fullPathSplit[fullPathSplit.length - 1] === MAIN_FOLDER) {
+      break;
+    } else {
+      fullPathSplit.pop();
+    }
+  }
+  fullPathSplit.push(relativePath);
+
+  return fullPathSplit.join('/');
+}

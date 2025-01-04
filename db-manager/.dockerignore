@@ -1,0 +1,5 @@
+db-dev
+rabbitmq-data
+logs
+node_modules
+dist

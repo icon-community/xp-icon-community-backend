@@ -1,9 +1,7 @@
 export const GENERAL_CONFIG = {
-  tasks: {
-    recurring: {},
-    triggered: {
-      subscribeNewsletter: 'SUBSCRIBE_NEWSLETTER',
-      clickButton: 'CLICK_BUTTON',
-    },
+  seeds: {
+    tasks: 'seed-data/tasks-seed.json',
+    seasons: 'seed-data/seasons-seed.json',
+    main: 'seed-data/main-seed.json',
   },
 };

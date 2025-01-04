@@ -2,13 +2,17 @@ import { Module } from '@nestjs/common';
 import { RabbitMQModule } from '../rabbitmq/rabbitmq.module';
 import { TaskProducerService } from './task-producer.service';
 import { TaskService } from './task.service';
-import { CheckBlockchainTask } from './recurring/check-blockchain.task';
-import { Task1Task } from './recurring/task1.task';
-import { SubscribeNewsletterTask } from './triggered/subscribe-newsletter.task';
-import { ClickButtonTask } from './triggered/click-button.task';
+import { ConfigHelperService } from '../config/config-helper.service';
+import { Task1Task, CheckBlockchainTask } from './recurring';
+import {
+  SubscribeNewsletterTask,
+  ClickButtonTask,
+  FeedTaskSeedToDbTask,
+} from './triggered';
+import { TasksModule } from '../collections/tasks/tasks.module';
 
 @Module({
-  imports: [RabbitMQModule],
+  imports: [RabbitMQModule, TasksModule],
   providers: [
     TaskProducerService,
     TaskService,
@@ -16,6 +20,8 @@ import { ClickButtonTask } from './triggered/click-button.task';
     Task1Task,
     SubscribeNewsletterTask,
     ClickButtonTask,
+    FeedTaskSeedToDbTask,
+    ConfigHelperService,
   ],
   exports: [TaskProducerService],
 })
