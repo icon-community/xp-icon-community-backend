@@ -11,19 +11,26 @@ export class TaskProducerService implements OnModuleInit {
   async onModuleInit() {
     const priorityTasks = [
       {
-        // IMPORTANT: this should be the first task to be executed, DO NOT CHANGE THE ORDER
-        // TODO: add priority to tasks
-        taskName: TRIGGERED_TASKS_TYPES.feedTaskSeedToDb,
+        task: {
+          // IMPORTANT: this should be the first task to be executed, DO NOT CHANGE THE ORDER
+          // TODO: add priority to tasks
+          taskName: TRIGGERED_TASKS_TYPES.feedTaskSeedToDb,
+        },
+        haltAllTasks: true,
       },
       {
-        taskName: TRIGGERED_TASKS_TYPES.feedSeasonSeedToDb,
+        task: {
+          taskName: TRIGGERED_TASKS_TYPES.feedSeasonSeedToDb,
+        },
+        haltAllTasks: true,
       },
     ];
 
     for (const task of priorityTasks) {
       this.rabbitMQService.sendToQueue(
         RABBITMQ_CONFIG.queues.triggeredTasks,
-        task,
+        task.task,
+        task.haltAllTasks,
       );
     }
 

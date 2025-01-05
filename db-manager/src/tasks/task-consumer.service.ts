@@ -18,7 +18,8 @@ export class TaskConsumerService implements OnModuleInit {
     // consume recurring tasks
     this.rabbitMQService.consume(
       RABBITMQ_CONFIG.queues.recurringTasks,
-      async (message) => {
+      async (message, callback) => {
+        void callback;
         this.logger.log({
           level: 'info',
           message: `Recurring Task Executed:, ${JSON.stringify(message)}`,
@@ -30,12 +31,15 @@ export class TaskConsumerService implements OnModuleInit {
     // consume triggered tasks
     this.rabbitMQService.consume(
       RABBITMQ_CONFIG.queues.triggeredTasks,
-      async (message) => {
+      async (message, callbackSetPaused) => {
         this.logger.log({
           level: 'info',
           message: `Triggered Task Executed:, ${JSON.stringify(message)}`,
         });
-        this.taskService.executeTriggeredTasks(message.taskName);
+        this.taskService.executeTriggeredTasks(
+          message.taskName,
+          callbackSetPaused,
+        );
       },
     );
   }

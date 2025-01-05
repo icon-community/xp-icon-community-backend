@@ -14,7 +14,14 @@ export class FeedSeasonSeedToDbTask {
     private readonly configHelperService: ConfigHelperService,
   ) {}
 
-  async execute(forceUpdate: boolean = false) {
+  async execute(...args) {
+    const [forceUpdate, callbackSetPaused] = args;
+    // const forceUpdate = false;
+    // const callbackSetPaused = (foo) => {
+    //   void foo;
+    // };
+    // console.log('args');
+    // console.log(args);
     try {
       this.logger.log({
         level: 'info',
@@ -90,7 +97,9 @@ export class FeedSeasonSeedToDbTask {
           }
         }
       }
+      callbackSetPaused(false);
     } catch (err) {
+      callbackSetPaused(false);
       this.logger.error({
         level: 'error',
         message: `FeedSeasonSeedToDbTask error: ${err.message}`,

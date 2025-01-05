@@ -8,6 +8,17 @@ export class RabbitMQService implements OnModuleInit {
   private connection: amqp.Connection;
   private channel: amqp.Channel;
   private logger = new Logger('RabbitMQService');
+  private paused: boolean = false;
+  private taskThatPaused: string | null = null;
+
+  constructor() {}
+
+  setPaused = (pause: boolean) => {
+    this.paused = pause;
+    if (!pause) {
+      this.taskThatPaused = null;
+    }
+  };
 
   async onModuleInit() {
     try {
@@ -49,7 +60,7 @@ export class RabbitMQService implements OnModuleInit {
     }
   }
 
-  async sendToQueue(queue: string, message: any) {
+  async sendToQueue(queue: string, message: any, pause = false) {
     try {
       if (!this.channel) {
         throw new Error('Channel not created');
@@ -65,6 +76,14 @@ export class RabbitMQService implements OnModuleInit {
         level: 'info',
         message: `Message sent to queue ${queue}. Message: ${JSON.stringify(message)}`,
       });
+      if (pause && this.taskThatPaused == null) {
+        this.logger.log({
+          level: 'info',
+          message: `Pausing all queue consumption`,
+        });
+        this.paused = true;
+        this.taskThatPaused = JSON.stringify(message);
+      }
     } catch (err) {
       this.logger.error({
         level: 'error',
@@ -74,11 +93,12 @@ export class RabbitMQService implements OnModuleInit {
     }
   }
 
-  async consume(queue: string, callback: (msg: any) => void) {
+  async consume(queue: string, callback: (msg: any, setPaused: any) => void) {
     try {
       if (!this.channel) {
         throw new Error('Channel not created');
       }
+
       this.channel.consume(queue, (msg) => {
         try {
           if (!msg) {
@@ -88,12 +108,68 @@ export class RabbitMQService implements OnModuleInit {
             });
             return;
           }
-          callback(JSON.parse(msg.content.toString()));
-          this.channel.ack(msg);
-          this.logger.log({
-            level: 'info',
-            message: `Message consumed from queue ${queue}. Message: ${msg.content.toString()}`,
-          });
+
+          if (this.paused) {
+            this.logger.log({
+              level: 'info',
+              message: `Queue consumption paused. Task that paused: ${this.taskThatPaused}`,
+            });
+            if (this.taskThatPaused !== msg.content.toString()) {
+              // if this is not the message that paused
+              // the queue consumption we send the message
+              // back to the queue
+              this.channel.nack(msg, false, true);
+              this.logger.log({
+                level: 'info',
+                message: `Message not consumed. Message: ${msg.content.toString()}`,
+              });
+            } else {
+              this.logger.log({
+                level: 'info',
+                message: `Consuming message that paused queue consumption. Message: ${msg.content.toString()}`,
+              });
+              try {
+                // if this next line fails the queue
+                // consumption should not be paused
+                // indefinitely because we wrapped the
+                // following logic in a try-catch block
+                callback(JSON.parse(msg.content.toString()), this.setPaused);
+                this.channel.ack(msg);
+                this.logger.log({
+                  level: 'info',
+                  message: `Message consumed from queue ${queue}. Message: ${msg.content.toString()}`,
+                });
+              } catch (internalError) {
+                this.logger.log({
+                  level: 'error',
+                  message: `Error executing callback for message. Message: ${msg.content.toString()}`,
+                  error: internalError,
+                });
+              }
+
+              // to avoid halting the queue consumption
+              // when executing the callback of the message
+              // that paused the queue consumption
+              // the previous logic has been wrapped in a
+              // try-catch block
+              // and in the following lines we unpause
+              // the queue consumption
+              // otherwise the callback execution failing
+              // will result on the queue consumption to
+              // be paused indefinitely
+              // this.logger.log({
+              //   level: 'info',
+              //   message: `Unpausing queue consumption`,
+              // });
+            }
+          } else {
+            callback(JSON.parse(msg.content.toString()), this.setPaused);
+            this.channel.ack(msg);
+            this.logger.log({
+              level: 'info',
+              message: `Message consumed from queue ${queue}. Message: ${msg.content.toString()}`,
+            });
+          }
         } catch (callbackError) {
           this.logger.log({
             level: 'error',
@@ -102,11 +178,6 @@ export class RabbitMQService implements OnModuleInit {
           });
           this.channel.nack(msg, false, false);
         }
-      });
-
-      this.logger.log({
-        level: 'info',
-        message: `Consuming messages from queue ${queue}`,
       });
     } catch (err) {
       this.logger.error({

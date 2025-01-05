@@ -12,7 +12,14 @@ export class FeedTaskSeedToDbTask {
     private readonly configHelperService: ConfigHelperService,
   ) {}
 
-  async execute(forceUpdate: boolean = false) {
+  async execute(...args: any[]) {
+    const [forceUpdate, callbackSetPaused] = args;
+    // const forceUpdate = false;
+    // const callbackSetPaused = (foo) => {
+    //   void foo;
+    // };
+    // console.log('args');
+    // console.log(args);
     try {
       this.logger.log({
         level: 'info',
@@ -46,12 +53,14 @@ export class FeedTaskSeedToDbTask {
           }
         }
       }
+      callbackSetPaused(false);
     } catch (err) {
       this.logger.error({
         level: 'error',
         message: `FeedTaskSeedToDbTask error: ${err.message}`,
         error: err,
       });
+      callbackSetPaused(false);
     }
   }
 }

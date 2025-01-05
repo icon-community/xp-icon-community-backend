@@ -39,37 +39,37 @@ export class TaskService {
     }
   }
 
-  executeTriggeredTasks(taskName: string) {
+  executeTriggeredTasks(taskName: string, callbackSetPaused) {
     const triggeredTasks = [
       {
         label: TRIGGERED_TASKS_TYPES.subscribeNewsletter,
         callback: this.subscribeNewsletterTask,
-        params: [],
+        params: [callbackSetPaused],
       },
       {
         label: TRIGGERED_TASKS_TYPES.clickButton,
         callback: this.clickButtonTask,
-        params: [],
+        params: [callbackSetPaused],
       },
       {
         label: TRIGGERED_TASKS_TYPES.feedTaskSeedToDbForce,
         callback: this.feedTaskSeedToDbTask,
-        params: [true],
+        params: [true, callbackSetPaused],
       },
       {
         label: TRIGGERED_TASKS_TYPES.feedTaskSeedToDb,
         callback: this.feedTaskSeedToDbTask,
-        params: [false],
+        params: [false, callbackSetPaused],
       },
       {
         label: TRIGGERED_TASKS_TYPES.feedSeasonSeedToDb,
         callback: this.feedSeasonSeedToDbTask,
-        params: [false],
+        params: [false, callbackSetPaused],
       },
       {
         label: TRIGGERED_TASKS_TYPES.feedSeasonSeedToDbForce,
         callback: this.feedSeasonSeedToDbTask,
-        params: [true],
+        params: [true, callbackSetPaused],
       },
     ];
 
