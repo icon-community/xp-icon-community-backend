@@ -60,4 +60,4 @@ rabbitmq-data/*
 !rabbitmq-data/.gitkeep
 logs/*
 !logs/.gitkeep
-db-dev
+dev-db

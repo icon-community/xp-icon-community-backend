@@ -58,7 +58,7 @@ services:
     ports:
       - '27017:27017'
     volumes:
-      - ./db-dev:/data/db # Persist MongoDB data
+      - ./dev-db:/data/db # Persist MongoDB data
     networks:
       - app-network
     environment:
