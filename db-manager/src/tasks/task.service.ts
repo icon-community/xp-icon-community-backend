@@ -5,6 +5,7 @@ import {
   SubscribeNewsletterTask,
   ClickButtonTask,
   FeedTaskSeedToDbTask,
+  FeedSeasonSeedToDbTask,
 } from './triggered';
 import { TRIGGERED_TASKS_TYPES } from '../constants';
 @Injectable()
@@ -16,6 +17,7 @@ export class TaskService {
     private readonly subscribeNewsletterTask: SubscribeNewsletterTask,
     private readonly clickButtonTask: ClickButtonTask,
     private readonly feedTaskSeedToDbTask: FeedTaskSeedToDbTask,
+    private readonly feedSeasonSeedToDbTask: FeedSeasonSeedToDbTask,
   ) {}
 
   executeRecurringTasks() {
@@ -58,6 +60,16 @@ export class TaskService {
         label: TRIGGERED_TASKS_TYPES.feedTaskSeedToDb,
         callback: this.feedTaskSeedToDbTask,
         params: [false],
+      },
+      {
+        label: TRIGGERED_TASKS_TYPES.feedSeasonSeedToDb,
+        callback: this.feedSeasonSeedToDbTask,
+        params: [false],
+      },
+      {
+        label: TRIGGERED_TASKS_TYPES.feedSeasonSeedToDbForce,
+        callback: this.feedSeasonSeedToDbTask,
+        params: [true],
       },
     ];
 

@@ -8,11 +8,13 @@ import {
   SubscribeNewsletterTask,
   ClickButtonTask,
   FeedTaskSeedToDbTask,
+  FeedSeasonSeedToDbTask,
 } from './triggered';
 import { TasksModule } from '../collections/tasks/tasks.module';
+import { SeasonsModule } from '../collections/seasons/seasons.module';
 
 @Module({
-  imports: [RabbitMQModule, TasksModule],
+  imports: [RabbitMQModule, TasksModule, SeasonsModule],
   providers: [
     TaskProducerService,
     TaskService,
@@ -21,6 +23,7 @@ import { TasksModule } from '../collections/tasks/tasks.module';
     SubscribeNewsletterTask,
     ClickButtonTask,
     FeedTaskSeedToDbTask,
+    FeedSeasonSeedToDbTask,
     ConfigHelperService,
   ],
   exports: [TaskProducerService],

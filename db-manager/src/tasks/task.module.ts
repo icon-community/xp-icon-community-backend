@@ -6,11 +6,13 @@ import {
   ClickButtonTask,
   SubscribeNewsletterTask,
   FeedTaskSeedToDbTask,
+  FeedSeasonSeedToDbTask,
 } from './triggered';
 import { TasksModule } from '../collections/tasks/tasks.module';
+import { SeasonsModule } from '../collections/seasons/seasons.module';
 
 @Module({
-  imports: [TasksModule],
+  imports: [TasksModule, SeasonsModule],
   providers: [
     TaskService,
     CheckBlockchainTask,
@@ -18,6 +20,7 @@ import { TasksModule } from '../collections/tasks/tasks.module';
     ClickButtonTask,
     SubscribeNewsletterTask,
     FeedTaskSeedToDbTask,
+    FeedSeasonSeedToDbTask,
     ConfigHelperService,
   ],
   exports: [TaskService],

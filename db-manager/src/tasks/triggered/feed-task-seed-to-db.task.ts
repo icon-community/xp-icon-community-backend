@@ -2,7 +2,6 @@ import { Injectable } from '@nestjs/common';
 import { Logger } from '@nestjs/common';
 import { TasksService } from '../../collections/tasks/tasks.service';
 import { ConfigHelperService } from '../../config/config-helper.service';
-import { Tasks } from '../../collections/tasks/tasks.interface';
 
 @Injectable()
 export class FeedTaskSeedToDbTask {

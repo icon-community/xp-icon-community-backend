@@ -9,10 +9,23 @@ export class TaskProducerService implements OnModuleInit {
   constructor(private readonly rabbitMQService: RabbitMQService) {}
 
   async onModuleInit() {
-    // send message to update the Task collection in db
-    this.rabbitMQService.sendToQueue(RABBITMQ_CONFIG.queues.triggeredTasks, {
-      taskName: TRIGGERED_TASKS_TYPES.feedTaskSeedToDb,
-    });
+    const priorityTasks = [
+      {
+        // IMPORTANT: this should be the first task to be executed, DO NOT CHANGE THE ORDER
+        // TODO: add priority to tasks
+        taskName: TRIGGERED_TASKS_TYPES.feedTaskSeedToDb,
+      },
+      {
+        taskName: TRIGGERED_TASKS_TYPES.feedSeasonSeedToDb,
+      },
+    ];
+
+    for (const task of priorityTasks) {
+      this.rabbitMQService.sendToQueue(
+        RABBITMQ_CONFIG.queues.triggeredTasks,
+        task,
+      );
+    }
 
     setInterval(() => {
       this.rabbitMQService.sendToQueue(RABBITMQ_CONFIG.queues.recurringTasks, {

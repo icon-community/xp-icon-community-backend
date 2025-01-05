@@ -1,4 +1,5 @@
 db-dev
+dev-db
 rabbitmq-data
 logs
 node_modules
