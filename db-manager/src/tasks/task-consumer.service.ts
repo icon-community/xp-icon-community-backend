@@ -24,7 +24,7 @@ export class TaskConsumerService implements OnModuleInit {
           level: 'info',
           message: `Recurring Task Executed:, ${JSON.stringify(message)}`,
         });
-        this.taskService.executeRecurringTasks();
+        this.taskService.executeRecurringTasks(message);
       },
     );
 

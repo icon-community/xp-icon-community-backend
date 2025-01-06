@@ -3,7 +3,19 @@ import { RabbitMQModule } from '../rabbitmq/rabbitmq.module';
 import { TaskProducerService } from './task-producer.service';
 import { TaskService } from './task.service';
 import { ConfigHelperService } from '../config/config-helper.service';
-import { Task1Task, CheckBlockchainTask } from './recurring';
+import {
+  ProcessNewUserRewardsTask,
+  ProcessSicxCollateralsTask,
+  ProcessAvaxCollateralsTask,
+  ProcessCrossChainCollateralsTask,
+  ProcessCrossChainLoansTask,
+  ProcessSuiCrossChainCollateralsTask,
+  ProcessDailyCheckInTask,
+  ProcessLoansTask,
+  ProcessLockedSavingsTask,
+  ProcessNewReferrersTask,
+  ProcessNewReferredTask,
+} from './recurring';
 import {
   SubscribeNewsletterTask,
   ClickButtonTask,
@@ -18,13 +30,22 @@ import { SeasonsModule } from '../collections/seasons/seasons.module';
   providers: [
     TaskProducerService,
     TaskService,
-    CheckBlockchainTask,
-    Task1Task,
     SubscribeNewsletterTask,
     ClickButtonTask,
     FeedTaskSeedToDbTask,
     FeedSeasonSeedToDbTask,
     ConfigHelperService,
+    ProcessNewUserRewardsTask,
+    ProcessSicxCollateralsTask,
+    ProcessAvaxCollateralsTask,
+    ProcessCrossChainCollateralsTask,
+    ProcessCrossChainLoansTask,
+    ProcessSuiCrossChainCollateralsTask,
+    ProcessDailyCheckInTask,
+    ProcessLoansTask,
+    ProcessLockedSavingsTask,
+    ProcessNewReferrersTask,
+    ProcessNewReferredTask,
   ],
   exports: [TaskProducerService],
 })

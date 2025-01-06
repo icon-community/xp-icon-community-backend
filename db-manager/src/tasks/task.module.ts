@@ -1,7 +1,19 @@
 import { Module } from '@nestjs/common';
 import { TaskService } from './task.service';
 import { ConfigHelperService } from '../config/config-helper.service';
-import { CheckBlockchainTask, Task1Task } from './recurring';
+import {
+  ProcessNewUserRewardsTask,
+  ProcessSicxCollateralsTask,
+  ProcessAvaxCollateralsTask,
+  ProcessCrossChainCollateralsTask,
+  ProcessCrossChainLoansTask,
+  ProcessSuiCrossChainCollateralsTask,
+  ProcessDailyCheckInTask,
+  ProcessLoansTask,
+  ProcessLockedSavingsTask,
+  ProcessNewReferrersTask,
+  ProcessNewReferredTask,
+} from './recurring';
 import {
   ClickButtonTask,
   SubscribeNewsletterTask,
@@ -15,13 +27,22 @@ import { SeasonsModule } from '../collections/seasons/seasons.module';
   imports: [TasksModule, SeasonsModule],
   providers: [
     TaskService,
-    CheckBlockchainTask,
-    Task1Task,
     ClickButtonTask,
     SubscribeNewsletterTask,
     FeedTaskSeedToDbTask,
     FeedSeasonSeedToDbTask,
     ConfigHelperService,
+    ProcessNewUserRewardsTask,
+    ProcessSicxCollateralsTask,
+    ProcessAvaxCollateralsTask,
+    ProcessCrossChainCollateralsTask,
+    ProcessCrossChainLoansTask,
+    ProcessSuiCrossChainCollateralsTask,
+    ProcessDailyCheckInTask,
+    ProcessLoansTask,
+    ProcessLockedSavingsTask,
+    ProcessNewReferrersTask,
+    ProcessNewReferredTask,
   ],
   exports: [TaskService],
 })

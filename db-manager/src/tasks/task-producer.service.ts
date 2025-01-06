@@ -34,11 +34,16 @@ export class TaskProducerService implements OnModuleInit {
       );
     }
 
-    setInterval(() => {
-      this.rabbitMQService.sendToQueue(RABBITMQ_CONFIG.queues.recurringTasks, {
-        task: 'recurringTask',
-        timestamp: Date.now(),
-      });
+    setInterval(async () => {
+      // get last block on ICON chain
+      const blockHeight = await this.getLastBlockOnIconChain();
+      const props = {
+        blockHeight: blockHeight,
+      };
+      this.rabbitMQService.sendToQueue(
+        RABBITMQ_CONFIG.queues.recurringTasks,
+        props,
+      );
     }, 10000);
   }
 
@@ -47,5 +52,9 @@ export class TaskProducerService implements OnModuleInit {
       RABBITMQ_CONFIG.queues.triggeredTasks,
       task,
     );
+  }
+
+  async getLastBlockOnIconChain() {
+    return 0;
   }
 }

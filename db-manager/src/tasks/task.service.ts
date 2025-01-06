@@ -1,6 +1,18 @@
 import { Injectable } from '@nestjs/common';
 import { Logger } from '@nestjs/common';
-import { CheckBlockchainTask, Task1Task } from './recurring';
+import {
+  ProcessNewUserRewardsTask,
+  ProcessSicxCollateralsTask,
+  ProcessAvaxCollateralsTask,
+  ProcessCrossChainCollateralsTask,
+  ProcessCrossChainLoansTask,
+  ProcessSuiCrossChainCollateralsTask,
+  ProcessDailyCheckInTask,
+  ProcessLoansTask,
+  ProcessLockedSavingsTask,
+  ProcessNewReferrersTask,
+  ProcessNewReferredTask,
+} from './recurring';
 import {
   SubscribeNewsletterTask,
   ClickButtonTask,
@@ -12,23 +24,47 @@ import { TRIGGERED_TASKS_TYPES } from '../constants';
 export class TaskService {
   private readonly logger = new Logger(TaskService.name);
   constructor(
-    private readonly checkBlockchainTask: CheckBlockchainTask,
-    private readonly task1Task: Task1Task,
+    // recurring tasks
+    private readonly processNewUserRewardsTask: ProcessNewUserRewardsTask,
+    private readonly processSicxCollateralsTask: ProcessSicxCollateralsTask,
+    private readonly processAvaxCollateralsTask: ProcessAvaxCollateralsTask,
+    private readonly processCrossChainCollateralsTask: ProcessCrossChainCollateralsTask,
+    private readonly processCrossChainLoansTask: ProcessCrossChainLoansTask,
+    private readonly processSuiCrossChainCollateralsTask: ProcessSuiCrossChainCollateralsTask,
+    private readonly processDailyCheckInTask: ProcessDailyCheckInTask,
+    private readonly processLoansTask: ProcessLoansTask,
+    private readonly processLockedSavingsTask: ProcessLockedSavingsTask,
+    private readonly processNewReferrersTask: ProcessNewReferrersTask,
+    private readonly processNewReferredTask: ProcessNewReferredTask,
+
+    // triggered tasks
     private readonly subscribeNewsletterTask: SubscribeNewsletterTask,
     private readonly clickButtonTask: ClickButtonTask,
     private readonly feedTaskSeedToDbTask: FeedTaskSeedToDbTask,
     private readonly feedSeasonSeedToDbTask: FeedSeasonSeedToDbTask,
   ) {}
 
-  executeRecurringTasks() {
-    const recurringTasks = [this.checkBlockchainTask, this.task1Task];
+  executeRecurringTasks({ blockHeight }: { blockHeight: number }) {
+    const recurringTasks = [
+      this.processNewUserRewardsTask,
+      this.processSicxCollateralsTask,
+      this.processAvaxCollateralsTask,
+      this.processCrossChainCollateralsTask,
+      this.processCrossChainLoansTask,
+      this.processSuiCrossChainCollateralsTask,
+      this.processDailyCheckInTask,
+      this.processLoansTask,
+      this.processLockedSavingsTask,
+      this.processNewReferrersTask,
+      this.processNewReferredTask,
+    ];
     for (const task of recurringTasks) {
       try {
         this.logger.log({
           level: 'info',
           message: `Executing task: ${task.constructor.name}`,
         });
-        task.execute();
+        task.execute({ blockHeight });
       } catch (err) {
         this.logger.log({
           level: 'error',
@@ -39,7 +75,7 @@ export class TaskService {
     }
   }
 
-  executeTriggeredTasks(taskName: string, callbackSetPaused) {
+  executeTriggeredTasks(taskName: string, callbackSetPaused: () => void) {
     const triggeredTasks = [
       {
         label: TRIGGERED_TASKS_TYPES.subscribeNewsletter,
