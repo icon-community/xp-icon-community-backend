@@ -1,5 +1,13 @@
 import * as fs from 'fs';
 import * as path from 'path';
+import rqst from 'rqst';
+import { parseUrl } from './lib';
+import { ConfigHelperService } from '../config/config-helper.service';
+import { JsonRpcRequest } from '../shared/types/GeneralTypes';
+import { Seasons } from '../collections/seasons/seasons.interface';
+import { Logger } from '@nestjs/common';
+const logger = new Logger('utils');
+const configHelperService = new ConfigHelperService();
 
 /**
  * Search to see if a tag exists in any of the log files.
@@ -30,7 +38,6 @@ export function isTagInLogs(tag: string, folderPath: string = ''): boolean {
       }
     }
   } catch (error) {
-    // console.error('Error reading log files:', error);
     void error;
     return false;
   }
@@ -45,36 +52,176 @@ export function isTagInLogs(tag: string, folderPath: string = ''): boolean {
  * @returns The full path of the file or folder.
  */
 export function customPath(relativePath: string): string {
-  const fullPath = path.dirname(require.main.filename);
-  const fullPathArray = fullPath.split('/');
-  fullPathArray[0] = '/';
-  let MAIN_FOLDER = null;
+  try {
+    const fullPath = path.dirname(require.main.filename);
+    const fullPathArray = fullPath.split('/');
+    fullPathArray[0] = '/';
+    let MAIN_FOLDER = null;
 
-  let maxLoops = 100;
-  while (MAIN_FOLDER === null && maxLoops > 0) {
-    maxLoops--;
-    const folderPath = path.join(...fullPathArray);
-    const packageJsonPath = path.join(folderPath, 'package.json');
-    try {
-      fs.accessSync(packageJsonPath, fs.constants.F_OK);
-      const folderSplit = folderPath.split('/');
-      MAIN_FOLDER = folderSplit[folderSplit.length - 1];
-    } catch (err) {
-      void err;
-      fullPathArray.pop();
+    let maxLoops = 100;
+    while (MAIN_FOLDER === null && maxLoops > 0) {
+      maxLoops--;
+      const folderPath = path.join(...fullPathArray);
+      const packageJsonPath = path.join(folderPath, 'package.json');
+      try {
+        fs.accessSync(packageJsonPath, fs.constants.F_OK);
+        const folderSplit = folderPath.split('/');
+        MAIN_FOLDER = folderSplit[folderSplit.length - 1];
+      } catch (err) {
+        void err;
+        fullPathArray.pop();
+      }
     }
-  }
-  const parsedPath = path.parse(__filename);
-  const fullPathSplit = parsedPath.dir.split('/');
+    const parsedPath = path.parse(__filename);
+    const fullPathSplit = parsedPath.dir.split('/');
 
-  while (fullPathSplit.length > 0) {
-    if (fullPathSplit[fullPathSplit.length - 1] === MAIN_FOLDER) {
-      break;
+    while (fullPathSplit.length > 0) {
+      if (fullPathSplit[fullPathSplit.length - 1] === MAIN_FOLDER) {
+        break;
+      } else {
+        fullPathSplit.pop();
+      }
+    }
+    fullPathSplit.push(relativePath);
+
+    return fullPathSplit.join('/');
+  } catch (err) {
+    logger.log({
+      level: 'error',
+      message: `Error getting custom path. Error: ${err.message}`,
+      error: err,
+    });
+    throw new Error(err);
+  }
+}
+
+export function makeJsonRpcRequestObject(
+  method: string,
+  params = null,
+  to = 'cx0000000000000000000000000000000000000000',
+  height = null,
+  jsonRpcMethod = 'icx_call',
+  params2 = null,
+) {
+  try {
+    const obj: JsonRpcRequest = {
+      jsonrpc: '2.0',
+      method: jsonRpcMethod,
+      id: Math.ceil(Math.random() * 1000),
+    };
+
+    if (to == null) {
+      if (params2 == null) {
+        throw new Error('To and params2 cannot be null at the same time');
+      }
+      obj.params = { ...params2 };
     } else {
-      fullPathSplit.pop();
+      obj.params = {
+        to: to,
+        dataType: 'call',
+        data: {
+          method,
+        },
+      };
+      if (params !== null) {
+        obj.params.data.params = params;
+      }
     }
-  }
-  fullPathSplit.push(relativePath);
 
-  return fullPathSplit.join('/');
+    if (height !== null) {
+      if (typeof height !== 'number') {
+        throw new Error('Height must be a number');
+      } else {
+        obj.params.height = '0x' + height.toString(16);
+      }
+    }
+
+    return JSON.stringify(obj);
+  } catch (err) {
+    logger.log({
+      level: 'error',
+      message: `Error creating json rpc request object. Error: ${err.message}`,
+      error: err,
+    });
+  }
+}
+
+export async function makeJsonRpcCall(
+  data: any,
+  url: string,
+  queryMethod = rqst,
+) {
+  let query = null;
+  try {
+    const parsedUrl = parseUrl(url);
+    query = await queryMethod(
+      parsedUrl.path,
+      data,
+      parsedUrl.hostname,
+      parsedUrl.protocol == 'http' ? false : true,
+      parsedUrl.port === '' ? false : parsedUrl.port,
+    );
+
+    if (query.error == null) {
+      return query.result;
+    } else {
+      throw new Error(JSON.stringify(query.error));
+    }
+  } catch (err) {
+    logger.log({
+      level: 'error',
+      message: `Error running node request. query: ${JSON.stringify(query)}`,
+      error: err,
+    });
+    throw new Error(err);
+  }
+}
+
+/*
+ * This function tries to first fetch a block height from
+ * the main seed file, if that fails it then searches
+ * from the lowest blockStart in all the seasons in the
+ * database and returns that blockStart
+ */
+export async function getInitBlock(allSeasons: Seasons[]) {
+  // This function will try to first fetch the last block from the seed file and if that fails, it will try to fetch it from the database by
+  // looking for the active season and returning the blockStart of that season
+  // If both fail, it will return null
+  try {
+    // first try to fetch from seed file
+    const mainSeed = configHelperService.getMain();
+
+    if (mainSeed != null && mainSeed.lastBlock != null) {
+      return mainSeed.lastBlock;
+    } else {
+      throw new Error('Seed file is empty');
+    }
+  } catch (err) {
+    logger.log({
+      level: 'error',
+      message: 'Error fetching last block from seed file',
+      error: err,
+    });
+  }
+
+  try {
+    const activeSeason = allSeasons
+      .filter((season) => season.active === true)
+      .reduce((lowest, current) => {
+        return lowest.blockStart < current.blockStart ? lowest : current;
+      });
+
+    if (activeSeason != null) {
+      // if active season is found, return the blockStart
+      return activeSeason.blockStart;
+    } else {
+      throw new Error('No active season found in database');
+    }
+  } catch (err) {
+    logger.log({
+      level: 'error',
+      message: 'Error fetching last block from database',
+      error: err,
+    });
+  }
 }

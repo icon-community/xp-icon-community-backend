@@ -3,10 +3,15 @@ import { RabbitMQService } from '../rabbitmq/rabbitmq.service';
 import { RABBITMQ_CONFIG } from '../config/rabbitmq.config';
 import { TRIGGERED_TASKS_TYPES } from '../constants';
 import { TaskObject } from '../shared/types/GeneralTypes';
+import { SeasonsService } from '../collections/seasons/seasons.service';
+import { getInitBlock } from '../utils/utils';
 
 @Injectable()
 export class TaskProducerService implements OnModuleInit {
-  constructor(private readonly rabbitMQService: RabbitMQService) {}
+  constructor(
+    private readonly rabbitMQService: RabbitMQService,
+    private readonly seasonsService: SeasonsService,
+  ) {}
 
   async onModuleInit() {
     const priorityTasks = [
@@ -37,6 +42,8 @@ export class TaskProducerService implements OnModuleInit {
     setInterval(async () => {
       // get last block on ICON chain
       const blockHeight = await this.getLastBlockOnIconChain();
+      const allSeasons = await this.seasonService.getAllSeasons();
+      const lowestBlockOnDb = await getInitBlock(allSeasons);
       const props = {
         blockHeight: blockHeight,
       };
