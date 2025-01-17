@@ -104,6 +104,9 @@
         "conditionFormula": ["amount", "return amount >= 5000"]
       }
     ],
+    "config": {
+      "hardCap": 10
+    },
     "title": "referral code used",
     "rewardFormula": ["", "return 5000"],
     "chain": "icon"

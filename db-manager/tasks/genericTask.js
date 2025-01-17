@@ -441,6 +441,15 @@ async function userReferralTaskMainLogic(
         return;
       }
 
+      // After a user has accumulated X successful referrals, he won't be receiving any more XP for any additional referrals.
+      const processedReferrals = referralDocs.filter(doc => doc.referrerIsProcessed === true || doc.referrerIsProcessed === "true").length;
+      if (targetTask.config?.hardCap && processedReferrals >= targetTask.config.hardCap) {
+        console.log(`--- User ${validUser._id} has hit hard cap on referrals`);
+        return;
+      } else {
+        console.log(`--- User ${validUser._id} has not hit hard cap on referrals (${processedReferrals} / ${targetTask.config.hardCap})`);
+      }
+
       for (const referralDoc of referralDocs) {
         // if the returned document has the referrerIsProcessed field
         // set to true, do nothing and return
