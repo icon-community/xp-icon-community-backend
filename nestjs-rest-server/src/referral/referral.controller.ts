@@ -1,6 +1,6 @@
 import { Controller, Get, Param, Query, UnauthorizedException, UseGuards, ValidationPipe } from "@nestjs/common";
 import { ReferralService } from "./referral.service";
-import { Referral } from "../db/schemas/Referral.schema";
+import { IReferral } from "../db/schemas/Referral.schema";
 import { AddressValidationPipe } from "../shared/pipes/address-validation-pipe.service";
 import { FindUserReferralsQuery } from "./referral-queries";
 import { JwtAuthGuard } from "../auth/guards/jwt-auth.guard";
@@ -46,7 +46,7 @@ export class ReferralController {
       }),
     )
     query: FindUserReferralsQuery,
-  ): Promise<Referral[]> {
+  ): Promise<IReferral[]> {
     if (publicAddress != address) {
       throw new UnauthorizedException(`Unauthorized to query user ${address} data`);
     }

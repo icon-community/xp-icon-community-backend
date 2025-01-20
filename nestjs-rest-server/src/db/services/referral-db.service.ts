@@ -1,7 +1,7 @@
 import { Injectable, Logger } from "@nestjs/common";
 import { InjectModel } from "@nestjs/mongoose";
 import { Model } from "mongoose";
-import { Referral } from "../schemas/Referral.schema";
+import { IReferral } from "../schemas/Referral.schema";
 import { CreateReferralDto } from "../../referral/dto/create-referral.dto";
 import { MongoDbErrorCode } from "../../shared/models/enum/MongoDbErrorCode";
 import { Collections } from "../../shared/models/enum/Collections";
@@ -10,7 +10,7 @@ import { Collections } from "../../shared/models/enum/Collections";
 export class ReferralDbService {
   private readonly logger = new Logger(ReferralDbService.name);
 
-  constructor(@InjectModel(Collections.REFERRALS) private referralModel: Model<Referral>) {}
+  constructor(@InjectModel(Collections.REFERRALS) private readonly referralModel: Model<IReferral>) {}
 
   async createReferral(referral: CreateReferralDto): Promise<boolean> {
     try {
@@ -29,7 +29,7 @@ export class ReferralDbService {
     }
   }
 
-  async getUserReferrals(address: string): Promise<Referral[]> {
+  async getUserReferrals(address: string): Promise<IReferral[]> {
     try {
       return this.referralModel
         .find({
@@ -44,7 +44,7 @@ export class ReferralDbService {
     }
   }
 
-  async getUserReferralsForPeriod(address: string, start: Date, end: Date): Promise<Referral[]> {
+  async getUserReferralsForPeriod(address: string, start: Date, end: Date): Promise<IReferral[]> {
     try {
       return this.referralModel
         .find({

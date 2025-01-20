@@ -1,11 +1,12 @@
 import { BadRequestException, Injectable, InternalServerErrorException } from "@nestjs/common";
 import { Types } from "mongoose";
 import { CreateReferralDto } from "./dto/create-referral.dto";
-import { Referral } from "../db/schemas/Referral.schema";
+import { IReferral } from "../db/schemas/Referral.schema";
 import { UsersDbService } from "../db/services/users-db.service";
 import { ReferralDbService } from "../db/services/referral-db.service";
 import { formatReferral } from "../shared/utils/mapper";
 import { ReferralDto } from "./dto/referral.dto";
+import { SeasonLabel } from "src/shared/models/enum/SeasonLabel";
 
 @Injectable()
 export class ReferralService {
@@ -18,16 +19,25 @@ export class ReferralService {
     return (await this.referralDb.getUserReferrals(address)).map((v) => formatReferral(v));
   }
 
-  findAllUserReferralsForPeriod(address: string, start: Date, end: Date): Promise<Referral[]> {
+  findAllUserReferralsForPeriod(address: string, start: Date, end: Date): Promise<IReferral[]> {
     return this.referralDb.getUserReferralsForPeriod(address, start, end);
   }
 
-  async createUserReferral(referralCode: string, publicAddress: string, referredId: Types.ObjectId): Promise<void> {
+  async createUserReferral(
+    referralCode: string,
+    seasonLabel: SeasonLabel,
+    publicAddress: string,
+    referredId: Types.ObjectId,
+  ): Promise<void> {
     // find referrer user
     const referrerUser = await this.userDb.getUsersByReferralCode(referralCode);
 
     if (!referrerUser) {
       throw new BadRequestException(`Failed to find referral user for ${referralCode} code.`);
+    }
+
+    if (referredId.toString().toLowerCase() === referrerUser._id.toString().toLowerCase()) {
+      throw new BadRequestException("Referrer and referred user cannot be the same");
     }
 
     try {
@@ -37,6 +47,7 @@ export class ReferralService {
         referralCode: referralCode,
         referredUserAddress: publicAddress,
         referredUserId: referredId,
+        seasonLabel: seasonLabel,
       });
     } catch {
       throw new InternalServerErrorException("Failed to create referral");

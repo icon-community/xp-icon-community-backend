@@ -9,7 +9,7 @@ import { MongoDbErrorCode } from "../../shared/models/enum/MongoDbErrorCode";
 export class DailyCheckInDbService {
   private readonly logger = new Logger(DailyCheckInDbService.name);
 
-  constructor(@InjectModel(Collections.DAILY_CHECK_IN) private dailyCheckInModel: Model<IDailyCheckIn>) {}
+  constructor(@InjectModel(Collections.DAILY_CHECK_IN) private readonly dailyCheckInModel: Model<IDailyCheckIn>) {}
 
   async getUserDailyCheckIn(address: string): Promise<IDailyCheckIn | null> {
     return this.dailyCheckInModel

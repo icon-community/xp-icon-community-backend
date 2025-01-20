@@ -15,7 +15,7 @@ import { DailyCheckInDocument } from "../../db/schemas/DailyCheckIn.schema";
 import { DailyCheckinDto } from "../../daily-check-in/dto/DailyCheckinDto";
 import { SubscriberObject } from "@mailerlite/mailerlite-nodejs";
 import { MaileriteSubscriberDto } from "../../user/dto/mailerite-subscriber.dto";
-import { Referral } from "../../db/schemas/Referral.schema";
+import { IReferral } from "../../db/schemas/Referral.schema";
 import { ReferralDto } from "../../referral/dto/referral.dto";
 import { SocialProvider } from "../models/enum/SocialProvider";
 import { TaskLabel } from "../../tasks/tasks.config";
@@ -32,7 +32,7 @@ export function mapProviderToSocialTask(provider: SocialProvider): TaskLabel {
   }
 }
 
-export function formatReferral(value: Referral): ReferralDto {
+export function formatReferral(value: IReferral): ReferralDto {
   return {
     referrerUserAddress: value.referrerUserAddress,
     referredUserAddress: value.referredUserAddress,
@@ -139,8 +139,6 @@ export function formatUserDocument(user: UserDocument | null | undefined): Forma
 }
 
 export function formatSeasonDocument(season: SeasonsDocument): FormattedSeason {
-  if (!season) return season;
-
   return {
     number: season.number,
     blockStart: season.blockStart,
