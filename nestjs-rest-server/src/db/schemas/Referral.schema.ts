@@ -1,60 +1,83 @@
-import { Prop, Schema, SchemaFactory } from "@nestjs/mongoose";
+import { HydratedDocument, Schema, Types } from "mongoose";
 import { Collections } from "../../shared/models/enum/Collections";
-import { HydratedDocument, Types } from "mongoose";
+import { SeasonLabel } from "src/shared/models/enum/SeasonLabel";
 
-@Schema({
-  collection: Collections.REFERRALS,
-  autoCreate: true,
-  autoIndex: true,
-  timestamps: {
-    createdAt: true,
-  },
-})
-export class Referral {
-  @Prop({
-    type: String,
-    isRequired: true,
-    index: true,
-  })
+export interface IReferral {
   referrerUserAddress: string; // The user who owns the referral code
-
-  @Prop({
-    type: String,
-    isRequired: true,
-    unique: true,
-    index: true,
-  })
   referredUserAddress: string; // The user who was referred
-
-  @Prop({
-    type: String,
-    index: true,
-  })
   referralCode: string;
+  seasonLabel: SeasonLabel;
   createdAt: Date;
-
-  @Prop({
-    type: Types.ObjectId,
-    isRequired: true,
-    ref: Collections.USERS,
-  })
-  referrerUserId: Types.ObjectId; // Id of the user who owns the referral code
-
-  @Prop({
-    type: Types.ObjectId,
-    isRequired: true,
-    ref: Collections.USERS,
-  })
-  referredUserId: Types.ObjectId; // Id of the user who was referred
-
-  @Prop({
-    type: Boolean,
-    isRequired: true,
-    default: false,
-  })
-  referredIsProcessed: boolean; // Whether the referred User has been processed or not
-  referrerIsProcessed: boolean; // Whether the referrer User has been processed or not
+  referrerUserId: Types.ObjectId;
+  referredUserId: Types.ObjectId;
+  referrerIsProcessed: boolean;
+  referredIsProcessed: boolean;
 }
 
-export type ReferralDocument = HydratedDocument<Referral>;
-export const ReferralSchema = SchemaFactory.createForClass(Referral);
+export type ReferralDocument = HydratedDocument<IReferral>;
+export const ReferralSchema = new Schema<IReferral>(
+  {
+    referrerUserAddress: {
+      type: String,
+      index: true,
+      required: [true, "Please specify field"],
+    },
+    referredUserAddress: {
+      type: String,
+      index: true,
+      unique: true,
+      required: [true, "Please specify field"],
+      validate: {
+        validator: function (v) {
+          return v !== this.referrerUserAddress;
+        },
+        message: "referredUserAddress must be different from referrerUserAddress",
+      },
+    },
+    referralCode: {
+      type: String,
+      index: true,
+      required: [true, "Please specify field"],
+    },
+    seasonLabel: {
+      type: String,
+      enum: SeasonLabel,
+      required: [true, "Please specify field"],
+    },
+    createdAt: {
+      type: Date,
+      default: Date.now,
+    },
+    referrerUserId: {
+      type: Schema.Types.ObjectId,
+      required: [true, "Please specify field"],
+      ref: Collections.USERS,
+    },
+    referredUserId: {
+      type: Schema.Types.ObjectId,
+      unique: true,
+      required: [true, "Please specify field"],
+      ref: Collections.USERS,
+    },
+    referrerIsProcessed: {
+      type: Boolean,
+      default: false,
+      required: [true, "Please specify field"],
+    },
+    referredIsProcessed: {
+      type: Boolean,
+      default: false,
+      required: [true, "Please specify field"],
+    },
+  },
+  {
+    collection: Collections.REFERRALS,
+    timestamps: {
+      createdAt: true,
+    },
+    autoCreate: true,
+    autoIndex: true,
+  },
+);
+
+ReferralSchema.index({ referredUserId: 1, seasonLabel: 1 }, { unique: true });

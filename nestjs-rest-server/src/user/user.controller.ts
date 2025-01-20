@@ -4,6 +4,7 @@ import {
   Get,
   HttpException,
   InternalServerErrorException,
+  Logger,
   NotFoundException,
   Param,
   Post,
@@ -25,11 +26,13 @@ import { LinkSocialDataDto } from "./dto/link-social-data.dto";
 import { LinkWalletDto } from "./dto/link-wallet.dto";
 import { RegisterSeasonDto } from "./dto/register-season.dto";
 import { SubscribeHanaNewsletterDto } from "./dto/subscribe-hana-newsletter.dto";
-import { EmailQueryParam } from "./user-queries";
+import { EmailQueryParam, ReferralQueryParam } from "./user-queries";
 import { MaileriteSubscriberDto } from "./dto/mailerite-subscriber.dto";
 
 @Controller("user")
 export class UserController {
+  private readonly logger = new Logger(UserController.name);
+
   constructor(private readonly userService: UserService) {}
 
   @Get("/hana-newsletter/subscriber")
@@ -48,7 +51,7 @@ export class UserController {
       if (e instanceof NotFoundException) {
         throw e;
       } else {
-        console.error(e);
+        this.logger.error(e);
         throw new InternalServerErrorException(e.message);
       }
     }
@@ -83,9 +86,9 @@ export class UserController {
   @UsePipes(new ValidationPipe())
   async register(
     @UserAddress() publicAddress: string,
-    @Query("referralCode") referralCode?: string,
+    @Query(new ValidationPipe()) referralQueryParam: ReferralQueryParam,
   ): Promise<UserResponseDto> {
-    return this.userService.registerUser(publicAddress, referralCode);
+    return this.userService.registerUser(publicAddress, referralQueryParam);
   }
 
   @Post("/register-season")
@@ -157,7 +160,7 @@ export class UserController {
       if (e instanceof NotFoundException) {
         throw e;
       } else {
-        console.error(e);
+        this.logger.error(e);
         throw new InternalServerErrorException(e.message);
       }
     }
@@ -194,9 +197,14 @@ export class UserController {
     try {
       return { code: await this.userService.getUserReferralCode(publicAddress) };
     } catch (e) {
-      throw new InternalServerErrorException({
-        error: e.message,
-      });
+      this.logger.error(e);
+      if (e instanceof HttpException) {
+        throw e;
+      } else {
+        throw new InternalServerErrorException({
+          error: e.message,
+        });
+      }
     }
   }
 }

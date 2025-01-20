@@ -18,6 +18,7 @@ const {
   updateOrCreateUserTask,
   getUserTasksBySeasonAndUserId,
 } = userTaskService;
+const config = require("../common/utils/config");
 
 async function genericTask(taskInput, db, seedId, callback) {
   const { height, prepTerm } = taskInput;
@@ -304,11 +305,11 @@ async function userReferralTaskMainLogic(
       // the one using a referral code
       //
       // with the validUser._id fetch all the documents
-      // in the referral collection on which this user
-      // is the referred and the referredIsProcessed
-      // field is false
-      const referralDocs = await referralService.getReferralByReferredId(
+      // in the referral collection of this season on which this user
+      // is the referred and the referredIsProcessed field is false
+      const referralDocs = await referralService.getReferralByReferredIdAndSeason(
         validUser._id,
+        config.seasonsRoutes[activeSeason.number],
         db.connection,
       );
 
@@ -324,8 +325,7 @@ async function userReferralTaskMainLogic(
       // if the returned document has the referredIsProcessed field
       // set to true, do nothing and return
       if (
-        referralDocs[0].referredIsProcessed === true ||
-        referralDocs[0].referredIsProcessed === "true"
+        referralDocs[0].referredIsProcessed === true || referralDocs[0].referredIsProcessed === "true"
       ) {
         console.log(
           `--- Referral document (${referralDocs[0]._id}) for user ${validUser._id} (referred) has already been processed`,
@@ -427,8 +427,9 @@ async function userReferralTaskMainLogic(
       // in the referral collection on which this user
       // is the referrer and the referrerIsProcessed
       // field is false
-      const referralDocs = await referralService.getReferralByReferrerId(
+      const referralDocs = await referralService.getReferralByReferrerIdAndSeason(
         validUser._id,
+        config.seasonsRoutes[activeSeason.number],
         db.connection,
       );
 

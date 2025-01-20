@@ -47,6 +47,7 @@ import { TasksService } from "../tasks/tasks.service";
 import { XpgoConfigService } from "../config/xpgo-config.service";
 import { retry } from "../shared/utils/general-util";
 import { MaileriteSubscriberDto } from "./dto/mailerite-subscriber.dto";
+import { ReferralQueryParam } from "./user-queries";
 
 @Injectable()
 export class UserService {
@@ -259,7 +260,7 @@ export class UserService {
     return referralCode;
   }
 
-  async registerUser(publicAddress: string, referralCode?: string): Promise<UserResponseDto> {
+  async registerUser(publicAddress: string, referralQueryParam: ReferralQueryParam): Promise<UserResponseDto> {
     try {
       const createUserDto: CreateUserDto = {
         walletAddress: publicAddress,
@@ -270,9 +271,14 @@ export class UserService {
       const rawUser = await this.userDb.createUser(createUserDto);
 
       // handle referral after user creation
-      if (referralCode) {
+      if (referralQueryParam.referralCode && referralQueryParam.seasonLabel) {
         try {
-          await this.referralService.createUserReferral(referralCode, publicAddress, rawUser._id);
+          await this.referralService.createUserReferral(
+            referralQueryParam.referralCode,
+            referralQueryParam.seasonLabel,
+            publicAddress,
+            rawUser._id,
+          );
         } catch {
           // gracefully log an error but do not throw
           this.logger.error("Failed to create referral");

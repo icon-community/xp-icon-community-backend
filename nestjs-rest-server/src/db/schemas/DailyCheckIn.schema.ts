@@ -27,5 +27,7 @@ export const DailyCheckInSchema = new Schema<IDailyCheckIn>(
   },
   {
     collection: Collections.DAILY_CHECK_IN,
+    autoCreate: true,
+    autoIndex: true,
   },
 );
