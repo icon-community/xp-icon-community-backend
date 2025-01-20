@@ -1,37 +1,82 @@
-import { makeJsonRpcRequestObject, makeJsonRpcCall } from './utils';
+import {
+  makeJsonRpcCall,
+  makeIcxGetBalanceRequestObject,
+  makeJsonRpcRequestTemplate,
+  makeIcxCallRequestObject,
+} from './utils';
 import { isXChainWallet } from './lib';
 import { ICON_CHAIN_INFO } from '../constants';
 import { Logger } from '@nestjs/common';
+import {
+  LastBlockDto,
+  GetNetworkInfoDto,
+  GetPRepTermDto,
+  GetAccountPositionsDto,
+} from '../shared/dto/json-rpc-services.dto';
+import {
+  StandingTokensDataEnum,
+  TokensEnum,
+} from '../shared/enum/general-enum';
+import { validate } from 'class-validator';
 
 const logger = new Logger('json-rpc-services');
 
-export async function getNetworkInfo(height = null) {
+export async function getNetworkInfo(
+  height = null,
+): Promise<GetNetworkInfoDto | null> {
   try {
-    const requestObj = makeJsonRpcRequestObject(
+    const requestObj = makeIcxCallRequestObject(
       'getNetworkInfo',
       null,
       ICON_CHAIN_INFO.mainnet.contracts.chain,
       height,
     );
-    return await makeJsonRpcCall(requestObj, config.jvm.default.rpc);
+    const response = await makeJsonRpcCall(
+      requestObj,
+      ICON_CHAIN_INFO.mainnet.rpc,
+    );
+
+    const result = Object.assign(new GetNetworkInfoDto(), response);
+    const errors = await validate(result);
+
+    if (errors.length > 0) {
+      throw new Error(`Invalid Api response. ${JSON.stringify(errors)}`);
+    }
+
+    return result;
   } catch (err) {
     logger.log({
       level: 'error',
-      message: 'Error making getNetworkInfo request',
+      message: `Error making getNetworkInfo request. ${err.message}`,
       error: err,
     });
   }
 }
 
-export async function getPRepTerm(height = null) {
+export async function getPRepTerm(
+  height = null,
+): Promise<GetPRepTermDto | null> {
   try {
-    const requestObj = makeJsonRpcRequestObject(
+    const requestObj = makeIcxCallRequestObject(
       'getPRepTerm',
       null,
-      config.jvm.default.contracts.chain,
+      ICON_CHAIN_INFO.mainnet.contracts.chain,
       height,
     );
-    return await makeJsonRpcCall(requestObj, config.jvm.default.rpc);
+    const response = await makeJsonRpcCall(
+      requestObj,
+      ICON_CHAIN_INFO.mainnet.rpc,
+    );
+
+    const result = Object.assign(new GetPRepTermDto(), response);
+
+    const errors = await validate(result);
+
+    if (errors.length > 0) {
+      throw new Error(`Invalid Api response. ${JSON.stringify(errors)}`);
+    }
+
+    return result;
   } catch (err) {
     logger.log({
       level: 'error',
@@ -96,9 +141,9 @@ export async function getAccountPositions(
   _owner: string,
   height: number | null = null,
   contract = ICON_CHAIN_INFO.mainnet.contracts.balanced.loans,
-) {
+): Promise<GetAccountPositionsDto | null> {
   try {
-    const requestObj = makeJsonRpcRequestObject(
+    const requestObj = makeIcxCallRequestObject(
       'getAccountPositions',
       {
         _owner: _owner,
@@ -106,7 +151,20 @@ export async function getAccountPositions(
       contract,
       height,
     );
-    return await makeJsonRpcCall(requestObj, ICON_CHAIN_INFO.mainnet.rpc);
+    const response = await makeJsonRpcCall(
+      requestObj,
+      ICON_CHAIN_INFO.mainnet.rpc,
+    );
+
+    const result = Object.assign(new GetAccountPositionsDto(), response);
+
+    const errors = await validate(result);
+
+    if (errors.length > 0) {
+      throw new Error(`Invalid Api response. ${JSON.stringify(errors)}`);
+    }
+
+    return result;
   } catch (err) {
     logger.log({
       level: 'error',
@@ -120,9 +178,9 @@ export async function getAccountPositions(
 export async function getDataFromStandings(
   wallet: string,
   token: string,
-  data: any,
+  data: StandingTokensDataEnum,
   height: number | null,
-) {
+): Promise<number | null> {
   try {
     const position = await getAccountPositions(wallet, height);
 
@@ -133,11 +191,6 @@ export async function getDataFromStandings(
     }
     return parseInt(position.standings[token][data], 16) / 10 ** 18;
   } catch (err) {
-    logger.log({
-      level: 'error',
-      message: `Error getting ${data} value for ${token}`,
-      error: err,
-    });
     const str = [
       'does not have a position in Balanced',
       'not found in standings',
@@ -147,6 +200,11 @@ export async function getDataFromStandings(
         return 0;
       }
     }
+    logger.log({
+      level: 'error',
+      message: `Error getting ${data} value for ${token}`,
+      error: err,
+    });
     throw new Error(err.message);
   }
 }
@@ -155,7 +213,7 @@ export async function getSumOfEntryFromStandings(
   wallet: string,
   entry: string,
   height: number | null,
-) {
+): Promise<number | null> {
   try {
     if (wallet == null) {
       throw new Error('null wallet');
@@ -170,11 +228,6 @@ export async function getSumOfEntryFromStandings(
 
     return sum;
   } catch (err) {
-    logger.log({
-      level: 'error',
-      message: `Error getting sum of ${entry} for wallet ${wallet}`,
-      error: err,
-    });
     const str = [
       'does not have a position in Balanced',
       'not found in standings',
@@ -184,6 +237,11 @@ export async function getSumOfEntryFromStandings(
         return 0;
       }
     }
+    logger.log({
+      level: 'error',
+      message: `Error getting sum of ${entry} for wallet ${wallet}`,
+      error: err,
+    });
     throw new Error(err.message);
   }
 }
@@ -191,11 +249,11 @@ export async function getSumOfEntryFromStandings(
 export async function getTotalDebtInUSDValue(
   wallet: string,
   height: number | null,
-) {
+): Promise<number | null> {
   try {
     return await getSumOfEntryFromStandings(
       wallet,
-      'total_debt_in_USD',
+      StandingTokensDataEnum.total_debt_in_USD,
       height,
     );
   } catch (err) {
@@ -211,11 +269,11 @@ export async function getTotalDebtInUSDValue(
 export async function getTotalCollateralInUSDValue(
   wallet: string,
   height: number | null,
-) {
+): Promise<number | null> {
   try {
     return await getSumOfEntryFromStandings(
       wallet,
-      'collateral_in_USD',
+      StandingTokensDataEnum.collateral_in_USD,
       height,
     );
   } catch (err) {
@@ -231,7 +289,7 @@ export async function getTotalCollateralInUSDValue(
 export async function getXChainDebtInUSDValue(
   wallet: string,
   height: number | null,
-) {
+): Promise<number | null> {
   try {
     if (!isXChainWallet(wallet)) {
       throw new Error('wallet is not an XChain wallet');
@@ -250,7 +308,7 @@ export async function getXChainDebtInUSDValue(
 export async function getXChainCollateralInUSDValue(
   wallet: string,
   height: number | null,
-) {
+): Promise<number | null> {
   try {
     if (!isXChainWallet(wallet)) {
       throw new Error('wallet is not an XChain wallet');
@@ -269,45 +327,71 @@ export async function getXChainCollateralInUSDValue(
 export async function getSicxDebtInUSDValue(
   wallet: string,
   height: number | null,
-) {
-  return getDataFromStandings(wallet, 'sICX', 'total_debt_in_USD', height);
+): Promise<number | null> {
+  return await getDataFromStandings(
+    wallet,
+    TokensEnum.sICX,
+    StandingTokensDataEnum.total_debt_in_USD,
+    height,
+  );
 }
 
 export async function getAVAXCollateralInUSDValue(
   wallet: string,
   height: number | null,
-) {
-  return getDataFromStandings(wallet, 'AVAX', 'collateral_in_USD', height);
+): Promise<number | null> {
+  return await getDataFromStandings(
+    wallet,
+    TokensEnum.AVAX,
+    StandingTokensDataEnum.collateral_in_USD,
+    height,
+  );
 }
 
 export async function getSICXCollateralInUSDValue(
   wallet: string,
   height: number | null,
-) {
-  return getDataFromStandings(wallet, 'sICX', 'collateral_in_USD', height);
+): Promise<number | null> {
+  return await getDataFromStandings(
+    wallet,
+    TokensEnum.sICX,
+    StandingTokensDataEnum.collateral_in_USD,
+    height,
+  );
 }
 
 export async function getSuiXChainDebtInUSDValue(
   wallet: string,
   height: number | null,
-) {
-  return getDataFromStandings(wallet, 'SUI', 'total_debt_in_USD', height);
+): Promise<number | null> {
+  return await getDataFromStandings(
+    wallet,
+    TokensEnum.SUI,
+    StandingTokensDataEnum.total_debt_in_USD,
+    height,
+  );
 }
 
 export async function getSuiXChainCollateralInUSDValue(
   wallet: string,
   height: number | null,
-) {
-  return getDataFromStandings(wallet, 'SUI', 'collateral_in_USD', height);
+): Promise<number | null> {
+  return await getDataFromStandings(
+    wallet,
+    TokensEnum.SUI,
+    StandingTokensDataEnum.collateral_in_USD,
+    height,
+  );
 }
 
 export async function getLockedAmount(
   user: string,
   height: number | null = null,
   contract = ICON_CHAIN_INFO.mainnet.contracts.balanced.savings,
-) {
+): Promise<string | null> {
+  const typeOfValidErrors = ['null response from saving rates contract'];
   try {
-    const requestObj = makeJsonRpcRequestObject(
+    const requestObj = makeIcxCallRequestObject(
       'getLockedAmount',
       {
         user: user,
@@ -322,9 +406,14 @@ export async function getLockedAmount(
     if (response != null) {
       return response;
     } else {
-      throw new Error('null response from saving rates contract');
+      throw new Error(typeOfValidErrors[0]);
     }
   } catch (err) {
+    for (let i = 0; i < typeOfValidErrors.length; i++) {
+      if (err.message.includes(typeOfValidErrors[i])) {
+        return '0x0';
+      }
+    }
     logger.log({
       level: 'error',
       message: 'Error making getLockedAmount request',
@@ -337,65 +426,31 @@ export async function getLockedAmount(
 export async function getLockedAmountAsDecimal(
   wallet: string,
   height: number | null,
-) {
+): Promise<number | null> {
+  const typeOfValidErrors = [
+    'Error parsing locked amount to number',
+    'null response from saving rates contract',
+  ];
   try {
     const response = await getLockedAmount(wallet, height);
-    return parseInt(response, 16) / 10 ** 18;
+    const parsedAsNumber = parseInt(response, 16) / 10 ** 18;
+    if (Number.isNaN(parsedAsNumber)) {
+      throw new Error(typeOfValidErrors[0]);
+    }
+
+    return parsedAsNumber;
   } catch (err) {
     logger.log({
       level: 'error',
       message: 'Error getting locked amount in USD value',
       error: err,
     });
-    const str = 'null response from saving rates contract';
-    if (err.message.includes(str)) {
-      return 0;
-    } else {
-      throw new Error(err.message);
+    for (let i = 0; i < typeOfValidErrors.length; i++) {
+      if (err.message.includes(typeOfValidErrors[i])) {
+        return 0;
+      }
     }
-  }
-}
-
-export async function getUsersList(
-  height: number | null = null,
-  contract = ICON_CHAIN_INFO.mainnet.contracts.registrationBook,
-) {
-  try {
-    const requestObj = makeJsonRpcRequestObject(
-      'getUsersList',
-      null,
-      contract,
-      height,
-    );
-    return await makeJsonRpcCall(requestObj, config.jvm.default.rpc);
-  } catch (err) {
-    logger.log({
-      level: 'error',
-      message: 'Error making getUsersList request',
-      error: err,
-    });
-  }
-}
-
-export async function getUserRegistrationBlock(
-  user: string,
-  height: number | null = null,
-  contract = ICON_CHAIN_INFO.mainnet.contracts.registrationBook,
-) {
-  try {
-    const requestObj = makeJsonRpcRequestObject(
-      'getUserRegistrationBlock',
-      { user: user },
-      contract,
-      height,
-    );
-    return await makeJsonRpcCall(requestObj, config.jvm.default.rpc);
-  } catch (err) {
-    logger.log({
-      level: 'error',
-      message: 'Error making getUserRegistrationBlock request',
-      error: err,
-    });
+    throw new Error(err.message);
   }
 }
 
@@ -404,21 +459,60 @@ export async function getIcxBalance(
   height: number | null = null,
 ) {
   try {
-    const requestObj = makeJsonRpcRequestObject(
-      null,
-      null,
-      null,
-      height,
-      'icx_getBalance',
-      { address: wallet },
+    const requestObj = makeIcxGetBalanceRequestObject(wallet, height);
+
+    const response = await makeJsonRpcCall(
+      requestObj,
+      ICON_CHAIN_INFO.mainnet.rpc,
     );
-    const response = makeJsonRpcCall(requestObj, config.jvm.default.rpc);
 
     return response;
   } catch (err) {
     logger.log({
       level: 'error',
       message: 'Error making icx_getBalance request',
+      error: err,
+    });
+  }
+}
+
+export async function getLastBlock(): Promise<LastBlockDto | null> {
+  try {
+    const requestObj = JSON.stringify(
+      makeJsonRpcRequestTemplate('icx_getLastBlock'),
+    );
+    const response = await makeJsonRpcCall(
+      requestObj,
+      ICON_CHAIN_INFO.mainnet.rpc,
+    );
+
+    return response;
+  } catch (err) {
+    logger.log({
+      level: 'error',
+      message: 'Error making icx_getLastBlock request',
+      error: err,
+    });
+  }
+}
+
+export async function getBlockByHeight(
+  height: number | string,
+): Promise<LastBlockDto | null> {
+  try {
+    const requestObj = makeJsonRpcRequestTemplate('icx_getBlockByHeight');
+    requestObj.params = { height: height };
+
+    const response = await makeJsonRpcCall(
+      JSON.stringify(requestObj),
+      ICON_CHAIN_INFO.mainnet.rpc,
+    );
+
+    return response;
+  } catch (err) {
+    logger.log({
+      level: 'error',
+      message: 'Error making icx_getBlockByHeight request',
       error: err,
     });
   }

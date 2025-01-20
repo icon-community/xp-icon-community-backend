@@ -42,8 +42,10 @@ export class TaskProducerService implements OnModuleInit {
     setInterval(async () => {
       // get last block on ICON chain
       const blockHeight = await this.getLastBlockOnIconChain();
-      const allSeasons = await this.seasonService.getAllSeasons();
+      const allSeasons = await this.seasonsService.findAll();
       const lowestBlockOnDb = await getInitBlock(allSeasons);
+      //TODO
+      void lowestBlockOnDb;
       const props = {
         blockHeight: blockHeight,
       };

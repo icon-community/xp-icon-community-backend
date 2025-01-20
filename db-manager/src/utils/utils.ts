@@ -95,37 +95,46 @@ export function customPath(relativePath: string): string {
   }
 }
 
-export function makeJsonRpcRequestObject(
+export function makeIcxGetBalanceRequestObject(wallet: string, height = null) {
+  const obj = makeJsonRpcRequestTemplate('icx_getBalance');
+  obj.params = { address: wallet };
+
+  if (height !== null) {
+    if (typeof height !== 'number') {
+      throw new Error('Height must be a number');
+    } else {
+      obj.params.height = '0x' + height.toString(16);
+    }
+  }
+  return JSON.stringify(obj);
+}
+
+export function makeJsonRpcRequestTemplate(method: string): JsonRpcRequest {
+  return {
+    jsonrpc: '2.0',
+    method: method,
+    id: Math.ceil(Math.random() * 1000),
+  };
+}
+
+export function makeIcxCallRequestObject(
   method: string,
   params = null,
   to = 'cx0000000000000000000000000000000000000000',
   height = null,
-  jsonRpcMethod = 'icx_call',
-  params2 = null,
 ) {
   try {
-    const obj: JsonRpcRequest = {
-      jsonrpc: '2.0',
-      method: jsonRpcMethod,
-      id: Math.ceil(Math.random() * 1000),
-    };
+    const obj = makeJsonRpcRequestTemplate('icx_call');
 
-    if (to == null) {
-      if (params2 == null) {
-        throw new Error('To and params2 cannot be null at the same time');
-      }
-      obj.params = { ...params2 };
-    } else {
-      obj.params = {
-        to: to,
-        dataType: 'call',
-        data: {
-          method,
-        },
-      };
-      if (params !== null) {
-        obj.params.data.params = params;
-      }
+    obj.params = {
+      to: to,
+      dataType: 'call',
+      data: {
+        method,
+      },
+    };
+    if (params !== null) {
+      obj.params.data.params = params;
     }
 
     if (height !== null) {
@@ -140,21 +149,17 @@ export function makeJsonRpcRequestObject(
   } catch (err) {
     logger.log({
       level: 'error',
-      message: `Error creating json rpc request object. Error: ${err.message}`,
+      message: `Error creating icx_call request object. Error: ${err.message}`,
       error: err,
     });
   }
 }
 
-export async function makeJsonRpcCall(
-  data: any,
-  url: string,
-  queryMethod = rqst,
-) {
+export async function makeJsonRpcCall(data: string, url: string) {
   let query = null;
   try {
     const parsedUrl = parseUrl(url);
-    query = await queryMethod(
+    query = await rqst(
       parsedUrl.path,
       data,
       parsedUrl.hostname,

@@ -1,6 +1,15 @@
 // imports
-import { getPRepTerm } from './json-rpc-services';
+import {
+  getPRepTerm,
+  getLastBlock,
+  getBlockByHeight,
+} from './json-rpc-services';
 import { ICON_CHAIN_INFO } from '../constants';
+import { LastBlockDto } from '../shared/dto/json-rpc-services.dto';
+import { Logger } from '@nestjs/common';
+
+//TODO remove if not needed
+void ICON_CHAIN_INFO;
 
 // Amount of block from the period end block to fetch all
 // the tasks related information.
@@ -14,27 +23,27 @@ const amountOfBlocksFromLatest = 100;
  * The class uses the JVM service to get blocks and transactions.
  * The class is designed to be run in the background.
  */
-class BlockPeriodMessageSender {
-  // Constructor for the BlockPeriodMessageSender class.
-  // jvmService: The JVM service to use for getting blocks and transactions.
-  // initBlockHeight: The initial block height to start monitoring from.
-  //                 If not provided, the monitor will start from the latest block.
-  //                 If provided, the monitor will start from the provided block height.
-  //
-  constructor(
-    jvmService,
-    tasks = [],
-    jvmBuilder,
-    initBlockHeight = null,
-    bypassTasks = false,
-  ) {
-    if (jvmService == null || tasks == null || jvmBuilder == null) {
+export default class BlockPeriodMessageSender {
+  private currentBlockHeight: number;
+  private running: boolean;
+  private timer: any;
+  private tasks: any[];
+  private latestTerm: number;
+  private amountToSleep: number;
+  private bypassTasks: boolean;
+  private tasksRunning: boolean;
+  private logger: Logger;
+
+  /**
+   * Constructor for the BlockPeriodMessageSender class.
+   */
+  constructor(tasks = [], initBlockHeight = null, bypassTasks = false) {
+    if (tasks == null) {
       throw new Error(
         'Invalid argument in BlockPeriodMessageSender constructor',
       );
     }
-    this.jvmService = jvmService;
-    this.jvmBuilder = jvmBuilder;
+    this.logger = new Logger('BlockPeriodMessageSender');
     this.currentBlockHeight = initBlockHeight;
     this.running = false;
     this.timer = null;
@@ -51,40 +60,60 @@ class BlockPeriodMessageSender {
     if (!this.running) {
       this.running = true;
       this.runLoop();
-      console.log('Background loop started.');
+      this.logger.log({
+        level: 'info',
+        message: 'Background loop started.',
+      });
     } else {
-      console.log('Background loop is already running.');
+      this.logger.log({
+        level: 'info',
+        message: 'Background loop is already running.',
+      });
     }
   }
 
-  async getBlockJvm(label = null) {
+  async getBlockJvm(
+    label: null | number | string = null,
+  ): Promise<LastBlockDto | null> {
     try {
-      const hashStart = '0x';
       if (label == null || label == 'latest') {
-        return await this.jvmService.getLastBlock().execute();
-      } else if (typeof label == 'string' && label.startsWith(hashStart)) {
-        return await this.jvmService.getBlockByHash(label).execute();
-      } else {
-        return await this.jvmService.getBlockByHeight(label).execute();
+        return await getLastBlock();
       }
+
+      if (typeof label === 'number') {
+        return await getBlockByHeight(label.toString(16));
+      }
+
+      if (Number.isNaN(parseInt(label))) {
+        throw new Error('Invalid argument in getBlockJvm');
+      }
+
+      if (typeof label === 'string') {
+        if (label.startsWith('0x')) {
+          return await getBlockByHeight(label);
+        }
+        const heightInHex = parseInt(label).toString(16);
+        return await getBlockByHeight(heightInHex);
+      }
+
+      throw new Error(`Invalid argument in getBlockJvm. ${label}`);
     } catch (err) {
-      console.log('\n> Block monitor: Error getting block on JVM chain:');
-      console.log(err);
-      // throw new Error("Error getting block on JVM chain");
+      this.logger.log({
+        level: 'error',
+        message: `Error getting block on JVM chain: ${typeof err.message === 'string' ? err.message : JSON.stringify(err.message)}`,
+        err: err,
+      });
     }
   }
 
-  async sleep(ms) {
+  async sleep(ms: number) {
     return new Promise((resolve) => setTimeout(resolve, ms));
   }
 
   async loopInnerLogic() {
     this.amountToSleep = 1000;
-    console.log(lineBreaker);
     if (this.latestTerm == null) {
-      console.log('> Executing First loop');
-    } else {
-      console.log('> Latest term set to: ', this.latestTerm);
+      this.logger.log({ level: 'info', message: 'Executing First loop' });
     }
     // On monitor start we either start from the latest block or from the value provided to this.initBlockHeight
     const height = this.currentBlockHeight;
@@ -92,23 +121,37 @@ class BlockPeriodMessageSender {
     // fetch block data. If the block is not available, wait for 1 second and try again
     const block = await this.getBlockJvm(height);
     if (block != null) {
-      console.log(`> Block (${height}) available.`);
+      this.logger.log({
+        level: 'info',
+        message: `Block (${height}) available.`,
+      });
       const prepTerm = await getPRepTerm(height);
       const seq = parseInt(prepTerm.sequence, 16);
-      console.log(`> Setting latest term to: ${seq}`);
       this.latestTerm = seq;
-      console.log(`> Calculating block of interest`);
+      this.logger.log({
+        level: 'info',
+        message: `Latest term set to: ${this.latestTerm}`,
+      });
+      this.logger.log({
+        level: 'info',
+        message: `Calculating block of interest`,
+      });
       const blockOfInterest =
         parseInt(prepTerm.endBlockHeight, 16) - amountOfBlocksFromLatest;
 
-      console.log(`> Block of interest: ${blockOfInterest}`);
+      this.logger.log({
+        level: 'info',
+        message: `Block of interest: ${blockOfInterest}`,
+      });
       if (height === blockOfInterest) {
-        console.log(
-          '> Current block is the block of interest. Proceed with tasks.',
-        );
+        this.logger.log({
+          level: 'info',
+          message:
+            'Current block is the block of interest. Proceed with tasks.',
+        });
         if (this.tasks.length > 0 && !this.bypassTasks) {
           this.tasksRunning = true;
-          console.log('> Executing tasks:');
+          this.logger.log({ level: 'info', message: 'Executing tasks' });
           for (const task of this.tasks) {
             try {
               const taskInput = {
@@ -117,23 +160,28 @@ class BlockPeriodMessageSender {
               };
               await task(taskInput);
             } catch (err) {
-              console.log(
-                '\n> (CRITICAL) Block monitor: Error executing task, will continue executing other tasks:',
-              );
-              console.log(err);
-              // throw new Error("Error executing task");
+              this.logger.log({
+                level: 'error',
+                message: `(CRITICAL) Block monitor: Error executing task, will continue executing other tasks. ${typeof err.message === 'string' ? err.message : JSON.stringify(err.message)}`,
+                error: err,
+              });
             }
           }
           this.tasksRunning = false;
         } else {
-          console.log('> No tasks to execute.');
+          this.logger.log({ level: 'info', message: 'No tasks to execute.' });
         }
-        console.log(
-          '> Setting next block to fetch to the first block of the next term',
-        );
+        this.logger.log({
+          level: 'info',
+          message:
+            'Setting next block to fetch to the first block of the next term',
+        });
         this.currentBlockHeight += amountOfBlocksFromLatest + 1;
       } else {
-        console.log('> Setting next block to fetch to the block of interest');
+        this.logger.log({
+          level: 'info',
+          message: 'Setting next block to fetch to the block of interest',
+        });
         this.currentBlockHeight = blockOfInterest;
       }
     } else {
@@ -141,22 +189,28 @@ class BlockPeriodMessageSender {
       try {
         latestBlock = await this.getBlockJvm();
         if (latestBlock != null && height != null) {
-          console.log('> Dinamically calculating amount to sleep');
+          this.logger.log({
+            level: 'info',
+            message: 'Dinamically calculating amount to sleep',
+          });
           this.amountToSleep = (height - latestBlock.height) * 1000;
         }
       } catch (err) {
-        console.log(err);
-        console.log(
-          '> Error getting latest block, Cant dinamically calculate amount to sleep. Sleep interval set to default value of 1s.',
-        );
+        this.logger.log({
+          level: 'error',
+          message: `Error getting latest block, Cant dinamically calculate amount to sleep. Sleep interval set to default value of 1s. ${typeof err.message === 'string' ? err.message : JSON.stringify(err.message)}`,
+          error: err,
+        });
         this.amountToSleep = 1000;
       }
-      console.log(
-        `> Block (${height}) not available, chain currently on block ${latestBlock.height}.`,
-      );
-      console.log('*-*-*-*-*-*-*-*-*-*-*-*-*');
-      console.log(`* > Sleeping for ${this.amountToSleep / 1000} s`);
-      console.log('*-*-*-*-*-*-*-*-*-*-*-*-*');
+      this.logger.log({
+        level: 'info',
+        message: `Block (${height}) not available, chain currently on block ${latestBlock.height}.`,
+      });
+      this.logger.log({
+        level: 'info',
+        message: `Sleeping for ${this.amountToSleep / 1000} s`,
+      });
       // Dynamic interval has been implemented so it is
       // not necessary to execute the sleep function
       // but this is left here for reference
@@ -172,9 +226,11 @@ class BlockPeriodMessageSender {
         // this will run until the tasks are completed
         // this way we avoid running task concurrently
         if (this.tasksRunning) {
-          console.log(
-            '> Tasks for previous loop are running, skipping execution of new loop.',
-          );
+          this.logger.log({
+            level: 'info',
+            message:
+              'Tasks for previous loop are running, skipping execution of new loop.',
+          });
           // resetting interval time
           this.amountToSleep = 1000;
         } else {
@@ -182,9 +238,11 @@ class BlockPeriodMessageSender {
           await this.loopInnerLogic();
         }
       } catch (err) {
-        console.log('\n> Block monitor: Unexpected Error in loopInnerLogic:');
-        console.log(err);
-        // throw new Error("Error in loopInnerLogic");
+        this.logger.log({
+          level: 'error',
+          message: `Block monitor: Unexpected Error in loopInnerLogic. ${typeof err.message === 'string' ? err.message : JSON.stringify(err.message)}`,
+          error: err,
+        });
       } finally {
         this.timer = setTimeout(this.runLoop, this.amountToSleep);
       }
@@ -198,9 +256,7 @@ class BlockPeriodMessageSender {
         clearTimeout(this.timer);
       }
       // Perform any cleanup here if needed
-      console.log('Background loop stopped.');
+      this.logger.log({ level: 'info', message: 'Background loop stopped.' });
     }
   }
 }
-
-module.exports = BlockPeriodMessageSender;
