@@ -26,7 +26,6 @@ export class SeasonController {
 
   @Post(":seasonLabel")
   @ApiParam({ name: "seasonLabel", required: true, description: "Season label", type: String })
-  @UsePipes(new ValidationPipe())
   calculateSeason(
     @Param() params: SeasonLabelParam,
     @Body() calculateSeasonReqDto: CalculateSeasonReqDto,

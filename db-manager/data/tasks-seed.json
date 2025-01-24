@@ -104,29 +104,29 @@
     "description": "One-time reward for using a referral code during registration.",
     "criteria": [
       {
-        "description": "gains the xp after the new user accumulates 5000 XP",
-        "conditionFormula": ["amount", "return amount >= 5000"]
+        "description": "gains the xp after the new user accumulates 10000 XP",
+        "conditionFormula": ["amount", "return amount >= 10000"]
       }
     ],
     "title": "use referral code",
-    "rewardFormula": ["", "return 5000"],
+    "rewardFormula": ["", "return 1000"],
     "chain": "icon"
   },
   {
     "seedId": "REFERRING_USER",
     "type": "referral",
-    "description": "Once per user using a referral code. The referrer will receive 5000 XP for each new user that uses their referral code.",
+    "description": "Once per user using a referral code. The referrer will receive 10000 XP for each new user that uses their referral code.",
     "criteria": [
       {
-        "description": "gains the xp after the new user uses the referral code and accumulates 5000 XP",
-        "conditionFormula": ["amount", "return amount >= 5000"]
+        "description": "gains the xp after the new user uses the referral code and accumulates 10000 XP",
+        "conditionFormula": ["amount", "return amount >= 10000"]
       }
     ],
     "config": {
       "hardCap": 10
     },
     "title": "referral code used",
-    "rewardFormula": ["", "return 5000"],
+    "rewardFormula": ["", "return 1000"],
     "chain": "icon"
   },
   {
@@ -153,7 +153,7 @@
     "description": "One time reward for subscribing linked email to hana newsletter",
     "criteria": [],
     "title": "hana newsletter",
-    "rewardFormula": ["amount", "return 420"],
+    "rewardFormula": ["amount", "return 3000"],
     "chain": "icon"
   },
   {

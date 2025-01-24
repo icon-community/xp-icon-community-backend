@@ -132,6 +132,7 @@ const config = {
   },
   seasonsRoutes: {
     sui: 1,
+    'growth-test-season': 2,
     // iconteam: "1",
     // ripdao: "2",
     // vybzdao: "3",
