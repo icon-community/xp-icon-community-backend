@@ -9,15 +9,16 @@ COPY package*.json ./
 # Install app dependencies
 RUN npm ci
 
+FROM builder AS prod
+
 COPY . .
 
 RUN npm run build
 
-FROM node:20
-
-COPY --from=builder /app/node_modules ./node_modules
-COPY --from=builder /app/package*.json ./
-COPY --from=builder /app/dist ./dist
-
-# 👇 new migrate and start app script
 CMD [ "node", "./dist/main.js" ]
+
+FROM builder AS dev
+
+COPY *.json ./
+
+CMD ["/bin/sh", "-c", "npm install && npm run start:dev"]
