@@ -81,6 +81,24 @@
     "chain": "icon"
   },
   {
+    "seedId": "DEPOSIT_M_SUI_COLLATERAL",
+    "type": "xchain",
+    "description": "for depositing mSUI collateral, the user will receive 1 XP per USD value of the collateral deposited that day. It will be done daily (per chain period)",
+    "criteria": [],
+    "title": "deposit mSUI crosschain collateral",
+    "rewardFormula": ["amount", "return amount * 1"],
+    "chain": "icon"
+  },
+  {
+    "seedId": "MINTING_BNUSD_M_SUI",
+    "type": "xchain",
+    "description": "for minting bnUSD on SUI by depositing mSUI as collateral, the user will receive 2 XP per bnUSD loan held per day. It will be done daily (per chain period)",
+    "criteria": [],
+    "title": "holding a mSUI loan",
+    "rewardFormula": ["amount", "return amount * 2"],
+    "chain": "icon"
+  },
+  {
     "seedId": "USING_REFERRAL_CODE",
     "type": "referral",
     "description": "One-time reward for using a referral code during registration.",

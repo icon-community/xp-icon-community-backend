@@ -2,7 +2,7 @@
   {
     "number": 1,
     "blockStart": 91775674,
-    "blockEnd": 92422451,
+    "blockEnd": 94422451,
     "active": true,
     "tasks": [
       "LOCKING_SAVINGS_RATE_ICON",
@@ -14,7 +14,9 @@
       "DAILY_CHECK_IN_SUI_COLLATERAL",
       "HANA_NEWSLETTER",
       "LINK_TWITTER_X",
-      "LINK_GOOGLE"
+      "LINK_GOOGLE",
+      "DEPOSIT_M_SUI_COLLATERAL",
+      "MINTING_BNUSD_M_SUI"
     ],
     "contract": "cx0ac2a377138d38364ae79b1553ac05cc2e911456"
   }

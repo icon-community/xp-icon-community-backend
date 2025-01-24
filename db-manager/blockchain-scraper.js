@@ -1,12 +1,12 @@
 //
-const Monitor = require("./utils/monitor");
+const Monitor = require('./utils/monitor');
 const {
   JVM_SERVICE,
   IconBuilder,
   taskRunner,
   getInitBlock,
-} = require("./common/utils/utils");
-const MainDb = require("./common/utils/mainDb");
+} = require('./common/utils/utils');
+const MainDb = require('./common/utils/mainDb');
 const {
   fetchRegisteredUsersAndUpdateDb,
   fetchSICXCollateralsAndUpdateDb,
@@ -20,11 +20,13 @@ const {
   fetchXChainCollateralsAndUpdateDb,
   fetchSuiXChainLoansAndUpdateDb,
   fetchSuiXChainCollateralsAndUpdateDb,
+  fetchMSuiXChainLoansAndUpdateDb,
+  fetchMSuiXChainCollateralsAndUpdateDb,
   fetchNewReferrersAndUpdateDb,
   fetchNewReferredAndUpdateDb,
   dailyCheckInTask,
-} = require("./tasks");
-const config = require("./common/utils/config");
+} = require('./tasks');
+const config = require('./common/utils/config');
 
 const lineBreak = config.misc.lineBreak;
 const RUN_TIME = parseInt(process.env.TIME);
@@ -48,7 +50,7 @@ async function main() {
     // to use the same seed file as production, or set it
     // to false to use the test seed file
     const seasonSeed =
-      process.env.USE_TEST_SEASON === "true"
+      process.env.USE_TEST_SEASON === 'true'
         ? config.seeds.test.season
         : config.seeds.seasons;
 
@@ -88,8 +90,8 @@ async function main() {
     }
 
     if (Number.isNaN(INIT_BLOCK_HEIGHT)) {
-      console.log("Invalid block height");
-      throw new Error("CRITICAL");
+      console.log('Invalid block height');
+      throw new Error('CRITICAL');
     }
     // Array of tasks that will be run by the monitor. these
     // task are run in the order they are added to the array
@@ -123,6 +125,16 @@ async function main() {
     tasks.push(taskRunner(fetchSuiXChainLoansAndUpdateDb, db));
 
     // Run task that fetches cross chain collaterals on SUI
+    // deposited by each user using mSUI token
+    // and updates the db
+    tasks.push(taskRunner(fetchMSuiXChainCollateralsAndUpdateDb, db));
+
+    // Run task that fetches cross chain loans on SUI
+    // deposited by each user using mSUI token
+    // and updates the db
+    tasks.push(taskRunner(fetchMSuiXChainLoansAndUpdateDb, db));
+
+    // Run task that fetches cross chain collaterals on SUI
     // deposited by each user and updates the db
     tasks.push(taskRunner(fetchSuiXChainCollateralsAndUpdateDb, db));
 
@@ -134,7 +146,7 @@ async function main() {
     tasks.push(taskRunner(fetchNewReferredAndUpdateDb, db));
 
     // Run task that fetches cross chain collaterals deposited by each user and updates the db
-    tasks.push(taskRunner(dailyCheckInTask, db, "sui"));
+    tasks.push(taskRunner(dailyCheckInTask, db, 'sui'));
 
     // create monitor instance
     monitor = new Monitor(
@@ -155,15 +167,15 @@ async function main() {
       }, RUN_TIME * 1000);
     }
   } catch (err) {
-    console.log("Error in main function");
+    console.log('Error in main function');
     console.log(err);
-    throw new Error("CRITICAL");
+    throw new Error('CRITICAL');
   }
 }
 
 // catch uncought exceptions
-process.on("uncaughtException", (err) => {
-  console.log("!!!!! Uncaught exception: ");
+process.on('uncaughtException', (err) => {
+  console.log('!!!!! Uncaught exception: ');
   console.log(err);
 
   // overall in the logic of the code a error with
@@ -182,7 +194,7 @@ process.on("uncaughtException", (err) => {
   // the season
   // TODO: this works, but it there might be a better way
   // to implemented this?, maybe?
-  if (err.message === "CRITICAL") {
+  if (err.message === 'CRITICAL') {
     if (db != null && monitor != null) {
       db.stop();
       monitor.stop();
@@ -192,7 +204,7 @@ process.on("uncaughtException", (err) => {
 });
 
 // Enable graceful stop
-process.once("SIGINT", () => {
+process.once('SIGINT', () => {
   if (db != null && monitor != null) {
     db.stop();
     monitor.stop();
@@ -200,7 +212,7 @@ process.once("SIGINT", () => {
   process.exit();
 });
 
-process.once("SIGTERM", () => {
+process.once('SIGTERM', () => {
   if (db != null && monitor != null) {
     db.stop();
     monitor.stop();
