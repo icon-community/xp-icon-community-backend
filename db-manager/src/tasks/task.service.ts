@@ -1,5 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { Logger } from '@nestjs/common';
+import { TaskInput } from '../shared/types/GeneralTypes';
 import {
   ProcessNewUserRewardsTask,
   ProcessSicxCollateralsTask,
@@ -15,11 +16,11 @@ import {
 } from './recurring';
 import {
   SubscribeNewsletterTask,
-  ClickButtonTask,
   FeedTaskSeedToDbTask,
   FeedSeasonSeedToDbTask,
 } from './triggered';
 import { TRIGGERED_TASKS_TYPES } from '../constants';
+
 @Injectable()
 export class TaskService {
   private readonly logger = new Logger(TaskService.name);
@@ -39,52 +40,66 @@ export class TaskService {
 
     // triggered tasks
     private readonly subscribeNewsletterTask: SubscribeNewsletterTask,
-    private readonly clickButtonTask: ClickButtonTask,
     private readonly feedTaskSeedToDbTask: FeedTaskSeedToDbTask,
     private readonly feedSeasonSeedToDbTask: FeedSeasonSeedToDbTask,
   ) {}
 
-  executeRecurringTasks({ blockHeight }: { blockHeight: number }) {
-    const recurringTasks = [
-      this.processNewUserRewardsTask,
-      this.processSicxCollateralsTask,
-      this.processAvaxCollateralsTask,
-      this.processCrossChainCollateralsTask,
-      this.processCrossChainLoansTask,
-      this.processSuiCrossChainCollateralsTask,
-      this.processDailyCheckInTask,
-      this.processLoansTask,
-      this.processLockedSavingsTask,
-      this.processNewReferrersTask,
-      this.processNewReferredTask,
+  async executeInitTasks() {
+    async function dummy() {}
+    const tasks = [
+      {
+        label: TRIGGERED_TASKS_TYPES.feedTaskSeedToDb,
+        callback: this.feedTaskSeedToDbTask,
+        params: [false, dummy],
+      },
+      {
+        label: TRIGGERED_TASKS_TYPES.feedSeasonSeedToDb,
+        callback: this.feedSeasonSeedToDbTask,
+        params: [false, dummy],
+      },
     ];
-    for (const task of recurringTasks) {
+    for (const task of tasks) {
       try {
         this.logger.log({
           level: 'info',
-          message: `Executing task: ${task.constructor.name}`,
+          message: `Executing task: ${task.label}`,
         });
-        task.execute({ blockHeight });
+
+        await task.callback.execute(...task.params);
       } catch (err) {
         this.logger.log({
           level: 'error',
-          message: `Error executing task: ${task.constructor.name}. Message: ${err.message}`,
+          message: `Error executing task: ${task}. Message: ${err.message}`,
           error: err,
         });
       }
     }
   }
 
-  executeTriggeredTasks(taskName: string, callbackSetPaused: () => void) {
+  async executeRecurringTasks(taskInput: TaskInput) {
+    const recurringTasks = [
+      this.processAvaxCollateralsTask,
+      this.processCrossChainCollateralsTask,
+      this.processCrossChainLoansTask,
+      this.processDailyCheckInTask,
+      this.processLoansTask,
+      this.processLockedSavingsTask,
+      this.processNewReferredTask,
+      this.processNewReferrersTask,
+      this.processNewUserRewardsTask,
+      this.processSicxCollateralsTask,
+      this.processSuiCrossChainCollateralsTask,
+    ];
+    for (const task of recurringTasks) {
+      await task.execute(taskInput);
+    }
+  }
+
+  async executeTriggeredTasks(taskName: string, callbackSetPaused: () => void) {
     const triggeredTasks = [
       {
         label: TRIGGERED_TASKS_TYPES.subscribeNewsletter,
         callback: this.subscribeNewsletterTask,
-        params: [callbackSetPaused],
-      },
-      {
-        label: TRIGGERED_TASKS_TYPES.clickButton,
-        callback: this.clickButtonTask,
         params: [callbackSetPaused],
       },
       {
@@ -127,7 +142,7 @@ export class TaskService {
             message: `Executing task: ${task.label}`,
           });
 
-          task.callback.execute(...task.params);
+          await task.callback.execute(...task.params);
           break;
         }
       } catch (err) {

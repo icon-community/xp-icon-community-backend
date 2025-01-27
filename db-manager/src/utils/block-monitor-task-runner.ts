@@ -4,12 +4,11 @@ import {
   getLastBlock,
   getBlockByHeight,
 } from './json-rpc-services';
-import { ICON_CHAIN_INFO } from '../constants';
 import { LastBlockDto } from '../shared/dto/json-rpc-services.dto';
+import { TaskInput } from '../shared/types/GeneralTypes';
 import { Logger } from '@nestjs/common';
-
-//TODO remove if not needed
-void ICON_CHAIN_INFO;
+import { getInitBlock } from './utils';
+import { Seasons } from '../collections/seasons/seasons.interface';
 
 // Amount of block from the period end block to fetch all
 // the tasks related information.
@@ -19,32 +18,35 @@ const amountOfBlocksFromLatest = 100;
 
 //TODO: REFACTOR THIS FILE
 /*
- * BlockPeriodMessageSender class to monitor the JVM chain for new blocks and transactions.
+ * BlockMonitorTaskRunner class to monitor the JVM chain for new blocks and transactions.
  * The class uses the JVM service to get blocks and transactions.
  * The class is designed to be run in the background.
  */
-export default class BlockPeriodMessageSender {
+export default class BlockMonitorTaskRunner {
   private currentBlockHeight: number;
   private running: boolean;
-  private timer: any;
-  private tasks: any[];
+  private timer: NodeJS.Timeout;
+  private tasks: Array<(input: TaskInput) => Promise<void>>;
   private latestTerm: number;
   private amountToSleep: number;
   private bypassTasks: boolean;
   private tasksRunning: boolean;
   private logger: Logger;
+  private dbSeasonGetter: () => Promise<Seasons[]>;
 
   /**
-   * Constructor for the BlockPeriodMessageSender class.
+   * Constructor for the BlockMonitorTaskRunner class.
    */
-  constructor(tasks = [], initBlockHeight = null, bypassTasks = false) {
+  constructor(
+    tasks = [],
+    dbSeasonGetter: () => Promise<Seasons[]>,
+    bypassTasks = false,
+  ) {
     if (tasks == null) {
-      throw new Error(
-        'Invalid argument in BlockPeriodMessageSender constructor',
-      );
+      throw new Error('Invalid argument in BlockMonitorTaskRunner constructor');
     }
-    this.logger = new Logger('BlockPeriodMessageSender');
-    this.currentBlockHeight = initBlockHeight;
+    this.logger = new Logger(BlockMonitorTaskRunner.name);
+    this.currentBlockHeight = null;
     this.running = false;
     this.timer = null;
     this.tasks = tasks;
@@ -52,12 +54,52 @@ export default class BlockPeriodMessageSender {
     this.amountToSleep = 1000;
     this.bypassTasks = bypassTasks;
     this.tasksRunning = false;
+    this.dbSeasonGetter = dbSeasonGetter;
 
     this.runLoop = this.runLoop.bind(this);
   }
 
-  start() {
+  async start() {
     if (!this.running) {
+      let currentLoop = 0;
+      const maxLoops = 60;
+
+      // the following loop waits for a max of 60 seconds
+      // to allow for the required initial tasks that
+      // setup the database to run completely.
+      // this approach has a potential issue, if the
+      // initial tasks take more than 60 seconds to
+      // complete the app will crash.
+      // A better implementation is to setup a way to
+      // notify when the initial tasks are completed
+      // directly from the task themselves.
+      // currently implemeting that solution has been
+      // dificult due to the separation of concerns in
+      // the task producer and task consumer
+      // TODO: figure out a way to implement a better
+      // solution for this
+      while (currentLoop < maxLoops) {
+        const seasons = await this.dbSeasonGetter();
+        this.currentBlockHeight = await getInitBlock(seasons);
+
+        if (this.currentBlockHeight == null) {
+          await this.sleep(1000);
+        } else {
+          break;
+        }
+        currentLoop++;
+      }
+
+      if (this.currentBlockHeight == null) {
+        this.logger.log({
+          level: 'error',
+          message: 'Error getting block height, cannot start background loop.',
+        });
+        throw new Error(
+          'CRITICAL: Error getting block height, cannot start background loop.',
+        );
+      }
+
       this.running = true;
       this.runLoop();
       this.logger.log({
@@ -81,7 +123,7 @@ export default class BlockPeriodMessageSender {
       }
 
       if (typeof label === 'number') {
-        return await getBlockByHeight(label.toString(16));
+        return await getBlockByHeight('0x' + label.toString(16));
       }
 
       if (Number.isNaN(parseInt(label))) {

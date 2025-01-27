@@ -4,10 +4,6 @@ import { TRIGGERED_TASKS_TYPES } from './constants';
 
 @Injectable()
 export class AppService {
-  getHello(): string {
-    return 'Hello World!';
-  }
-
   constructor(private taskProducerService: TaskProducerService) {}
 
   async subscribeNewsletter() {
@@ -15,4 +11,25 @@ export class AppService {
       taskName: TRIGGERED_TASKS_TYPES.subscribeNewsletter,
     });
   }
+
+  // TODO the following methods are for future
+  // implementation of implementing and endpoint that
+  // can be called to update the database with new data
+  // async updateTasksInDb() {
+  //   await this.taskProducerService.sendTaskToTriggeredQueue(
+  //     {
+  //       taskName: TRIGGERED_TASKS_TYPES.feedTaskSeedToDb,
+  //     },
+  //     true,
+  //   );
+  // }
+
+  // async updateSeasonsInDb() {
+  //   await this.taskProducerService.sendTaskToTriggeredQueue(
+  //     {
+  //       taskName: TRIGGERED_TASKS_TYPES.feedSeasonSeedToDb,
+  //     },
+  //     true,
+  //   );
+  // }
 }

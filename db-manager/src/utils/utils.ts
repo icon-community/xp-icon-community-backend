@@ -188,7 +188,9 @@ export async function makeJsonRpcCall(data: string, url: string) {
  * from the lowest blockStart in all the seasons in the
  * database and returns that blockStart
  */
-export async function getInitBlock(allSeasons: Seasons[]) {
+export async function getInitBlock(
+  allSeasons: Seasons[],
+): Promise<number | null> {
   // This function will try to first fetch the last block from the seed file and if that fails, it will try to fetch it from the database by
   // looking for the active season and returning the blockStart of that season
   // If both fail, it will return null
@@ -204,8 +206,7 @@ export async function getInitBlock(allSeasons: Seasons[]) {
   } catch (err) {
     logger.log({
       level: 'error',
-      message: 'Error fetching last block from seed file',
-      error: err,
+      message: `Error fetching last block from seed file. ${JSON.stringify(err.message)}`,
     });
   }
 

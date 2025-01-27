@@ -1,69 +1,92 @@
-import { Injectable, OnModuleInit } from '@nestjs/common';
+import {
+  Injectable,
+  OnModuleInit,
+  OnModuleDestroy,
+  OnApplicationShutdown,
+  Logger,
+} from '@nestjs/common';
 import { RabbitMQService } from '../rabbitmq/rabbitmq.service';
 import { RABBITMQ_CONFIG } from '../config/rabbitmq.config';
-import { TRIGGERED_TASKS_TYPES } from '../constants';
 import { TaskObject } from '../shared/types/GeneralTypes';
 import { SeasonsService } from '../collections/seasons/seasons.service';
-import { getInitBlock } from '../utils/utils';
+import BlockMonitorTaskRunner from '../utils/block-monitor-task-runner';
+import { TaskInput } from '../shared/types/GeneralTypes';
+import { TaskService } from './task.service';
 
 @Injectable()
-export class TaskProducerService implements OnModuleInit {
+export class TaskProducerService
+  implements OnModuleInit, OnModuleDestroy, OnApplicationShutdown
+{
+  private logger: Logger;
+  private blockMonitorTaskRunner: BlockMonitorTaskRunner;
+
   constructor(
     private readonly rabbitMQService: RabbitMQService,
     private readonly seasonsService: SeasonsService,
-  ) {}
-
-  async onModuleInit() {
-    const priorityTasks = [
-      {
-        task: {
-          // IMPORTANT: this should be the first task to be executed, DO NOT CHANGE THE ORDER
-          // TODO: add priority to tasks
-          taskName: TRIGGERED_TASKS_TYPES.feedTaskSeedToDb,
-        },
-        haltAllTasks: true,
-      },
-      {
-        task: {
-          taskName: TRIGGERED_TASKS_TYPES.feedSeasonSeedToDb,
-        },
-        haltAllTasks: true,
-      },
-    ];
-
-    for (const task of priorityTasks) {
-      this.rabbitMQService.sendToQueue(
-        RABBITMQ_CONFIG.queues.triggeredTasks,
-        task.task,
-        task.haltAllTasks,
-      );
-    }
-
-    setInterval(async () => {
-      // get last block on ICON chain
-      const blockHeight = await this.getLastBlockOnIconChain();
-      const allSeasons = await this.seasonsService.findAll();
-      const lowestBlockOnDb = await getInitBlock(allSeasons);
-      //TODO
-      void lowestBlockOnDb;
-      const props = {
-        blockHeight: blockHeight,
-      };
-      this.rabbitMQService.sendToQueue(
-        RABBITMQ_CONFIG.queues.recurringTasks,
-        props,
-      );
-    }, 10000);
+    private readonly taskService: TaskService,
+  ) {
+    this.logger = new Logger(TaskProducerService.name);
   }
 
-  async sendTaskToTriggeredQueue(task: TaskObject) {
+  async onModuleInit() {
+    try {
+      // execute initial tasks
+      // these tasks are required to be executed before
+      // anything else at the beggining of the application
+      // these tasks setup the initial state in the db
+      await this.taskService.executeInitTasks();
+
+      // start the block monitor task runner
+      // this will take care of execute the recurring task
+      // at the defined interval inside the block monitor
+      // task runner
+      this.blockMonitorTaskRunner = new BlockMonitorTaskRunner(
+        [this.sendTaskToRecurringQueue.bind(this)],
+        this.seasonsService.findAll.bind(this.seasonsService),
+      );
+
+      this.blockMonitorTaskRunner.start();
+    } catch (err) {
+      if (err.message.includes('CRITICAL')) {
+        this.logger.log({
+          message: err.message,
+          level: 'error',
+          timestamp: new Date(),
+        });
+        throw new Error(err.message);
+      }
+    }
+  }
+
+  private async sendTaskToRecurringQueue(task: TaskInput) {
     this.rabbitMQService.sendToQueue(
-      RABBITMQ_CONFIG.queues.triggeredTasks,
+      RABBITMQ_CONFIG.queues.recurringTasks,
       task,
     );
   }
 
-  async getLastBlockOnIconChain() {
-    return 0;
+  async sendTaskToTriggeredQueue(task: TaskObject, haltAllTasks = false) {
+    this.rabbitMQService.sendToQueue(
+      RABBITMQ_CONFIG.queues.triggeredTasks,
+      task,
+      haltAllTasks,
+    );
+  }
+
+  async onModuleDestroy() {
+    if (this.blockMonitorTaskRunner) {
+      this.blockMonitorTaskRunner.stop();
+    }
+  }
+
+  async onApplicationShutdown(signal?: string) {
+    this.logger.log({
+      level: 'warn',
+      message: `Application is shutting down with signal: ${signal}`,
+    });
+
+    if (this.blockMonitorTaskRunner) {
+      this.blockMonitorTaskRunner.stop();
+    }
   }
 }

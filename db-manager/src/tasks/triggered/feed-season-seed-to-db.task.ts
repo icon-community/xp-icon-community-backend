@@ -16,12 +16,6 @@ export class FeedSeasonSeedToDbTask {
 
   async execute(...args) {
     const [forceUpdate, callbackSetPaused] = args;
-    // const forceUpdate = false;
-    // const callbackSetPaused = (foo) => {
-    //   void foo;
-    // };
-    // console.log('args');
-    // console.log(args);
     try {
       this.logger.log({
         level: 'info',

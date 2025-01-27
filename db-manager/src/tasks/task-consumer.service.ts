@@ -22,7 +22,7 @@ export class TaskConsumerService implements OnModuleInit {
         void callback;
         this.logger.log({
           level: 'info',
-          message: `Recurring Task Executed:, ${JSON.stringify(message)}`,
+          message: `Executing recurring tasks:, ${JSON.stringify(message)}`,
         });
         this.taskService.executeRecurringTasks(message);
       },
@@ -34,7 +34,7 @@ export class TaskConsumerService implements OnModuleInit {
       async (message, callbackSetPaused) => {
         this.logger.log({
           level: 'info',
-          message: `Triggered Task Executed:, ${JSON.stringify(message)}`,
+          message: `Executing triggered tasks:, ${JSON.stringify(message)}`,
         });
         this.taskService.executeTriggeredTasks(
           message.taskName,

@@ -7,11 +7,15 @@ import { Logger } from '@nestjs/common';
 export class RabbitMQService implements OnModuleInit {
   private connection: amqp.Connection;
   private channel: amqp.Channel;
-  private logger = new Logger('RabbitMQService');
-  private paused: boolean = false;
-  private taskThatPaused: string | null = null;
+  private logger: Logger;
+  private paused: boolean;
+  private taskThatPaused: string | null;
 
-  constructor() {}
+  constructor() {
+    this.logger = new Logger(RabbitMQService.name);
+    this.paused = false;
+    this.taskThatPaused = null;
+  }
 
   setPaused = (pause: boolean) => {
     this.paused = pause;
@@ -187,4 +191,43 @@ export class RabbitMQService implements OnModuleInit {
       });
     }
   }
+
+  triggeredQueueStatus = async () => {
+    try {
+      if (!this.channel) {
+        throw new Error('Channel not created');
+      }
+
+      return await this.channel.checkQueue(
+        RABBITMQ_CONFIG.queues.triggeredTasks,
+      );
+    } catch (err) {
+      this.logger.error({
+        level: 'error',
+        message: 'Error checking triggeredTasks queue status',
+        error: err,
+      });
+    }
+  };
+
+  // Example of how to use the triggeredQueueStatus method
+  // async waitForTriggeredQueueToEmpty() {
+  //   try {
+  //     const triggeredQueueStatus = await this.triggeredQueueStatus();
+
+  //     while (triggeredQueueStatus.messageCount > 0) {
+  //       this.logger.log({
+  //         level: 'info',
+  //         message: `Waiting for ${RABBITMQ_CONFIG.queues.triggeredTasks} queue to empty`,
+  //       });
+  //       await new Promise((resolve) => setTimeout(resolve, 3000));
+  //     }
+  //   } catch (err) {
+  //     this.logger.error({
+  //       level: 'error',
+  //       message: 'Error waiting for triggeredTasks queue to empty',
+  //       error: err,
+  //     });
+  //   }
+  // }
 }

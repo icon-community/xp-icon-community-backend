@@ -16,3 +16,8 @@ export type JsonRpcRequest = {
   params?: any;
   id: number;
 };
+
+export type TaskInput = {
+  height: number;
+  prepTerm: number;
+};
