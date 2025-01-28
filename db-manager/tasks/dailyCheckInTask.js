@@ -1,5 +1,5 @@
 const {
-  getXChainCollateralInUSDValue,
+  getXChainCollateralInUSDValue, getSuiXChainCollateralInUSDValue, getmSuiXChainCollateralInUSDValue,
 } = require("../common/utils/json-rpc-services");
 const {
   userService,
@@ -174,8 +174,15 @@ async function dailyCheckInTask(taskInput, db, chain) {
           }
 
           for (const xCallAddress of allXCallAddresses) {
-            const depositedCollateralUsd =
-              await getXChainCollateralInUSDValue(xCallAddress, height);
+            let depositedCollateralUsd = 0;
+            if (xCallAddress.startsWith("sui")) {
+              depositedCollateralUsd =
+                (await getSuiXChainCollateralInUSDValue(xCallAddress, height) ?? 0) +
+                (await getmSuiXChainCollateralInUSDValue(xCallAddress, height) ?? 0);
+            } else {
+              depositedCollateralUsd = await getXChainCollateralInUSDValue(xCallAddress, height);
+            }
+
 
             if (depositedCollateralUsd && depositedCollateralUsd > 0) {
               const dailyCheckInDoc = await getUserDailyCheckIn(
