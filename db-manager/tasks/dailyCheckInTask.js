@@ -184,7 +184,7 @@ async function dailyCheckInTask(taskInput, db, chain) {
               );
 
               if (!dailyCheckInDoc ||
-                dailyCheckInDoc.length === 0 || 
+                dailyCheckInDoc.length === 0 ||
                 dailyCheckInDoc.streakCounter === 0) {
                 console.log(
                   `-- dailyCheckInDoc undefined or streakCounter is 0, skipping ${xCallAddress} --`,
@@ -193,11 +193,7 @@ async function dailyCheckInTask(taskInput, db, chain) {
               }
 
               // add collateral
-              totalDailyXp += Math.round(
-                1 +
-                (dailyCheckInDoc.streakCounter / 100) *
-                (depositedCollateralUsd / 2),
-              );
+              totalDailyXp += Math.round(depositedCollateralUsd  * (dailyCheckInDoc.streakCounter / 10));
             } else {
               console.log(`-- depositedCollateralUsd undefined or 0 --`);
             }
