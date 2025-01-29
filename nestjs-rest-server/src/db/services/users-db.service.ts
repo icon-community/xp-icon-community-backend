@@ -15,7 +15,7 @@ import { isStellarAddress, isEvmAddress, isSuiAddress } from "../../shared/utils
 export class UsersDbService {
   private readonly logger = new Logger(UsersDbService.name);
 
-  constructor(@InjectModel(Collections.USERS) private userModel: Model<IUser>) {}
+  constructor(@InjectModel(Collections.USERS) private readonly userModel: Model<IUser>) {}
 
   async createUser(user: CreateUserDto): Promise<UserDocument> {
     try {
