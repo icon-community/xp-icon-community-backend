@@ -15,9 +15,6 @@ export function sumXpTotal(arrayOfTasks: { task: { XPEarned_total_task: number }
 
 export function sumXp24hrs(
   arrayOfTasks: {
-    task: FormattedTask & {
-      XPEarned_total_task: number;
-    };
     xp: FormattedUserTask;
   }[],
 ): number {
