@@ -22,5 +22,6 @@ test-docker
 .history
 .tmp
 dev-db
+db-manager/dev-db
 dist
 rabbitmq-data

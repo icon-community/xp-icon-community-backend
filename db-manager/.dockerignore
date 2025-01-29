@@ -1,10 +1,8 @@
 .git
 .gitignore
 node_modules
-dist
 rabbitmq-data
 .tmp
-db-manager/dist
 db-manager/rabbitmq-data
 db-manager/.tmp
 db-manager/dev-db
