@@ -1,9 +1,10 @@
-import { HydratedDocument, Schema } from "mongoose";
+import { HydratedDocument, Schema, Types } from "mongoose";
 import { Chains } from "../../shared/models/enum/Chains";
 import { Collections } from "../../shared/models/enum/Collections";
 import { ChainType } from "../../shared/models/enum/ChainType";
 
 export interface ITask {
+  _id: Types.ObjectId;
   seedId: string;
   type: string;
   description: string;

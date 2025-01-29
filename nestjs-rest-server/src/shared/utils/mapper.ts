@@ -129,9 +129,7 @@ export function formatUserTaskDocuments(
   });
 }
 
-export function formatUserDocument(user: UserDocument | null | undefined): FormattedUser | null | undefined {
-  if (!user) return user;
-
+export function formatUserDocument(user: UserDocument): FormattedUser {
   return {
     // _id: user._id,
     walletAddress: user.walletAddress,
