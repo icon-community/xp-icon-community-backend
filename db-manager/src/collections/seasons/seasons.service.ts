@@ -29,4 +29,8 @@ export class SeasonsService extends BaseService<
   ): Promise<Seasons> {
     return super.update(query, updateSeasonDto);
   }
+
+  async findActiveSeasons(): Promise<Seasons[]> {
+    return this.seasonsModel.find({ active: true });
+  }
 }

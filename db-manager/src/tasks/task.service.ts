@@ -2,7 +2,6 @@ import { Injectable } from '@nestjs/common';
 import { Logger } from '@nestjs/common';
 import { TaskInput } from '../shared/types/GeneralTypes';
 import {
-  ProcessNewUserRewardsTask,
   ProcessSicxCollateralsTask,
   ProcessAvaxCollateralsTask,
   ProcessCrossChainCollateralsTask,
@@ -26,7 +25,6 @@ export class TaskService {
   private readonly logger = new Logger(TaskService.name);
   constructor(
     // recurring tasks
-    private readonly processNewUserRewardsTask: ProcessNewUserRewardsTask,
     private readonly processSicxCollateralsTask: ProcessSicxCollateralsTask,
     private readonly processAvaxCollateralsTask: ProcessAvaxCollateralsTask,
     private readonly processCrossChainCollateralsTask: ProcessCrossChainCollateralsTask,
@@ -86,7 +84,6 @@ export class TaskService {
       this.processLockedSavingsTask,
       this.processNewReferredTask,
       this.processNewReferrersTask,
-      this.processNewUserRewardsTask,
       this.processSicxCollateralsTask,
       this.processSuiCrossChainCollateralsTask,
     ];

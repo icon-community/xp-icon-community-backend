@@ -4,7 +4,6 @@ import { TaskProducerService } from './task-producer.service';
 import { TaskService } from './task.service';
 import { ConfigHelperService } from '../config/config-helper.service';
 import {
-  ProcessNewUserRewardsTask,
   ProcessSicxCollateralsTask,
   ProcessAvaxCollateralsTask,
   ProcessCrossChainCollateralsTask,
@@ -35,7 +34,6 @@ import { SeasonsModule } from '../collections/seasons/seasons.module';
     FeedTaskSeedToDbTask,
     FeedSeasonSeedToDbTask,
     ConfigHelperService,
-    ProcessNewUserRewardsTask,
     ProcessSicxCollateralsTask,
     ProcessAvaxCollateralsTask,
     ProcessCrossChainCollateralsTask,

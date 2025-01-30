@@ -1,20 +1,25 @@
 import { Injectable } from '@nestjs/common';
 import { TasksService } from '../../collections/tasks/tasks.service';
+import { SeasonsService } from '../../collections/seasons/seasons.service';
 import { ConfigHelperService } from '../../config/config-helper.service';
 import { TaskInput } from '../../shared/types/GeneralTypes';
 import { BaseTask } from '../base/base.task';
+import { RECURRING_TASKS_TYPES } from '../../constants';
 
 @Injectable()
 export class ProcessAvaxCollateralsTask extends BaseTask {
+  private readonly taskType = RECURRING_TASKS_TYPES.depositAvaxCollateral;
   constructor(
-    private readonly tasksService: TasksService,
+    tasksService: TasksService,
+    seasonsService: SeasonsService,
     private readonly configHelperService: ConfigHelperService,
   ) {
-    super();
+    super(seasonsService, tasksService);
+    this.taskType = RECURRING_TASKS_TYPES.depositAvaxCollateral;
   }
 
   async execute(taskInput: TaskInput): Promise<void> {
-    await super.execute(taskInput, this.main.bind(this));
+    await super.execute(taskInput, this.main.bind(this), this.taskType);
   }
 
   private async main(taskInput: TaskInput): Promise<void> {

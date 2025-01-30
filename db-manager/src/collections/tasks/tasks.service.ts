@@ -29,4 +29,8 @@ export class TasksService extends BaseService<
   ): Promise<Tasks> {
     return super.update(query, updateTaskDto);
   }
+
+  async findBySeedId(seedId: string): Promise<Tasks> {
+    return super.findByQuery({ seedId });
+  }
 }

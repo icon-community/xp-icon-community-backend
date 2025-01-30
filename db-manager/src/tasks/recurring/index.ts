@@ -1,4 +1,3 @@
-export { ProcessNewUserRewardsTask } from './process-new-user-rewards.task';
 export { ProcessSicxCollateralsTask } from './process-sicx-collaterals.task';
 export { ProcessAvaxCollateralsTask } from './process-avax-collaterals.task';
 export { ProcessCrossChainCollateralsTask } from './process-cross-chain-collaterals.task';

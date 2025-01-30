@@ -18,6 +18,7 @@ export const RECURRING_TASKS_TYPES = {
   dailyCheckInSui: 'DAILY_CHECK_IN_SUI_COLLATERAL',
 };
 export const TRIGGERED_TASKS_TYPES = {
+  newUser: 'NEW_USER',
   hanaNewsletter: 'HANA_NEWSLETTER',
   linkTwitterX: 'LINK_TWITTER_X',
   linkGoogle: 'LINK_GOOGLE',
