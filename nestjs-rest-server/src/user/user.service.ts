@@ -174,12 +174,18 @@ export class UserService {
       // find the user above in the rankings and initialize
       // and empty array to store the tasks of this user
       const userAbove = thisUserIndex - 1 < 0 ? null : rankings[thisUserIndex - 1].address;
-      const userAboveTasks = [];
+      const userAboveRankingData = rankings.find((userObj) => {
+        return userObj.address == userAbove;
+      });
+      const userAboveTasksXp = userAboveRankingData ? userAboveRankingData.total : null;
 
       // find the user below in the rankings and initialize
       // and empty array to store the tasks of this user
       const userBelow = thisUserIndex + 1 >= rankings.length ? null : rankings[thisUserIndex + 1].address;
-      const userBelowTasks = [];
+      const userBelowRankingData = rankings.find((userObj) => {
+        return userObj.address == userBelow;
+      });
+      const userBelowTasksXp = userBelowRankingData ? userBelowRankingData.total : null;
 
       for (let i = 0; i < seasonTasks.length; i++) {
         const taskFromDb = seasonTasks[i];
@@ -187,28 +193,6 @@ export class UserService {
         if (taskFromDb == null) {
           this.logger.log("Task not found");
           continue;
-        }
-
-        if (userAbove != null) {
-          const totalXp = rankings.find((userObj) => {
-            return userObj.address == userAbove;
-          });
-          userAboveTasks.push({
-            task: {
-              XPEarned_total_task: totalXp == null ? 0 : totalXp.total,
-            },
-          });
-        }
-
-        if (userBelow != null) {
-          const totalXp = rankings.find((userObj) => {
-            return userObj.address == userBelow;
-          });
-          userBelowTasks.push({
-            task: {
-              XPEarned_total_task: totalXp == null ? 0 : totalXp.total,
-            },
-          });
         }
 
         const userTaskTemplate = {
@@ -243,21 +227,24 @@ export class UserService {
         });
       }
 
-      return {
+      const result = {
         user: formattedUser,
         season: {
           ...formattedSeason,
           Rank: thisUserIndex + 1,
           Address_above: userAbove,
           Address_below: userBelow,
-          Address_above_XP: sumXpTotal(userAboveTasks),
-          Address_below_XP: sumXpTotal(userBelowTasks),
+          Address_above_XP: userAboveTasksXp,
+          Address_below_XP: userBelowTasksXp,
           XPEarned_total: sumXpTotal(tasks),
           XPEarned_24hrs: sumXp24hrs(tasks),
           tasks: tasks,
         },
       };
-    } catch {
+
+      return result;
+    } catch (err) {
+      this.logger.error(err);
       return new InternalServerErrorException("Failed to get user by season");
     }
   }
