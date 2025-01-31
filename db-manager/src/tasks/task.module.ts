@@ -21,9 +21,10 @@ import {
 } from './triggered';
 import { TasksModule } from '../collections/tasks/tasks.module';
 import { SeasonsModule } from '../collections/seasons/seasons.module';
+import { UsersModule } from '../collections/users/users.module';
 
 @Module({
-  imports: [TasksModule, SeasonsModule],
+  imports: [TasksModule, SeasonsModule, UsersModule],
   providers: [
     TaskService,
     ClickButtonTask,

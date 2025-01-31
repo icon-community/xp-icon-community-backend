@@ -23,9 +23,10 @@ import {
 } from './triggered';
 import { TasksModule } from '../collections/tasks/tasks.module';
 import { SeasonsModule } from '../collections/seasons/seasons.module';
+import { UsersModule } from '../collections/users/users.module';
 
 @Module({
-  imports: [RabbitMQModule, TasksModule, SeasonsModule],
+  imports: [RabbitMQModule, TasksModule, SeasonsModule, UsersModule],
   providers: [
     TaskProducerService,
     TaskService,

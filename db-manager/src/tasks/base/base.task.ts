@@ -2,16 +2,24 @@ import { Logger } from '@nestjs/common';
 import { TaskInput } from '../../shared/types/GeneralTypes';
 import { SeasonsService } from '../../collections/seasons/seasons.service';
 import { TasksService } from '../../collections/tasks/tasks.service';
+import { UsersService } from '../../collections/users/users.service';
+import { Types } from 'mongoose';
 
 export class BaseTask {
   private readonly logger: Logger;
   protected readonly seasonsService: SeasonsService;
   protected readonly tasksService: TasksService;
+  protected readonly usersService: UsersService;
 
-  constructor(seasonsService: SeasonsService, tasksService: TasksService) {
+  constructor(
+    seasonsService: SeasonsService,
+    tasksService: TasksService,
+    usersService: UsersService,
+  ) {
     this.logger = new Logger(this.constructor.name);
     this.seasonsService = seasonsService;
     this.tasksService = tasksService;
+    this.usersService = usersService;
   }
 
   async execute(
@@ -68,6 +76,13 @@ export class BaseTask {
           });
           return;
         }
+
+        // Fetch all the users in this season
+        const allUsers = await this.usersService.findUsersBySeason(
+          new Types.ObjectId(season._id.toString()),
+        );
+        console.log('allUsers');
+        console.log(allUsers);
 
         //TODO: continue
         // Execute custom task logic from child class

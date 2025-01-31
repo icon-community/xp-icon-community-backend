@@ -1,6 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { TasksService } from '../../collections/tasks/tasks.service';
 import { SeasonsService } from '../../collections/seasons/seasons.service';
+import { UsersService } from '../../collections/users/users.service';
 import { ConfigHelperService } from '../../config/config-helper.service';
 import { TaskInput } from '../../shared/types/GeneralTypes';
 import { BaseTask } from '../base/base.task';
@@ -12,9 +13,10 @@ export class ProcessSuiCrossChainCollateralsTask extends BaseTask {
   constructor(
     tasksService: TasksService,
     seasonsService: SeasonsService,
+    usersService: UsersService,
     private readonly configHelperService: ConfigHelperService,
   ) {
-    super(seasonsService, tasksService);
+    super(seasonsService, tasksService, usersService);
     this.taskType = RECURRING_TASKS_TYPES.depositNativeSui;
   }
 
