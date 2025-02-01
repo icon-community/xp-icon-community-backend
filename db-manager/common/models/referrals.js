@@ -2,6 +2,7 @@
 const mongoose = require("mongoose");
 const { Schema } = mongoose;
 const config = require("../utils/config");
+const COLLECTION_NAME = config.collections.referrals;
 
 /*
  * Referrals schema
@@ -22,7 +23,8 @@ const referralSchema = new Schema(
         validator: function (v) {
           return v !== this.referrerUserAddress;
         },
-        message: "referredUserAddress must be different from referrerUserAddress",
+        message:
+          "referredUserAddress must be different from referrerUserAddress",
       },
     },
     referralCode: {
@@ -67,9 +69,9 @@ const referralSchema = new Schema(
     autoCreate: true,
     autoIndex: true,
   },
+  { collection: COLLECTION_NAME },
 );
 
 referralSchema.index({ referredUserId: 1, seasonLabel: 1 }, { unique: true });
-
 
 module.exports = referralSchema;

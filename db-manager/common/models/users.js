@@ -1,8 +1,8 @@
-//
-
 // Imports
 const mongoose = require("mongoose");
+const config = require("../utils/config");
 const { Schema } = mongoose;
+const COLLECTION_NAME = config.collections.users;
 
 const season = new Schema({
   seasonId: {
@@ -35,35 +35,37 @@ const linkedWallet = new Schema({
 /*
  * User schema
  */
-const userSchema = new Schema({
-  walletAddress: {
-    type: String,
-    unique: true,
-    index: true,
-    required: [true, "Please specify field"],
-  },
-  linkedWallets: {
-    type: [linkedWallet],
-    default: [],
-    validate: {
-      validator: function (wallets) {
-        const addresses = wallets.map((wallet) => wallet.address);
-        return addresses.length === new Set(addresses).size;
-      },
-      message: "Address in linkedWallets must be unique",
+const userSchema = new Schema(
+  {
+    walletAddress: {
+      type: String,
+      unique: true,
+      index: true,
+      required: [true, "Please specify field"],
     },
+    linkedWallets: {
+      type: [linkedWallet],
+      default: [],
+      validate: {
+        validator: function (wallets) {
+          const addresses = wallets.map((wallet) => wallet.address);
+          return addresses.length === new Set(addresses).size;
+        },
+        message: "Address in linkedWallets must be unique",
+      },
+    },
+    dailyCheckInStreak: {
+      type: Number,
+      default: 0,
+    },
+    seasons: {
+      type: [season],
+      default: [],
+    },
+    createdAt: { type: Date, default: Date.now },
+    updatedAt: { type: Date, default: Date.now },
   },
-  dailyCheckInStreak: {
-    type: Number,
-    default: 0,
-  },
-  seasons: {
-    type: [season],
-    default: [],
-  },
-  createdAt: { type: Date, default: Date.now },
-  updatedAt: { type: Date, default: Date.now },
-});
+  { collection: COLLECTION_NAME },
+);
 
-// const User = mongoose.model("User", userSchema);
 module.exports = userSchema;

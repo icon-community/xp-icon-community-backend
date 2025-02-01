@@ -63,7 +63,8 @@ async function getEntryByParam(param, collectionId, connection = null) {
     if (!model) {
       throw new Error(`Model ${collectionId} not found`);
     }
-    return await model.find(param);
+    const result = await model.find(param);
+    return result;
   } catch (err) {
     console.log("Error on getEntryByParam:");
     console.log(err);
