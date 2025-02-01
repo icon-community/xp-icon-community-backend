@@ -37,7 +37,6 @@ export class BaseTask {
       const targetTask = await this.tasksService.findBySeedId(taskType);
 
       // validate the task document
-
       if (!targetTask) {
         this.logger.log({
           level: "info",
@@ -45,8 +44,6 @@ export class BaseTask {
         });
         return;
       }
-      console.log("taskdocument");
-      console.log(targetTask);
       /*
        * {
   _id: new ObjectId('679ae970e0de8eead56da1a3'),
