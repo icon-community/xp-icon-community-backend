@@ -2,20 +2,20 @@ const {
   makeJsonRpcRequestObject,
   makeJsonRpcCall,
   isXChainWallet,
-} = require('./utils');
-const config = require('./config');
+} = require("./utils");
+const config = require("./config");
 
 async function getNetworkInfo(height = null) {
   try {
     const requestObj = makeJsonRpcRequestObject(
-      'getNetworkInfo',
+      "getNetworkInfo",
       null,
       config.jvm.default.contracts.chain,
       height,
     );
     return await makeJsonRpcCall(requestObj, config.jvm.default.rpc);
   } catch (e) {
-    console.log('Error making getNetworkInfo request');
+    console.log("Error making getNetworkInfo request");
     console.error(e);
   }
 }
@@ -23,14 +23,14 @@ async function getNetworkInfo(height = null) {
 async function getPRepTerm(height = null) {
   try {
     const requestObj = makeJsonRpcRequestObject(
-      'getPRepTerm',
+      "getPRepTerm",
       null,
       config.jvm.default.contracts.chain,
       height,
     );
     return await makeJsonRpcCall(requestObj, config.jvm.default.rpc);
   } catch (e) {
-    console.log('Error making getPRepTerm request');
+    console.log("Error making getPRepTerm request");
     console.error(e);
   }
 }
@@ -93,7 +93,7 @@ async function getAccountPositions(
 ) {
   try {
     const requestObj = makeJsonRpcRequestObject(
-      'getAccountPositions',
+      "getAccountPositions",
       {
         _owner: _owner,
       },
@@ -102,7 +102,7 @@ async function getAccountPositions(
     );
     return await makeJsonRpcCall(requestObj, config.jvm.default.rpc);
   } catch (err) {
-    console.log('Error making getAccountPositions request');
+    console.log("Error making getAccountPositions request");
     console.log(err.message);
     throw new Error(err.message);
   }
@@ -117,13 +117,27 @@ async function getDataFromStandings(wallet, token, data, height) {
         `token ${token} not found in standings at height ${height}`,
       );
     }
-    return parseInt(position.standings[token][data], 16) / 10 ** 18;
+    if (position.standings[token][data] == null) {
+      throw new Error(
+        `data ${data} not found in standings for token ${token} at height ${height}. Value is ${position.standings[token][data]}`,
+      );
+    }
+    const result = parseInt(position.standings[token][data], 16) / 10 ** 18;
+
+    if (isNaN(result)) {
+      throw new Error(
+        `Error converting ${data} value for ${token} to decimal. Value is ${position.standings[token][data]}`,
+      );
+    }
+
+    return result;
   } catch (err) {
     console.log(`Error getting ${data} value for ${token}`);
     console.log(err.message);
     const str = [
-      'does not have a position in Balanced',
-      'not found in standings',
+      "does not have a position in Balanced",
+      "not found in standings",
+      "Error converting",
     ];
     for (let i = 0; i < str.length; i++) {
       if (err.message.includes(str[i])) {
@@ -137,7 +151,7 @@ async function getDataFromStandings(wallet, token, data, height) {
 async function getSumOfEntryFromStandings(wallet, entry, height) {
   try {
     if (wallet == null) {
-      throw new Error('null wallet');
+      throw new Error("null wallet");
     }
     const position = await getAccountPositions(wallet, height);
 
@@ -152,8 +166,8 @@ async function getSumOfEntryFromStandings(wallet, entry, height) {
     console.log(`Error getting sum of ${entry} for wallet ${wallet}`);
     console.log(err.message);
     const str = [
-      'does not have a position in Balanced',
-      'not found in standings',
+      "does not have a position in Balanced",
+      "not found in standings",
     ];
     for (let i = 0; i < str.length; i++) {
       if (err.message.includes(str[i])) {
@@ -168,7 +182,7 @@ async function getTotalDebtInUSDValue(wallet, height) {
   try {
     return await getSumOfEntryFromStandings(
       wallet,
-      'total_debt_in_USD',
+      "total_debt_in_USD",
       height,
     );
   } catch (err) {
@@ -182,7 +196,7 @@ async function getTotalCollateralInUSDValue(wallet, height) {
   try {
     return await getSumOfEntryFromStandings(
       wallet,
-      'collateral_in_USD',
+      "collateral_in_USD",
       height,
     );
   } catch (err) {
@@ -195,7 +209,7 @@ async function getTotalCollateralInUSDValue(wallet, height) {
 async function getXChainDebtInUSDValue(wallet, height) {
   try {
     if (!isXChainWallet(wallet)) {
-      throw new Error('wallet is not an XChain wallet');
+      throw new Error("wallet is not an XChain wallet");
     }
     return await getTotalDebtInUSDValue(wallet, height);
   } catch (err) {
@@ -207,7 +221,7 @@ async function getXChainDebtInUSDValue(wallet, height) {
 async function getXChainCollateralInUSDValue(wallet, height) {
   try {
     if (!isXChainWallet(wallet)) {
-      throw new Error('wallet is not an XChain wallet');
+      throw new Error("wallet is not an XChain wallet");
     }
     return await getTotalCollateralInUSDValue(wallet, height);
   } catch (err) {
@@ -219,31 +233,31 @@ async function getXChainCollateralInUSDValue(wallet, height) {
 }
 
 async function getSicxDebtInUSDValue(wallet, height) {
-  return getDataFromStandings(wallet, 'sICX', 'total_debt_in_USD', height);
+  return getDataFromStandings(wallet, "sICX", "total_debt_in_USD", height);
 }
 
 async function getAVAXCollateralInUSDValue(wallet, height) {
-  return getDataFromStandings(wallet, 'AVAX', 'collateral_in_USD', height);
+  return getDataFromStandings(wallet, "AVAX", "collateral_in_USD", height);
 }
 
 async function getSICXCollateralInUSDValue(wallet, height) {
-  return getDataFromStandings(wallet, 'sICX', 'collateral_in_USD', height);
+  return getDataFromStandings(wallet, "sICX", "collateral_in_USD", height);
 }
 
 async function getSuiXChainDebtInUSDValue(wallet, height) {
-  return getDataFromStandings(wallet, 'SUI', 'total_debt_in_USD', height);
+  return getDataFromStandings(wallet, "SUI", "total_debt_in_USD", height);
 }
 
 async function getSuiXChainCollateralInUSDValue(wallet, height) {
-  return getDataFromStandings(wallet, 'SUI', 'collateral_in_USD', height);
+  return getDataFromStandings(wallet, "SUI", "collateral_in_USD", height);
 }
 
 async function getmSuiXChainDebtInUSDValue(wallet, height) {
-  return getDataFromStandings(wallet, 'mSUI', 'total_debt_in_USD', height);
+  return getDataFromStandings(wallet, "mSUI", "total_debt_in_USD", height);
 }
 
 async function getmSuiXChainCollateralInUSDValue(wallet, height) {
-  return getDataFromStandings(wallet, 'mSUI', 'collateral_in_USD', height);
+  return getDataFromStandings(wallet, "mSUI", "collateral_in_USD", height);
 }
 async function getLockedAmount(
   user,
@@ -252,7 +266,7 @@ async function getLockedAmount(
 ) {
   try {
     const requestObj = makeJsonRpcRequestObject(
-      'getLockedAmount',
+      "getLockedAmount",
       {
         user: user,
       },
@@ -263,10 +277,10 @@ async function getLockedAmount(
     if (response != null) {
       return response;
     } else {
-      throw new Error('null response from saving rates contract');
+      throw new Error("null response from saving rates contract");
     }
   } catch (err) {
-    console.log('Error making getLockedAmount request');
+    console.log("Error making getLockedAmount request");
     console.log(err.message);
     throw new Error(err.message);
   }
@@ -277,9 +291,9 @@ async function getLockedAmountAsDecimal(wallet, height) {
     const response = await getLockedAmount(wallet, height);
     return parseInt(response, 16) / 10 ** 18;
   } catch (err) {
-    console.log('Error getting locked amount in USD value');
+    console.log("Error getting locked amount in USD value");
     console.log(err.message);
-    const str = 'null response from saving rates contract';
+    const str = "null response from saving rates contract";
     if (err.message.includes(str)) {
       return 0;
     } else {
@@ -294,14 +308,14 @@ async function getUsersList(
 ) {
   try {
     const requestObj = makeJsonRpcRequestObject(
-      'getUsersList',
+      "getUsersList",
       null,
       contract,
       height,
     );
     return await makeJsonRpcCall(requestObj, config.jvm.default.rpc);
   } catch (e) {
-    console.log('Error making getUsersList request');
+    console.log("Error making getUsersList request");
     console.error(e);
   }
 }
@@ -313,14 +327,14 @@ async function getUserRegistrationBlock(
 ) {
   try {
     const requestObj = makeJsonRpcRequestObject(
-      'getUserRegistrationBlock',
+      "getUserRegistrationBlock",
       { user: user },
       contract,
       height,
     );
     return await makeJsonRpcCall(requestObj, config.jvm.default.rpc);
   } catch (e) {
-    console.log('Error making getUserRegistrationBlock request');
+    console.log("Error making getUserRegistrationBlock request");
     console.error(e);
   }
 }
@@ -332,14 +346,14 @@ async function getIcxBalance(wallet, height = null) {
       null,
       null,
       height,
-      'icx_getBalance',
+      "icx_getBalance",
       { address: wallet },
     );
     const response = makeJsonRpcCall(requestObj, config.jvm.default.rpc);
 
     return response;
   } catch (e) {
-    console.log('Error making icx_getBalance request');
+    console.log("Error making icx_getBalance request");
     console.error(e);
   }
 }
