@@ -11,5 +11,5 @@ module.exports = {
   seasonSchema,
   userTasksSchema,
   referralSchema,
-  dailyCheckInSchema
+  dailyCheckInSchema,
 };

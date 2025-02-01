@@ -170,7 +170,10 @@ async function genericTask(taskInput, db, seedId, callback) {
             continue;
           }
 
-          if (targetTask.seedId === TASKS_LABELS.mintingBnusdSui || targetTask.seedId === TASKS_LABELS.depositNativeSui) {
+          if (
+            targetTask.seedId === TASKS_LABELS.mintingBnusdSui ||
+            targetTask.seedId === TASKS_LABELS.depositNativeSui
+          ) {
             // handle SUI specific tasks
             for (const xChainWallet of linkedWallets) {
               if (xChainWallet.type === "sui") {
@@ -307,11 +310,12 @@ async function userReferralTaskMainLogic(
       // with the validUser._id fetch all the documents
       // in the referral collection of this season on which this user
       // is the referred and the referredIsProcessed field is false
-      const referralDocs = await referralService.getReferralByReferredIdAndSeason(
-        validUser._id,
-        config.seasonsRoutes[activeSeason.number],
-        db.connection,
-      );
+      const referralDocs =
+        await referralService.getReferralByReferredIdAndSeason(
+          validUser._id,
+          config.seasonsRoutes[activeSeason.number],
+          db.connection,
+        );
 
       // if there are no documents in the returned array
       // do nothing and return
@@ -325,16 +329,17 @@ async function userReferralTaskMainLogic(
       // if the returned document has the referredIsProcessed field
       // set to true, do nothing and return
       if (
-        referralDocs[0].referredIsProcessed === true || referralDocs[0].referredIsProcessed === "true"
+        referralDocs[0].referredIsProcessed === true ||
+        referralDocs[0].referredIsProcessed === "true"
       ) {
         console.log(
           `--- Referral document (${referralDocs[0]._id}) for user ${validUser._id} (referred) has already been processed`,
         );
         return;
       }
-        console.log(
-          `--- Referral document (${referralDocs[0]._id}) for user ${validUser._id} (referred) found and not processed`,
-        );
+      console.log(
+        `--- Referral document (${referralDocs[0]._id}) for user ${validUser._id} (referred) found and not processed`,
+      );
 
       // if the returned document has the referredIsProcessed field
       // set to false, it means the referral has not been
@@ -384,17 +389,15 @@ async function userReferralTaskMainLogic(
         // referral document will be marked as processed
         // but the user will not be awarded with XP
         try {
-        const rewardFormula = new Function(...targetTask.rewardFormula);
+          const rewardFormula = new Function(...targetTask.rewardFormula);
 
-        xpArray.push({
-          period: prepTerm,
-          block: height,
-          xp: rewardFormula(),
-        });
+          xpArray.push({
+            period: prepTerm,
+            block: height,
+            xp: rewardFormula(),
+          });
         } catch (err) {
-        console.log(
-          `--- Error processing referred User ${validUser._id}.`,
-        );
+          console.log(`--- Error processing referred User ${validUser._id}.`);
           console.log(err);
         }
         // Update userTask document with new xpEarned array
@@ -427,11 +430,12 @@ async function userReferralTaskMainLogic(
       // in the referral collection on which this user
       // is the referrer and the referrerIsProcessed
       // field is false
-      const referralDocs = await referralService.getReferralByReferrerIdAndSeason(
-        validUser._id,
-        config.seasonsRoutes[activeSeason.number],
-        db.connection,
-      );
+      const referralDocs =
+        await referralService.getReferralByReferrerIdAndSeason(
+          validUser._id,
+          config.seasonsRoutes[activeSeason.number],
+          db.connection,
+        );
 
       // if there are no documents in the returned array
       // do nothing and return
@@ -443,12 +447,21 @@ async function userReferralTaskMainLogic(
       }
 
       // After a user has accumulated X successful referrals, he won't be receiving any more XP for any additional referrals.
-      const processedReferrals = referralDocs.filter(doc => doc.referrerIsProcessed === true || doc.referrerIsProcessed === "true").length;
-      if (targetTask.config?.hardCap && processedReferrals >= targetTask.config.hardCap) {
+      const processedReferrals = referralDocs.filter(
+        (doc) =>
+          doc.referrerIsProcessed === true ||
+          doc.referrerIsProcessed === "true",
+      ).length;
+      if (
+        targetTask.config?.hardCap &&
+        processedReferrals >= targetTask.config.hardCap
+      ) {
         console.log(`--- User ${validUser._id} has hit hard cap on referrals`);
         return;
       } else {
-        console.log(`--- User ${validUser._id} has not hit hard cap on referrals (${processedReferrals} / ${targetTask.config.hardCap})`);
+        console.log(
+          `--- User ${validUser._id} has not hit hard cap on referrals (${processedReferrals} / ${targetTask.config.hardCap})`,
+        );
       }
 
       for (const referralDoc of referralDocs) {
@@ -463,9 +476,9 @@ async function userReferralTaskMainLogic(
           );
           continue;
         }
-          console.log(
-            `--- Referral document (${referralDoc._id}) for user ${validUser._id} (referrer) found and not processed`,
-          );
+        console.log(
+          `--- Referral document (${referralDoc._id}) for user ${validUser._id} (referrer) found and not processed`,
+        );
 
         // if the returned document has the referrerIsProcessed field
         // set to false, it means the referral has not been
@@ -495,7 +508,9 @@ async function userReferralTaskMainLogic(
         // to know the amount of XP required to have before
         // this task is done
         const allCriteriaMet = targetTask.criteria.every((eachCriteria) => {
-          const conditionFormula = new Function(...eachCriteria.conditionFormula);
+          const conditionFormula = new Function(
+            ...eachCriteria.conditionFormula,
+          );
           return conditionFormula(referredUserXpTotal);
         });
 
@@ -514,17 +529,15 @@ async function userReferralTaskMainLogic(
           // referral document will be marked as processed
           // but the user will not be awarded with XP
           try {
-          const rewardFormula = new Function(...targetTask.rewardFormula);
+            const rewardFormula = new Function(...targetTask.rewardFormula);
 
-          xpArray.push({
-            period: prepTerm,
-            block: height,
-            xp: rewardFormula(),
-          });
+            xpArray.push({
+              period: prepTerm,
+              block: height,
+              xp: rewardFormula(),
+            });
           } catch (err) {
-          console.log(
-            `--- Error processing referred User ${validUser._id}.`,
-          );
+            console.log(`--- Error processing referred User ${validUser._id}.`);
             console.log(err);
           }
         } else {
@@ -550,7 +563,6 @@ async function userReferralTaskMainLogic(
         console.log("--- UserTask document updated");
       }
     }
-
   } catch (err) {
     console.log("> Error running userReferralTaskMainLogic ");
     console.log(err);
