@@ -4,7 +4,7 @@ import { InjectModel } from "@nestjs/mongoose";
 import { DailyCheckInDocument } from "./schemas/daily-check-in.schema";
 import { CreateDailyCheckInDto, UpdateDailyCheckInDto } from "./dto";
 import MONGO_CONFIG from "../../config/mongo.config";
-import { BaseService } from "../../shared/base/base.service";
+import { BaseService } from "../shared/base/base.service";
 
 @Injectable()
 export class DailyCheckInService extends BaseService<

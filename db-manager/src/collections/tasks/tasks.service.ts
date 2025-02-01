@@ -4,7 +4,7 @@ import { InjectModel } from "@nestjs/mongoose";
 import { Tasks } from "./tasks.interface";
 import { CreateTaskDto, UpdateTaskDto } from "./dto";
 import MONGO_CONFIG from "../../config/mongo.config";
-import { BaseService } from "../../shared/base/base.service";
+import { BaseService } from "../shared/base/base.service";
 
 @Injectable()
 export class TasksService extends BaseService<
@@ -28,6 +28,10 @@ export class TasksService extends BaseService<
     updateTaskDto: UpdateTaskDto,
   ): Promise<Tasks> {
     return super.update(query, updateTaskDto);
+  }
+
+  async findAll(): Promise<Tasks[]> {
+    return super.findAll();
   }
 
   async findBySeedId(seedId: string): Promise<Tasks> {

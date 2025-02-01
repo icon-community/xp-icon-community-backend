@@ -4,7 +4,7 @@ import { InjectModel } from "@nestjs/mongoose";
 import { Seasons } from "./seasons.interface";
 import { CreateSeasonDto, UpdateSeasonDto } from "./dto";
 import MONGO_CONFIG from "../../config/mongo.config";
-import { BaseService } from "../../shared/base/base.service";
+import { BaseService } from "../shared/base/base.service";
 
 @Injectable()
 export class SeasonsService extends BaseService<

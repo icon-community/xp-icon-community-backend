@@ -1,13 +1,13 @@
 // import { Test, TestingModule } from '@nestjs/testing';
 // import { AppModule } from '../src/app.module';
-import * as amqp from 'amqplib';
-import { RABBITMQ_CONFIG } from '../src/config/rabbitmq.config';
-import { isTagInLogs } from '../src/utils/utils';
+import * as amqp from "amqplib";
+import { RABBITMQ_CONFIG } from "../src/config/rabbitmq.config";
+import { isTagInLogs } from "../src/utils/utils";
 
-describe('RabbitMQ Consumer Integration Test', () => {
+describe("RabbitMQ Consumer Integration Test", () => {
   let connection: amqp.Connection;
   let channel: amqp.Channel;
-  const queueName = 'triggered_tasks';
+  const queueName = "triggered_tasks";
 
   beforeAll(async () => {
     // Connect to RabbitMQ
@@ -23,9 +23,9 @@ describe('RabbitMQ Consumer Integration Test', () => {
     await connection.close();
   });
 
-  it('should send tasks to queue', async () => {
+  it("should send tasks to queue", async () => {
     const task = {
-      taskName: 'SUBSCRIBE_NEWSLETTER',
+      taskName: "SUBSCRIBE_NEWSLETTER",
       payload: { tag: Math.random().toString(36).substring(7) },
     };
 
@@ -37,7 +37,7 @@ describe('RabbitMQ Consumer Integration Test', () => {
 
     // Here you should add assertions based on how your app processes the task
     // Example: Check database entries, logs, or any expected side effects
-    const check = isTagInLogs(task.payload.tag, '../../logs');
+    const check = isTagInLogs(task.payload.tag, "../../logs");
     expect(check).toBe(true);
   });
 });

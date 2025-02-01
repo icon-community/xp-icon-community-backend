@@ -12,6 +12,10 @@ export class BaseService<T extends Document, CreateDto, UpdateDto> {
     return this.model.find().exec();
   }
 
+  async findAllByQuery(query: UpdateDto): Promise<T[]> {
+    return this.model.find(query).exec();
+  }
+
   async findOne(id: string): Promise<T> {
     return this.model.findOne({ _id: id }).exec();
   }

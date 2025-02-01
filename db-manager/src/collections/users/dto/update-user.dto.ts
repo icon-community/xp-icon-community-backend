@@ -7,6 +7,7 @@ import {
   IsEnum,
   ValidateNested,
   ArrayUnique,
+  IsMongoId,
 } from "class-validator";
 import { Type } from "class-transformer";
 import { ObjectId } from "mongoose";
@@ -20,7 +21,7 @@ class LinkedWalletDto {
 }
 
 class SeasonDto {
-  @IsString()
+  @IsMongoId()
   seasonId: ObjectId;
 
   @IsNumber()

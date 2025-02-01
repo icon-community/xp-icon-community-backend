@@ -4,7 +4,7 @@ import { InjectModel } from "@nestjs/mongoose";
 import { UserDocument } from "./schemas/users.schema";
 import { CreateUserDto, UpdateUserDto } from "./dto";
 import MONGO_CONFIG from "../../config/mongo.config";
-import { BaseService } from "../../shared/base/base.service";
+import { BaseService } from "../shared/base/base.service";
 
 @Injectable()
 export class UsersService extends BaseService<
@@ -34,7 +34,9 @@ export class UsersService extends BaseService<
     return super.findByQuery({ walletAddress });
   }
 
-  async findUsersBySeason(seasonId: Types.ObjectId): Promise<UserDocument> {
-    return super.findByQuery({ seasons: { $elemMatch: { seasonId } } } as any);
+  async findUsersBySeason(seasonId: Types.ObjectId): Promise<UserDocument[]> {
+    return super.findAllByQuery({
+      "seasons.seasonId": seasonId,
+    } as any);
   }
 }

@@ -4,7 +4,7 @@ import { InjectModel } from "@nestjs/mongoose";
 import { ReferralDocument } from "./schemas/referrals.schema";
 import { CreateReferralDto, UpdateReferralDto } from "./dto";
 import MONGO_CONFIG from "../../config/mongo.config";
-import { BaseService } from "../../shared/base/base.service";
+import { BaseService } from "../shared/base/base.service";
 
 @Injectable()
 export class ReferralsService extends BaseService<
