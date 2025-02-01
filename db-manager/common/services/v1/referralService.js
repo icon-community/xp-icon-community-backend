@@ -20,7 +20,11 @@ async function updateOrCreateReferral(query, update, connection) {
   return await updateOrCreateEntry(query, update, REFERRALS, connection);
 }
 
-async function getReferralByReferrerIdAndSeason(reffererUserId, seasonLabel, connection) {
+async function getReferralByReferrerIdAndSeason(
+  reffererUserId,
+  seasonLabel,
+  connection,
+) {
   return await getEntryByParam(
     {
       referrerUserId: reffererUserId,
@@ -31,7 +35,11 @@ async function getReferralByReferrerIdAndSeason(reffererUserId, seasonLabel, con
   );
 }
 
-async function getReferralByReferredIdAndSeason(refferedUserId, seasonLabel, connection) {
+async function getReferralByReferredIdAndSeason(
+  refferedUserId,
+  seasonLabel,
+  connection,
+) {
   return await getEntryByParam(
     {
       referredUserId: refferedUserId,

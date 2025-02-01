@@ -1,14 +1,14 @@
-const genericTask = require('./genericTask');
-const { tasks } = require('../common/utils/config');
+const genericTask = require("./genericTask");
+const { tasks } = require("../common/utils/config");
 const SEED_ID = tasks.depositMSui;
 const {
   getmSuiXChainCollateralInUSDValue,
-} = require('../common/utils/json-rpc-services');
+} = require("../common/utils/json-rpc-services");
 
 async function fetchMSuiXChainCollateralsAndUpdateDb(taskInput, db) {
   try {
-    console.log('========');
-    console.log('> Running fetchMSuiXChainCollateralsAndUpdateDb task');
+    console.log("========");
+    console.log("> Running fetchMSuiXChainCollateralsAndUpdateDb task");
     return await genericTask(
       taskInput,
       db,
@@ -16,7 +16,7 @@ async function fetchMSuiXChainCollateralsAndUpdateDb(taskInput, db) {
       getmSuiXChainCollateralInUSDValue,
     );
   } catch (err) {
-    console.log('Error running fetchMSuiXChainCollateralsAndUpdateDb task');
+    console.log("Error running fetchMSuiXChainCollateralsAndUpdateDb task");
     console.log(err);
   }
 }

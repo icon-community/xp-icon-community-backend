@@ -12,7 +12,12 @@ async function fetchSuiXChainLoansAndUpdateDb(taskInput, db) {
   try {
     console.log("========");
     console.log("> Running fetchSuiXChainLoansAndUpdateDb task");
-    return await genericTask(taskInput, db, SEED_ID, getSuiXChainDebtInUSDValue);
+    return await genericTask(
+      taskInput,
+      db,
+      SEED_ID,
+      getSuiXChainDebtInUSDValue,
+    );
   } catch (err) {
     console.log("Error running fetchSuiXChainLoansAndUpdateDb task");
     console.log(err);
