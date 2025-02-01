@@ -1,34 +1,34 @@
-import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
-import { Document, Schema as MongooseSchema } from 'mongoose';
+import { Prop, Schema, SchemaFactory } from "@nestjs/mongoose";
+import { Document, Schema as MongooseSchema } from "mongoose";
 
 @Schema()
 class LinkedWallet {
   @Prop({
     type: String,
-    required: [true, 'Please specify field'],
+    required: [true, "Please specify field"],
   })
   address: string;
 
   @Prop({
     type: String,
     required: true,
-    enum: ['evm', 'icon'],
+    enum: ["evm", "icon"],
   })
-  type: 'evm' | 'icon';
+  type: "evm" | "icon";
 }
 
 @Schema()
 class Season {
   @Prop({
     type: MongooseSchema.Types.ObjectId,
-    ref: 'Season',
-    required: [true, 'Please specify field'],
+    ref: "Season",
+    required: [true, "Please specify field"],
   })
   seasonId: MongooseSchema.Types.ObjectId;
 
   @Prop({
     type: Number,
-    required: [true, 'Please specify field'],
+    required: [true, "Please specify field"],
   })
   registrationBlock: number;
 }
@@ -43,7 +43,7 @@ export class User {
     type: String,
     unique: true,
     index: true,
-    required: [true, 'Please specify field'],
+    required: [true, "Please specify field"],
   })
   walletAddress: string;
 
@@ -55,7 +55,7 @@ export class User {
         const addresses = wallets.map((wallet) => wallet.address);
         return addresses.length === new Set(addresses).size;
       },
-      message: 'Address in linkedWallets must be unique',
+      message: "Address in linkedWallets must be unique",
     },
   })
   linkedWallets: LinkedWallet[];

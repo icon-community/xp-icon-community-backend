@@ -1,4 +1,4 @@
-import { MongoConfig } from '../shared/types/ConfigTypes';
+import { MongoConfig } from "../shared/types/ConfigTypes";
 
 const MONGO_CONFIG: MongoConfig = {
   user: process.env.MONGO_USER,
@@ -17,15 +17,15 @@ const MONGO_CONFIG: MongoConfig = {
 };
 
 const mongoContainer =
-  process.env.NODE_ENV === 'dev'
-    ? 'localhost'
+  process.env.NODE_ENV === "dev"
+    ? "localhost"
     : MONGO_CONFIG.containerName == null
-      ? 'mongodb'
+      ? "mongodb"
       : MONGO_CONFIG.containerName;
 
 MONGO_CONFIG.uri =
-  process.env.USE_LOCALHOST === 'true'
-    ? 'mongodb://127.0.0.1:27017'
+  process.env.USE_LOCALHOST === "true"
+    ? "mongodb://127.0.0.1:27017"
     : `mongodb://${MONGO_CONFIG.user}:${MONGO_CONFIG.pwd}@${mongoContainer}:${MONGO_CONFIG.port}`;
 
 export default MONGO_CONFIG;

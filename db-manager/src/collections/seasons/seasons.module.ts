@@ -1,8 +1,8 @@
-import { Module } from '@nestjs/common';
-import { SeasonsService } from './seasons.service';
-import { SeasonSchema } from './schemas/seasons.schema';
-import MONGO_CONFIG from '../../config/mongo.config';
-import { MongooseModule } from '@nestjs/mongoose';
+import { Module } from "@nestjs/common";
+import { SeasonsService } from "./seasons.service";
+import { SeasonSchema } from "./schemas/seasons.schema";
+import MONGO_CONFIG from "../../config/mongo.config";
+import { MongooseModule } from "@nestjs/mongoose";
 
 @Module({
   imports: [

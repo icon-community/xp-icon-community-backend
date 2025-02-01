@@ -4,14 +4,14 @@ import {
   OnModuleDestroy,
   OnApplicationShutdown,
   Logger,
-} from '@nestjs/common';
-import { RabbitMQService } from '../rabbitmq/rabbitmq.service';
-import { RABBITMQ_CONFIG } from '../config/rabbitmq.config';
-import { TaskObject } from '../shared/types/GeneralTypes';
-import { SeasonsService } from '../collections/seasons/seasons.service';
-import BlockMonitorTaskRunner from '../utils/block-monitor-task-runner';
-import { TaskInput } from '../shared/types/GeneralTypes';
-import { TaskService } from './task.service';
+} from "@nestjs/common";
+import { RabbitMQService } from "../rabbitmq/rabbitmq.service";
+import { RABBITMQ_CONFIG } from "../config/rabbitmq.config";
+import { TaskObject } from "../shared/types/GeneralTypes";
+import { SeasonsService } from "../collections/seasons/seasons.service";
+import BlockMonitorTaskRunner from "../utils/block-monitor-task-runner";
+import { TaskInput } from "../shared/types/GeneralTypes";
+import { TaskService } from "./task.service";
 
 @Injectable()
 export class TaskProducerService
@@ -41,16 +41,16 @@ export class TaskProducerService
       // at the defined interval inside the block monitor
       // task runner
       this.blockMonitorTaskRunner = new BlockMonitorTaskRunner(
-        [this.sendTaskToRecurringQueue.bind(this)],
         this.seasonsService.findAll.bind(this.seasonsService),
+        [this.sendTaskToRecurringQueue.bind(this)],
       );
 
       this.blockMonitorTaskRunner.start();
     } catch (err) {
-      if (err.message.includes('CRITICAL')) {
+      if (err.message.includes("CRITICAL")) {
         this.logger.log({
           message: err.message,
-          level: 'error',
+          level: "error",
           timestamp: new Date(),
         });
         throw new Error(err.message);
@@ -81,7 +81,7 @@ export class TaskProducerService
 
   async onApplicationShutdown(signal?: string) {
     this.logger.log({
-      level: 'warn',
+      level: "warn",
       message: `Application is shutting down with signal: ${signal}`,
     });
 

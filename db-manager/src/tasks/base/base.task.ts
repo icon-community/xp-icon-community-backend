@@ -1,9 +1,9 @@
-import { Logger } from '@nestjs/common';
-import { TaskInput } from '../../shared/types/GeneralTypes';
-import { SeasonsService } from '../../collections/seasons/seasons.service';
-import { TasksService } from '../../collections/tasks/tasks.service';
-import { UsersService } from '../../collections/users/users.service';
-import { Types } from 'mongoose';
+import { Logger } from "@nestjs/common";
+import { TaskInput } from "../../shared/types/GeneralTypes";
+import { SeasonsService } from "../../collections/seasons/seasons.service";
+import { TasksService } from "../../collections/tasks/tasks.service";
+import { UsersService } from "../../collections/users/users.service";
+import { Types } from "mongoose";
 
 export class BaseTask {
   private readonly logger: Logger;
@@ -29,7 +29,7 @@ export class BaseTask {
   ): Promise<void> {
     try {
       this.logger.log({
-        level: 'info',
+        level: "info",
         message: `${this.constructor.name} begin execution. Task Input: ${JSON.stringify(taskInput)}`,
       });
 
@@ -38,7 +38,7 @@ export class BaseTask {
 
       if (activeSeasons.length === 0) {
         this.logger.log({
-          level: 'info',
+          level: "info",
           message: `${this.constructor.name} no active seasons found. Task execution skipped.`,
         });
         return;
@@ -52,7 +52,7 @@ export class BaseTask {
           taskInput.height > season.blockEnd
         ) {
           this.logger.log({
-            level: 'info',
+            level: "info",
             message: `${this.constructor.name} block height ${taskInput.height} is outside of season ${season._id} block range. Task execution skipped.`,
           });
           continue;
@@ -71,7 +71,7 @@ export class BaseTask {
 
         if (!taskIsInSeason) {
           this.logger.log({
-            level: 'info',
+            level: "info",
             message: `${this.constructor.name} task ${taskType} not found in active season. Task execution skipped.`,
           });
           return;
@@ -81,7 +81,7 @@ export class BaseTask {
         const allUsers = await this.usersService.findUsersBySeason(
           new Types.ObjectId(season._id.toString()),
         );
-        console.log('allUsers');
+        console.log("allUsers");
         console.log(allUsers);
 
         //TODO: continue
@@ -90,10 +90,14 @@ export class BaseTask {
       }
     } catch (err) {
       this.logger.error({
-        level: 'error',
+        level: "error",
         message: `${this.constructor.name} error: ${err.message}`,
         error: err,
       });
     }
+  }
+
+  async addXpToCollection(collectionId: string, data: any): Promise<void> {
+    //
   }
 }
