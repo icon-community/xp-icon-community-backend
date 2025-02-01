@@ -5,8 +5,8 @@ import {
   IsArray,
   IsOptional,
   IsMongoId,
-} from 'class-validator';
-import { Types, ObjectId } from 'mongoose';
+} from "class-validator";
+import { Types, ObjectId } from "mongoose";
 
 export class UpdateSeasonDto {
   @IsOptional()

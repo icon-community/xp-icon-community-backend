@@ -1,7 +1,7 @@
-import { NestFactory } from '@nestjs/core';
-import { AppModule } from './app.module';
-import { WinstonModule } from 'nest-winston';
-import { Logging } from './shared/logging/custom-logger';
+import { NestFactory } from "@nestjs/core";
+import { AppModule } from "./app.module";
+import { WinstonModule } from "nest-winston";
+import { Logging } from "./shared/logging/custom-logger";
 // import * as mongoose from 'mongoose';
 
 async function bootstrap() {

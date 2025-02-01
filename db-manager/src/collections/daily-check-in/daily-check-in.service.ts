@@ -1,10 +1,10 @@
-import { Model } from 'mongoose';
-import { Injectable } from '@nestjs/common';
-import { InjectModel } from '@nestjs/mongoose';
-import { DailyCheckInDocument } from './schemas/daily-check-in.schema';
-import { CreateDailyCheckInDto, UpdateDailyCheckInDto } from './dto';
-import MONGO_CONFIG from '../../config/mongo.config';
-import { BaseService } from '../../shared/base/base.service';
+import { Model } from "mongoose";
+import { Injectable } from "@nestjs/common";
+import { InjectModel } from "@nestjs/mongoose";
+import { DailyCheckInDocument } from "./schemas/daily-check-in.schema";
+import { CreateDailyCheckInDto, UpdateDailyCheckInDto } from "./dto";
+import MONGO_CONFIG from "../../config/mongo.config";
+import { BaseService } from "../../shared/base/base.service";
 
 @Injectable()
 export class DailyCheckInService extends BaseService<
@@ -19,7 +19,9 @@ export class DailyCheckInService extends BaseService<
     super(dailyCheckInModel);
   }
 
-  async create(createDailyCheckInDto: CreateDailyCheckInDto): Promise<DailyCheckInDocument> {
+  async create(
+    createDailyCheckInDto: CreateDailyCheckInDto,
+  ): Promise<DailyCheckInDocument> {
     return super.create(createDailyCheckInDto);
   }
 
@@ -30,7 +32,9 @@ export class DailyCheckInService extends BaseService<
     return super.update(query, updateDailyCheckInDto);
   }
 
-  async findByWalletAddress(walletAddress: string): Promise<DailyCheckInDocument> {
+  async findByWalletAddress(
+    walletAddress: string,
+  ): Promise<DailyCheckInDocument> {
     return super.findByQuery({ walletAddress });
   }
 }

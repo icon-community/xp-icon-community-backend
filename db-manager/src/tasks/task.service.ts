@@ -1,6 +1,6 @@
-import { Injectable } from '@nestjs/common';
-import { Logger } from '@nestjs/common';
-import { TaskInput } from '../shared/types/GeneralTypes';
+import { Injectable } from "@nestjs/common";
+import { Logger } from "@nestjs/common";
+import { TaskInput } from "../shared/types/GeneralTypes";
 import {
   ProcessSicxCollateralsTask,
   ProcessAvaxCollateralsTask,
@@ -12,13 +12,13 @@ import {
   ProcessLockedSavingsTask,
   ProcessNewReferrersTask,
   ProcessNewReferredTask,
-} from './recurring';
+} from "./recurring";
 import {
   SubscribeNewsletterTask,
   FeedTaskSeedToDbTask,
   FeedSeasonSeedToDbTask,
-} from './triggered';
-import { TRIGGERED_TASKS_TYPES } from '../constants';
+} from "./triggered";
+import { TRIGGERED_TASKS_TYPES } from "../constants";
 
 @Injectable()
 export class TaskService {
@@ -59,14 +59,14 @@ export class TaskService {
     for (const task of tasks) {
       try {
         this.logger.log({
-          level: 'info',
+          level: "info",
           message: `Executing task: ${task.label}`,
         });
 
         await task.callback.execute(...task.params);
       } catch (err) {
         this.logger.log({
-          level: 'error',
+          level: "error",
           message: `Error executing task: ${task}. Message: ${err.message}`,
           error: err,
         });
@@ -123,7 +123,7 @@ export class TaskService {
 
     if (!triggeredTasks.some((item) => item.label === taskName)) {
       this.logger.log({
-        level: 'error',
+        level: "error",
         message: `Unknown triggered task: ${taskName}`,
       });
       return;
@@ -135,7 +135,7 @@ export class TaskService {
           continue;
         } else {
           this.logger.log({
-            level: 'info',
+            level: "info",
             message: `Executing task: ${task.label}`,
           });
 
@@ -144,7 +144,7 @@ export class TaskService {
         }
       } catch (err) {
         this.logger.log({
-          level: 'error',
+          level: "error",
           message: `Error executing task: ${task}. Message: ${err.message}`,
           error: err,
         });

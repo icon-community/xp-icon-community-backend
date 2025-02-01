@@ -1,10 +1,10 @@
-import { Model, Types } from 'mongoose';
-import { Injectable } from '@nestjs/common';
-import { InjectModel } from '@nestjs/mongoose';
-import { UserDocument } from './schemas/users.schema';
-import { CreateUserDto, UpdateUserDto } from './dto';
-import MONGO_CONFIG from '../../config/mongo.config';
-import { BaseService } from '../../shared/base/base.service';
+import { Model, Types } from "mongoose";
+import { Injectable } from "@nestjs/common";
+import { InjectModel } from "@nestjs/mongoose";
+import { UserDocument } from "./schemas/users.schema";
+import { CreateUserDto, UpdateUserDto } from "./dto";
+import MONGO_CONFIG from "../../config/mongo.config";
+import { BaseService } from "../../shared/base/base.service";
 
 @Injectable()
 export class UsersService extends BaseService<

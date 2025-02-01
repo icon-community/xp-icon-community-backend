@@ -1,36 +1,36 @@
-import * as fs from 'fs';
-import * as path from 'path';
-import rqst from 'rqst';
-import { parseUrl } from './lib';
-import { ConfigHelperService } from '../config/config-helper.service';
-import { JsonRpcRequest } from '../shared/types/GeneralTypes';
-import { Seasons } from '../collections/seasons/seasons.interface';
-import { Logger } from '@nestjs/common';
-const logger = new Logger('utils');
+import * as fs from "fs";
+import * as path from "path";
+import rqst from "rqst";
+import { parseUrl } from "./lib";
+import { ConfigHelperService } from "../config/config-helper.service";
+import { JsonRpcRequest } from "../shared/types/GeneralTypes";
+import { Seasons } from "../collections/seasons/seasons.interface";
+import { Logger } from "@nestjs/common";
+const logger = new Logger("utils");
 const configHelperService = new ConfigHelperService();
 
 /**
  * Search to see if a tag exists in any of the log files.
  * @param tag The tag to search for.
  */
-export function isTagInLogs(tag: string, folderPath: string = ''): boolean {
+export function isTagInLogs(tag: string, folderPath: string = ""): boolean {
   // Directory where log files are stored
   const directory = path.join(
     __dirname,
-    folderPath === '' ? 'logs' : folderPath,
+    folderPath === "" ? "logs" : folderPath,
   );
 
   try {
     const logFiles = fs
       .readdirSync(directory)
-      .filter((file) => file.endsWith('.log')); // Adjust extension if necessary
+      .filter((file) => file.endsWith(".log")); // Adjust extension if necessary
 
     for (const file of logFiles) {
       const filePath = path.join(directory, file);
-      const data = fs.readFileSync(filePath, 'utf-8');
+      const data = fs.readFileSync(filePath, "utf-8");
 
       const matchingLines = data
-        .split('\n')
+        .split("\n")
         .filter((line) => line.includes(`${tag}`)); // Checks if the tag exists in the line
 
       if (matchingLines.length > 0) {
@@ -54,18 +54,18 @@ export function isTagInLogs(tag: string, folderPath: string = ''): boolean {
 export function customPath(relativePath: string): string {
   try {
     const fullPath = path.dirname(require.main.filename);
-    const fullPathArray = fullPath.split('/');
-    fullPathArray[0] = '/';
+    const fullPathArray = fullPath.split("/");
+    fullPathArray[0] = "/";
     let MAIN_FOLDER = null;
 
     let maxLoops = 100;
     while (MAIN_FOLDER === null && maxLoops > 0) {
       maxLoops--;
       const folderPath = path.join(...fullPathArray);
-      const packageJsonPath = path.join(folderPath, 'package.json');
+      const packageJsonPath = path.join(folderPath, "package.json");
       try {
         fs.accessSync(packageJsonPath, fs.constants.F_OK);
-        const folderSplit = folderPath.split('/');
+        const folderSplit = folderPath.split("/");
         MAIN_FOLDER = folderSplit[folderSplit.length - 1];
       } catch (err) {
         void err;
@@ -73,7 +73,7 @@ export function customPath(relativePath: string): string {
       }
     }
     const parsedPath = path.parse(__filename);
-    const fullPathSplit = parsedPath.dir.split('/');
+    const fullPathSplit = parsedPath.dir.split("/");
 
     while (fullPathSplit.length > 0) {
       if (fullPathSplit[fullPathSplit.length - 1] === MAIN_FOLDER) {
@@ -84,10 +84,10 @@ export function customPath(relativePath: string): string {
     }
     fullPathSplit.push(relativePath);
 
-    return fullPathSplit.join('/');
+    return fullPathSplit.join("/");
   } catch (err) {
     logger.log({
-      level: 'error',
+      level: "error",
       message: `Error getting custom path. Error: ${err.message}`,
       error: err,
     });
@@ -96,14 +96,14 @@ export function customPath(relativePath: string): string {
 }
 
 export function makeIcxGetBalanceRequestObject(wallet: string, height = null) {
-  const obj = makeJsonRpcRequestTemplate('icx_getBalance');
+  const obj = makeJsonRpcRequestTemplate("icx_getBalance");
   obj.params = { address: wallet };
 
   if (height !== null) {
-    if (typeof height !== 'number') {
-      throw new Error('Height must be a number');
+    if (typeof height !== "number") {
+      throw new Error("Height must be a number");
     } else {
-      obj.params.height = '0x' + height.toString(16);
+      obj.params.height = "0x" + height.toString(16);
     }
   }
   return JSON.stringify(obj);
@@ -111,7 +111,7 @@ export function makeIcxGetBalanceRequestObject(wallet: string, height = null) {
 
 export function makeJsonRpcRequestTemplate(method: string): JsonRpcRequest {
   return {
-    jsonrpc: '2.0',
+    jsonrpc: "2.0",
     method: method,
     id: Math.ceil(Math.random() * 1000),
   };
@@ -120,15 +120,15 @@ export function makeJsonRpcRequestTemplate(method: string): JsonRpcRequest {
 export function makeIcxCallRequestObject(
   method: string,
   params = null,
-  to = 'cx0000000000000000000000000000000000000000',
+  to = "cx0000000000000000000000000000000000000000",
   height = null,
 ) {
   try {
-    const obj = makeJsonRpcRequestTemplate('icx_call');
+    const obj = makeJsonRpcRequestTemplate("icx_call");
 
     obj.params = {
       to: to,
-      dataType: 'call',
+      dataType: "call",
       data: {
         method,
       },
@@ -138,17 +138,17 @@ export function makeIcxCallRequestObject(
     }
 
     if (height !== null) {
-      if (typeof height !== 'number') {
-        throw new Error('Height must be a number');
+      if (typeof height !== "number") {
+        throw new Error("Height must be a number");
       } else {
-        obj.params.height = '0x' + height.toString(16);
+        obj.params.height = "0x" + height.toString(16);
       }
     }
 
     return JSON.stringify(obj);
   } catch (err) {
     logger.log({
-      level: 'error',
+      level: "error",
       message: `Error creating icx_call request object. Error: ${err.message}`,
       error: err,
     });
@@ -163,8 +163,8 @@ export async function makeJsonRpcCall(data: string, url: string) {
       parsedUrl.path,
       data,
       parsedUrl.hostname,
-      parsedUrl.protocol == 'http' ? false : true,
-      parsedUrl.port === '' ? false : parsedUrl.port,
+      parsedUrl.protocol == "http" ? false : true,
+      parsedUrl.port === "" ? false : parsedUrl.port,
     );
 
     if (query.error == null) {
@@ -174,7 +174,7 @@ export async function makeJsonRpcCall(data: string, url: string) {
     }
   } catch (err) {
     logger.log({
-      level: 'error',
+      level: "error",
       message: `Error running node request. query: ${JSON.stringify(query)}`,
       error: err,
     });
@@ -201,11 +201,11 @@ export async function getInitBlock(
     if (mainSeed != null && mainSeed.lastBlock != null) {
       return mainSeed.lastBlock;
     } else {
-      throw new Error('Seed file is empty');
+      throw new Error("Seed file is empty");
     }
   } catch (err) {
     logger.log({
-      level: 'error',
+      level: "error",
       message: `Error fetching last block from seed file. ${JSON.stringify(err.message)}`,
     });
   }
@@ -221,12 +221,12 @@ export async function getInitBlock(
       // if active season is found, return the blockStart
       return activeSeason.blockStart;
     } else {
-      throw new Error('No active season found in database');
+      throw new Error("No active season found in database");
     }
   } catch (err) {
     logger.log({
-      level: 'error',
-      message: 'Error fetching last block from database',
+      level: "error",
+      message: "Error fetching last block from database",
       error: err,
     });
   }

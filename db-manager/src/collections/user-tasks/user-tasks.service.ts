@@ -1,10 +1,10 @@
-import { Model, Types } from 'mongoose';
-import { Injectable } from '@nestjs/common';
-import { InjectModel } from '@nestjs/mongoose';
-import { UserTaskDocument } from './schemas/user-tasks.schema';
-import { CreateUserTaskDto, UpdateUserTaskDto } from './dto';
-import MONGO_CONFIG from '../../config/mongo.config';
-import { BaseService } from '../../shared/base/base.service';
+import { Model, Types } from "mongoose";
+import { Injectable } from "@nestjs/common";
+import { InjectModel } from "@nestjs/mongoose";
+import { UserTaskDocument } from "./schemas/user-tasks.schema";
+import { CreateUserTaskDto, UpdateUserTaskDto } from "./dto";
+import MONGO_CONFIG from "../../config/mongo.config";
+import { BaseService } from "../../shared/base/base.service";
 
 @Injectable()
 export class UserTasksService extends BaseService<
@@ -19,7 +19,9 @@ export class UserTasksService extends BaseService<
     super(userTasksModel);
   }
 
-  async create(createUserTaskDto: CreateUserTaskDto): Promise<UserTaskDocument> {
+  async create(
+    createUserTaskDto: CreateUserTaskDto,
+  ): Promise<UserTaskDocument> {
     return super.create(createUserTaskDto);
   }
 
@@ -38,7 +40,9 @@ export class UserTasksService extends BaseService<
     return super.findByQuery({ taskId });
   }
 
-  async findUserTasksBySeason(seasonId: Types.ObjectId): Promise<UserTaskDocument> {
+  async findUserTasksBySeason(
+    seasonId: Types.ObjectId,
+  ): Promise<UserTaskDocument> {
     return super.findByQuery({ seasonId });
   }
 }

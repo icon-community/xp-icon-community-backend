@@ -1,8 +1,8 @@
-import { Injectable } from '@nestjs/common';
-import { Logger } from '@nestjs/common';
-import { SeasonsService } from '../../collections/seasons/seasons.service';
-import { TasksService } from '../../collections/tasks/tasks.service';
-import { ConfigHelperService } from '../../config/config-helper.service';
+import { Injectable } from "@nestjs/common";
+import { Logger } from "@nestjs/common";
+import { SeasonsService } from "../../collections/seasons/seasons.service";
+import { TasksService } from "../../collections/tasks/tasks.service";
+import { ConfigHelperService } from "../../config/config-helper.service";
 
 @Injectable()
 export class FeedSeasonSeedToDbTask {
@@ -18,7 +18,7 @@ export class FeedSeasonSeedToDbTask {
     const [forceUpdate, callbackSetPaused] = args;
     try {
       this.logger.log({
-        level: 'info',
+        level: "info",
         message: `FeedSeasonSeedToDbTask begin execution. Force flag: ${forceUpdate}`,
       });
 
@@ -47,7 +47,7 @@ export class FeedSeasonSeedToDbTask {
               arrOfTaskToSave.push(taskToSave._id);
             } else {
               this.logger.log({
-                level: 'error',
+                level: "error",
                 message: `FeedSeasonSeedToDbTask task not found: ${taskId}`,
               });
 
@@ -56,7 +56,7 @@ export class FeedSeasonSeedToDbTask {
               // seed the tasks before seeding the seasons
               // if this happens it is a CRITICAL error
               // in the logic and it needs to be fixed
-              throw new Error('CRITICAL');
+              throw new Error("CRITICAL");
             }
           }
           season.tasks = [...arrOfTaskToSave];
@@ -64,19 +64,19 @@ export class FeedSeasonSeedToDbTask {
           if (seasonDoesNotExist) {
             await this.seasonsService.create(season);
             this.logger.log({
-              level: 'info',
+              level: "info",
               message: `FeedSeasonSeedToDbTask created season: ${season.number}`,
             });
           }
         } else {
           this.logger.log({
-            level: 'info',
+            level: "info",
             message: `FeedSeasonSeedToDbTask season already exists: ${season.number}`,
           });
 
           if (forceUpdate) {
             this.logger.log({
-              level: 'info',
+              level: "info",
               message: `FeedSeasonSeedToDbTask updating season: ${season.number}. Force flag: ${forceUpdate}`,
             });
             const seasonToUpdate = existingSeasons.find(
@@ -85,7 +85,7 @@ export class FeedSeasonSeedToDbTask {
 
             this.seasonsService.update({ _id: seasonToUpdate._id }, season);
             this.logger.log({
-              level: 'info',
+              level: "info",
               message: `FeedSeasonSeedToDbTask updated season: ${season.number}`,
             });
           }
@@ -95,13 +95,13 @@ export class FeedSeasonSeedToDbTask {
     } catch (err) {
       callbackSetPaused(false);
       this.logger.error({
-        level: 'error',
+        level: "error",
         message: `FeedSeasonSeedToDbTask error: ${err.message}`,
         error: err,
       });
 
-      if (err.message === 'CRITICAL') {
-        throw new Error('CRITICAL');
+      if (err.message === "CRITICAL") {
+        throw new Error("CRITICAL");
       }
     }
   }

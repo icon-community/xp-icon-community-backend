@@ -1,6 +1,14 @@
-import { IsString, IsEnum, IsMongoId, IsOptional, IsArray, ValidateNested, IsNumber } from 'class-validator';
-import { Type } from 'class-transformer';
-import { Types } from 'mongoose';
+import {
+  IsString,
+  IsEnum,
+  IsMongoId,
+  IsOptional,
+  IsArray,
+  ValidateNested,
+  IsNumber,
+} from "class-validator";
+import { Type } from "class-transformer";
+import { Types } from "mongoose";
 
 class XpEarnedDto {
   @IsNumber()
@@ -27,8 +35,8 @@ export class CreateUserTaskDto {
   seasonId: Types.ObjectId;
 
   @IsString()
-  @IsEnum(['pending', 'completed', 'failed'])
-  status: 'pending' | 'completed' | 'failed';
+  @IsEnum(["pending", "completed", "failed"])
+  status: "pending" | "completed" | "failed";
 
   @IsString()
   walletAddress: string;

@@ -1,4 +1,4 @@
-declare module 'rqst' {
+declare module "rqst" {
   const rqst: (
     path: string,
     data: any,

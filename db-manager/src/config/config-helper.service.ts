@@ -1,6 +1,6 @@
-import { customPath } from '../utils/utils';
-import { GENERAL_CONFIG } from './general.config';
-import * as fs from 'fs';
+import { customPath } from "../utils/utils";
+import { GENERAL_CONFIG } from "./general.config";
+import * as fs from "fs";
 
 export class ConfigHelperService {
   private readonly tasks: any[];
@@ -14,7 +14,7 @@ export class ConfigHelperService {
   }
 
   private loadFile(filePath: string): any[] {
-    return JSON.parse(fs.readFileSync(filePath, 'utf8'));
+    return JSON.parse(fs.readFileSync(filePath, "utf8"));
   }
 
   getTasks(): any[] {

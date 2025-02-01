@@ -79,10 +79,18 @@ export class BaseTask {
 
         // Fetch all the users in this season
         const allUsers = await this.usersService.findUsersBySeason(
-          new Types.ObjectId(season._id.toString()),
+          new Types.ObjectId(season._id?.toString()),
         );
         console.log("allUsers");
         console.log(allUsers);
+
+        if (allUsers.length === 0) {
+          this.logger.log({
+            level: "info",
+            message: `${this.constructor.name} no users found in season ${season._id}. Task execution skipped.`,
+          });
+          return;
+        }
 
         //TODO: continue
         // Execute custom task logic from child class
@@ -97,7 +105,7 @@ export class BaseTask {
     }
   }
 
-  async addXpToCollection(collectionId: string, data: any): Promise<void> {
+  async addXpToUserTaskDocument(documentId: string, data: any): Promise<void> {
     //
   }
 }

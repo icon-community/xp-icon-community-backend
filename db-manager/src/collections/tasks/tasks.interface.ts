@@ -1,4 +1,4 @@
-import { Document, ObjectId } from 'mongoose';
+import { Document, ObjectId } from "mongoose";
 
 export interface Tasks extends Document {
   _id: ObjectId | string;
@@ -9,5 +9,5 @@ export interface Tasks extends Document {
   title: string;
   rewardFormula: string[];
   createdAt?: Date;
-  chain: 'icon' | 'evm';
+  chain: "icon" | "evm";
 }

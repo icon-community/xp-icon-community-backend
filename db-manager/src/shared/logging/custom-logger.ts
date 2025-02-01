@@ -1,5 +1,5 @@
-import * as winston from 'winston';
-import 'winston-daily-rotate-file';
+import * as winston from "winston";
+import "winston-daily-rotate-file";
 
 const alignedWithColorsAndTime = winston.format.combine(
   winston.format.colorize(),
@@ -8,8 +8,8 @@ const alignedWithColorsAndTime = winston.format.combine(
   winston.format.printf((info) => {
     const { timestamp, level, message, ...args } = info;
 
-    const ts = (timestamp as string).slice(0, 19).replace('T', ' ');
-    return `${ts} [${level}]: ${message} ${Object.keys(args).length ? JSON.stringify(args, null, 2) : ''}`;
+    const ts = (timestamp as string).slice(0, 19).replace("T", " ");
+    return `${ts} [${level}]: ${message} ${Object.keys(args).length ? JSON.stringify(args, null, 2) : ""}`;
   }),
 );
 
@@ -19,10 +19,10 @@ const customFormat = winston.format.combine(
   winston.format.errors({ stack: true }),
   winston.format.json(),
   winston.format.timestamp({
-    format: 'YYYY-MM-DD HH:mm:ss',
+    format: "YYYY-MM-DD HH:mm:ss",
   }),
   winston.format.printf(
-    ({ level = 'info', message, timestamp, req, err, ...metadata }) => {
+    ({ level = "info", message, timestamp, req, err, ...metadata }) => {
       if (!req) {
         req = { headers: {} };
       }
@@ -57,9 +57,9 @@ export class Logging {
     this.dailyRotateFileTransport = new winston.transports.DailyRotateFile({
       filename: `logs/app_log-%DATE%.log`,
       zippedArchive: false,
-      datePattern: 'YYYY-MM-DD',
-      maxSize: '20m',
-      maxFiles: '14d',
+      datePattern: "YYYY-MM-DD",
+      maxSize: "20m",
+      maxFiles: "14d",
     });
 
     /**
@@ -67,20 +67,20 @@ export class Logging {
      */
     this.myFormat = alignedWithColorsAndTime;
     this.createLoggerConfig = {
-      level: 'info',
+      level: "info",
       format: winston.format.combine(
         // winston.format.colorize(),
         winston.format.splat(),
         winston.format.errors({ stack: true }),
         winston.format.json(),
         winston.format.timestamp({
-          format: 'YYYY-MM-DD HH:mm:ss',
+          format: "YYYY-MM-DD HH:mm:ss",
         }),
         this.myFormat,
       ),
 
       transports: [
-        new winston.transports.Console({ level: 'info' }),
+        new winston.transports.Console({ level: "info" }),
         this.dailyRotateFileTransport,
       ],
     };

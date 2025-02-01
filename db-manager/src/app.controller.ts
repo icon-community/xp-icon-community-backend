@@ -1,11 +1,11 @@
-import { Controller, Get } from '@nestjs/common';
-import { AppService } from './app.service';
+import { Controller, Get } from "@nestjs/common";
+import { AppService } from "./app.service";
 
 @Controller()
 export class AppController {
   constructor(private readonly appService: AppService) {}
 
-  @Get('/subscribe-newsletter')
+  @Get("/subscribe-newsletter")
   async subscribeNewsletter(): Promise<void> {
     await this.appService.subscribeNewsletter();
   }

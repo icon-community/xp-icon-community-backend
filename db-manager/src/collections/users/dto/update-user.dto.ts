@@ -7,16 +7,16 @@ import {
   IsEnum,
   ValidateNested,
   ArrayUnique,
-} from 'class-validator';
-import { Type } from 'class-transformer';
-import { ObjectId } from 'mongoose';
+} from "class-validator";
+import { Type } from "class-transformer";
+import { ObjectId } from "mongoose";
 
 class LinkedWalletDto {
   @IsString()
   address: string;
 
-  @IsEnum(['evm', 'icon'])
-  type: 'evm' | 'icon';
+  @IsEnum(["evm", "icon"])
+  type: "evm" | "icon";
 }
 
 class SeasonDto {

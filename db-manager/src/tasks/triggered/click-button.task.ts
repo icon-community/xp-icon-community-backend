@@ -1,5 +1,5 @@
-import { Injectable } from '@nestjs/common';
-import { Logger } from '@nestjs/common';
+import { Injectable } from "@nestjs/common";
+import { Logger } from "@nestjs/common";
 
 @Injectable()
 export class ClickButtonTask {
@@ -7,8 +7,8 @@ export class ClickButtonTask {
   execute(...rest): void {
     void rest;
     this.logger.log({
-      level: 'info',
-      message: 'ClickButtonTask executed',
+      level: "info",
+      message: "ClickButtonTask executed",
     });
   }
 }

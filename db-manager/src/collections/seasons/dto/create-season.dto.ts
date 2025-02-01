@@ -5,8 +5,8 @@ import {
   IsString,
   ArrayNotEmpty,
   IsArray,
-} from 'class-validator';
-import { Types } from 'mongoose';
+} from "class-validator";
+import { Types } from "mongoose";
 
 export class TaskReferenceDto {
   @IsNotEmpty()

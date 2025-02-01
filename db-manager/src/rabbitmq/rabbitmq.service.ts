@@ -1,7 +1,7 @@
-import { Injectable, OnModuleInit } from '@nestjs/common';
-import * as amqp from 'amqplib';
-import { RABBITMQ_CONFIG } from '../config/rabbitmq.config';
-import { Logger } from '@nestjs/common';
+import { Injectable, OnModuleInit } from "@nestjs/common";
+import * as amqp from "amqplib";
+import { RABBITMQ_CONFIG } from "../config/rabbitmq.config";
+import { Logger } from "@nestjs/common";
 
 @Injectable()
 export class RabbitMQService implements OnModuleInit {
@@ -27,38 +27,38 @@ export class RabbitMQService implements OnModuleInit {
   async onModuleInit() {
     try {
       this.logger.log({
-        level: 'info',
-        message: 'Connecting to RabbitMQ',
+        level: "info",
+        message: "Connecting to RabbitMQ",
       });
       this.connection = await amqp.connect(RABBITMQ_CONFIG.uri);
       this.logger.log({
-        level: 'info',
-        message: 'Connected to RabbitMQ',
+        level: "info",
+        message: "Connected to RabbitMQ",
       });
       this.channel = await this.connection.createChannel();
       this.logger.log({
-        level: 'info',
-        message: 'Channel created',
+        level: "info",
+        message: "Channel created",
       });
       for (const queueName of Object.values(RABBITMQ_CONFIG.queues)) {
         await this.channel.assertQueue(queueName);
         this.logger.log({
-          level: 'info',
+          level: "info",
           message: `Queue ${queueName} asserted`,
         });
       }
     } catch (err) {
       this.logger.error({
-        level: 'error',
-        message: 'Error connecting to RabbitMQ',
+        level: "error",
+        message: "Error connecting to RabbitMQ",
         error: err,
       });
 
       if (this.connection) {
         this.connection.close();
         this.logger.log({
-          level: 'info',
-          message: 'Connection closed',
+          level: "info",
+          message: "Connection closed",
         });
       }
     }
@@ -67,7 +67,7 @@ export class RabbitMQService implements OnModuleInit {
   async sendToQueue(queue: string, message: any, pause = false) {
     try {
       if (!this.channel) {
-        throw new Error('Channel not created');
+        throw new Error("Channel not created");
       }
       const sent = this.channel.sendToQueue(
         queue,
@@ -77,12 +77,12 @@ export class RabbitMQService implements OnModuleInit {
         throw new Error(`Failure sending message to queue ${queue}`);
       }
       this.logger.log({
-        level: 'info',
+        level: "info",
         message: `Message sent to queue ${queue}. Message: ${JSON.stringify(message)}`,
       });
       if (pause && this.taskThatPaused == null) {
         this.logger.log({
-          level: 'info',
+          level: "info",
           message: `Pausing all queue consumption`,
         });
         this.paused = true;
@@ -90,8 +90,8 @@ export class RabbitMQService implements OnModuleInit {
       }
     } catch (err) {
       this.logger.error({
-        level: 'error',
-        message: 'Error sending message to queue',
+        level: "error",
+        message: "Error sending message to queue",
         error: err,
       });
     }
@@ -100,14 +100,14 @@ export class RabbitMQService implements OnModuleInit {
   async consume(queue: string, callback: (msg: any, setPaused: any) => void) {
     try {
       if (!this.channel) {
-        throw new Error('Channel not created');
+        throw new Error("Channel not created");
       }
 
       this.channel.consume(queue, (msg) => {
         try {
           if (!msg) {
             this.logger.log({
-              level: 'info',
+              level: "info",
               message: `No message in queue ${queue}`,
             });
             return;
@@ -115,7 +115,7 @@ export class RabbitMQService implements OnModuleInit {
 
           if (this.paused) {
             this.logger.log({
-              level: 'info',
+              level: "info",
               message: `Queue consumption paused. Task that paused: ${this.taskThatPaused}`,
             });
             if (this.taskThatPaused !== msg.content.toString()) {
@@ -124,12 +124,12 @@ export class RabbitMQService implements OnModuleInit {
               // back to the queue
               this.channel.nack(msg, false, true);
               this.logger.log({
-                level: 'info',
+                level: "info",
                 message: `Message not consumed. Message: ${msg.content.toString()}`,
               });
             } else {
               this.logger.log({
-                level: 'info',
+                level: "info",
                 message: `Consuming message that paused queue consumption. Message: ${msg.content.toString()}`,
               });
               try {
@@ -140,12 +140,12 @@ export class RabbitMQService implements OnModuleInit {
                 callback(JSON.parse(msg.content.toString()), this.setPaused);
                 this.channel.ack(msg);
                 this.logger.log({
-                  level: 'info',
+                  level: "info",
                   message: `Message consumed from queue ${queue}. Message: ${msg.content.toString()}`,
                 });
               } catch (internalError) {
                 this.logger.log({
-                  level: 'error',
+                  level: "error",
                   message: `Error executing callback for message. Message: ${msg.content.toString()}`,
                   error: internalError,
                 });
@@ -170,14 +170,14 @@ export class RabbitMQService implements OnModuleInit {
             callback(JSON.parse(msg.content.toString()), this.setPaused);
             this.channel.ack(msg);
             this.logger.log({
-              level: 'info',
+              level: "info",
               message: `Message consumed from queue ${queue}. Message: ${msg.content.toString()}`,
             });
           }
         } catch (callbackError) {
           this.logger.log({
-            level: 'error',
-            message: 'Error consuming message from queue',
+            level: "error",
+            message: "Error consuming message from queue",
             error: callbackError,
           });
           this.channel.nack(msg, false, false);
@@ -185,8 +185,8 @@ export class RabbitMQService implements OnModuleInit {
       });
     } catch (err) {
       this.logger.error({
-        level: 'error',
-        message: 'Error consuming message from queue',
+        level: "error",
+        message: "Error consuming message from queue",
         error: err,
       });
     }
@@ -195,7 +195,7 @@ export class RabbitMQService implements OnModuleInit {
   triggeredQueueStatus = async () => {
     try {
       if (!this.channel) {
-        throw new Error('Channel not created');
+        throw new Error("Channel not created");
       }
 
       return await this.channel.checkQueue(
@@ -203,8 +203,8 @@ export class RabbitMQService implements OnModuleInit {
       );
     } catch (err) {
       this.logger.error({
-        level: 'error',
-        message: 'Error checking triggeredTasks queue status',
+        level: "error",
+        message: "Error checking triggeredTasks queue status",
         error: err,
       });
     }

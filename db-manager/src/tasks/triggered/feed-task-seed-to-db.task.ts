@@ -1,7 +1,7 @@
-import { Injectable } from '@nestjs/common';
-import { Logger } from '@nestjs/common';
-import { TasksService } from '../../collections/tasks/tasks.service';
-import { ConfigHelperService } from '../../config/config-helper.service';
+import { Injectable } from "@nestjs/common";
+import { Logger } from "@nestjs/common";
+import { TasksService } from "../../collections/tasks/tasks.service";
+import { ConfigHelperService } from "../../config/config-helper.service";
 
 @Injectable()
 export class FeedTaskSeedToDbTask {
@@ -22,7 +22,7 @@ export class FeedTaskSeedToDbTask {
     // console.log(args);
     try {
       this.logger.log({
-        level: 'info',
+        level: "info",
         message: `FeedTaskSeedToDbTask begin execution. Force flag: ${forceUpdate}`,
       });
 
@@ -35,19 +35,19 @@ export class FeedTaskSeedToDbTask {
         if (!existingTasks.find((t) => t.seedId === task.seedId)) {
           await this.tasksService.create(task);
           this.logger.log({
-            level: 'info',
+            level: "info",
             message: `FeedTaskSeedToDbTask created task: ${task.seedId}`,
           });
         } else {
           this.logger.log({
-            level: 'info',
+            level: "info",
             message: `FeedTaskSeedToDbTask task already exists: ${task.seedId}`,
           });
           // if forceUpdate is true, update the task
           if (forceUpdate) {
             await this.tasksService.update({ seedId: task.seedId }, task);
             this.logger.log({
-              level: 'info',
+              level: "info",
               message: `FeedTaskSeedToDbTask updated task: ${task.seedId}`,
             });
           }
@@ -56,7 +56,7 @@ export class FeedTaskSeedToDbTask {
       callbackSetPaused(false);
     } catch (err) {
       this.logger.error({
-        level: 'error',
+        level: "error",
         message: `FeedTaskSeedToDbTask error: ${err.message}`,
         error: err,
       });

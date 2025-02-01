@@ -1,4 +1,4 @@
-import { Model, Document } from 'mongoose';
+import { Model, Document } from "mongoose";
 
 export class BaseService<T extends Document, CreateDto, UpdateDto> {
   constructor(private readonly model: Model<T>) {}

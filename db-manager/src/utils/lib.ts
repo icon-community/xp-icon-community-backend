@@ -1,4 +1,4 @@
-import { ParseUrl } from '../shared/types/GeneralTypes';
+import { ParseUrl } from "../shared/types/GeneralTypes";
 
 export function parseUrl(url: string): ParseUrl {
   const inputInlowercase = url.toLowerCase();
@@ -6,26 +6,26 @@ export function parseUrl(url: string): ParseUrl {
     /^((https|http):\/\/)?(([a-zA-Z0-9-]{1,}\.){1,}([a-zA-Z0-9]{1,63}))(:[0-9]{2,5})?(\/.*)?$/;
 
   const parsedUrl = {
-    protocol: 'https',
-    path: '/',
+    protocol: "https",
+    path: "/",
     hostname: null,
-    port: '443',
+    port: "443",
   };
 
   const regexResult = inputInlowercase.match(urlRegex);
 
   if (regexResult != null) {
-    parsedUrl.protocol = regexResult[2] == null ? 'https' : regexResult[2];
-    parsedUrl.path = regexResult[7] == null ? '/' : regexResult[7];
+    parsedUrl.protocol = regexResult[2] == null ? "https" : regexResult[2];
+    parsedUrl.path = regexResult[7] == null ? "/" : regexResult[7];
     parsedUrl.hostname = regexResult[3] == null ? null : regexResult[3];
-    parsedUrl.port = regexResult[6] == null ? '' : regexResult[6].slice(1);
+    parsedUrl.port = regexResult[6] == null ? "" : regexResult[6].slice(1);
   }
 
   return parsedUrl;
 }
 
 export function isValidHex(str: string): boolean {
-  if (typeof str !== 'string') {
+  if (typeof str !== "string") {
     return false;
   }
   const hexRegex = /^0x[0-9a-fA-F]+$/;
@@ -33,7 +33,7 @@ export function isValidHex(str: string): boolean {
 }
 
 export function isXChainWallet(wallet: string): boolean {
-  return wallet.includes('/');
+  return wallet.includes("/");
 }
 
 // function taskRunner(task, db, extra) {

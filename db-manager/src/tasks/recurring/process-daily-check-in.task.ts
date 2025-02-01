@@ -1,11 +1,11 @@
-import { Injectable } from '@nestjs/common';
-import { TasksService } from '../../collections/tasks/tasks.service';
-import { SeasonsService } from '../../collections/seasons/seasons.service';
-import { UsersService } from '../../collections/users/users.service';
-import { ConfigHelperService } from '../../config/config-helper.service';
-import { TaskInput } from '../../shared/types/GeneralTypes';
-import { BaseTask } from '../base/base.task';
-import { RECURRING_TASKS_TYPES } from '../../constants';
+import { Injectable } from "@nestjs/common";
+import { TasksService } from "../../collections/tasks/tasks.service";
+import { SeasonsService } from "../../collections/seasons/seasons.service";
+import { UsersService } from "../../collections/users/users.service";
+import { ConfigHelperService } from "../../config/config-helper.service";
+import { TaskInput } from "../../shared/types/GeneralTypes";
+import { BaseTask } from "../base/base.task";
+import { RECURRING_TASKS_TYPES } from "../../constants";
 
 @Injectable()
 export class ProcessDailyCheckInTask extends BaseTask {
@@ -16,7 +16,8 @@ export class ProcessDailyCheckInTask extends BaseTask {
     usersService: UsersService,
     private readonly configHelperService: ConfigHelperService,
   ) {
-    super(seasonsService, tasksService, usersService); }
+    super(seasonsService, tasksService, usersService);
+  }
 
   async execute(taskInput: TaskInput): Promise<void> {
     await super.execute(taskInput, this.main.bind(this), this.taskType);

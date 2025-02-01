@@ -36,21 +36,21 @@ export type UserTaskDocument = UserTask & Document;
 export class UserTask {
   @Prop({
     type: MongooseSchema.Types.ObjectId,
-    ref: 'User',
+    ref: "User",
     required: [true, "Please specify field"],
   })
   userId: MongooseSchema.Types.ObjectId;
 
   @Prop({
     type: MongooseSchema.Types.ObjectId,
-    ref: 'Task',
+    ref: "Task",
     required: [true, "Please specify field"],
   })
   taskId: MongooseSchema.Types.ObjectId;
 
   @Prop({
     type: MongooseSchema.Types.ObjectId,
-    ref: 'Season',
+    ref: "Season",
     required: [true, "Please specify field"],
   })
   seasonId: MongooseSchema.Types.ObjectId;

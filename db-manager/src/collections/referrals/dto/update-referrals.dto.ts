@@ -1,5 +1,5 @@
-import { IsString, IsBoolean, IsMongoId, IsOptional } from 'class-validator';
-import { Types } from 'mongoose';
+import { IsString, IsBoolean, IsMongoId, IsOptional } from "class-validator";
+import { Types } from "mongoose";
 
 export class UpdateReferralDto {
   @IsOptional()

@@ -1,5 +1,5 @@
-import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
-import { Document } from 'mongoose';
+import { Prop, Schema, SchemaFactory } from "@nestjs/mongoose";
+import { Document } from "mongoose";
 
 export type DailyCheckInDocument = DailyCheckIn & Document;
 
@@ -11,7 +11,7 @@ export class DailyCheckIn {
     type: String,
     unique: true,
     index: true,
-    required: [true, 'Please specify field'],
+    required: [true, "Please specify field"],
   })
   walletAddress: string;
 

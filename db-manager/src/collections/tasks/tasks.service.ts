@@ -1,10 +1,10 @@
-import { Model } from 'mongoose';
-import { Injectable } from '@nestjs/common';
-import { InjectModel } from '@nestjs/mongoose';
-import { Tasks } from './tasks.interface';
-import { CreateTaskDto, UpdateTaskDto } from './dto';
-import MONGO_CONFIG from '../../config/mongo.config';
-import { BaseService } from '../../shared/base/base.service';
+import { Model } from "mongoose";
+import { Injectable } from "@nestjs/common";
+import { InjectModel } from "@nestjs/mongoose";
+import { Tasks } from "./tasks.interface";
+import { CreateTaskDto, UpdateTaskDto } from "./dto";
+import MONGO_CONFIG from "../../config/mongo.config";
+import { BaseService } from "../../shared/base/base.service";
 
 @Injectable()
 export class TasksService extends BaseService<

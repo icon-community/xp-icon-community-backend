@@ -1,6 +1,6 @@
-import { Injectable } from '@nestjs/common';
-import { TaskProducerService } from './tasks/task-producer.service';
-import { TRIGGERED_TASKS_TYPES } from './constants';
+import { Injectable } from "@nestjs/common";
+import { TaskProducerService } from "./tasks/task-producer.service";
+import { TRIGGERED_TASKS_TYPES } from "./constants";
 
 @Injectable()
 export class AppService {

@@ -1,4 +1,4 @@
-import { IsString, IsNumber, IsDate, IsOptional } from 'class-validator';
+import { IsString, IsNumber, IsDate, IsOptional } from "class-validator";
 
 export class CreateDailyCheckInDto {
   @IsString()

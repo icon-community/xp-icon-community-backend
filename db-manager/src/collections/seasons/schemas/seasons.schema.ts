@@ -1,6 +1,6 @@
-import * as mongoose from 'mongoose';
+import * as mongoose from "mongoose";
 const { Schema } = mongoose;
-import MONGO_CONFIG from '../../../config/mongo.config';
+import MONGO_CONFIG from "../../../config/mongo.config";
 
 /*
  * Season Schema
@@ -23,7 +23,7 @@ export const SeasonSchema = new Schema({
       validator: function (v) {
         return v > this.blockStart;
       },
-      message: 'blockEnd must be greater than blockStart',
+      message: "blockEnd must be greater than blockStart",
     },
   },
   active: {

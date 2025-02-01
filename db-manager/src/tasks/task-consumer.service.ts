@@ -1,8 +1,8 @@
-import { Injectable, OnModuleInit } from '@nestjs/common';
-import { RabbitMQService } from '../rabbitmq/rabbitmq.service';
-import { RABBITMQ_CONFIG } from '../config/rabbitmq.config';
-import { TaskService } from './task.service';
-import { Logger } from '@nestjs/common';
+import { Injectable, OnModuleInit } from "@nestjs/common";
+import { RabbitMQService } from "../rabbitmq/rabbitmq.service";
+import { RABBITMQ_CONFIG } from "../config/rabbitmq.config";
+import { TaskService } from "./task.service";
+import { Logger } from "@nestjs/common";
 
 @Injectable()
 export class TaskConsumerService implements OnModuleInit {
@@ -21,7 +21,7 @@ export class TaskConsumerService implements OnModuleInit {
       async (message, callback) => {
         void callback;
         this.logger.log({
-          level: 'info',
+          level: "info",
           message: `Executing recurring tasks:, ${JSON.stringify(message)}`,
         });
         this.taskService.executeRecurringTasks(message);
@@ -33,7 +33,7 @@ export class TaskConsumerService implements OnModuleInit {
       RABBITMQ_CONFIG.queues.triggeredTasks,
       async (message, callbackSetPaused) => {
         this.logger.log({
-          level: 'info',
+          level: "info",
           message: `Executing triggered tasks:, ${JSON.stringify(message)}`,
         });
         this.taskService.executeTriggeredTasks(

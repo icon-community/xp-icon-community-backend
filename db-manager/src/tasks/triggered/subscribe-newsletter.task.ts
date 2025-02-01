@@ -1,5 +1,5 @@
-import { Injectable } from '@nestjs/common';
-import { Logger } from '@nestjs/common';
+import { Injectable } from "@nestjs/common";
+import { Logger } from "@nestjs/common";
 
 @Injectable()
 export class SubscribeNewsletterTask {
@@ -7,8 +7,8 @@ export class SubscribeNewsletterTask {
   execute(...args: any[]): void {
     void args;
     this.logger.log({
-      level: 'info',
-      message: 'SubscribeNewsletterTask executed',
+      level: "info",
+      message: "SubscribeNewsletterTask executed",
     });
   }
 }

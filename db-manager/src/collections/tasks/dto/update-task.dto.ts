@@ -4,9 +4,9 @@ import {
   IsOptional,
   IsEnum,
   IsMongoId,
-} from 'class-validator';
+} from "class-validator";
 
-import { ObjectId } from 'mongoose';
+import { ObjectId } from "mongoose";
 
 export class UpdateTaskDto {
   @IsMongoId()
@@ -35,6 +35,6 @@ export class UpdateTaskDto {
   @IsOptional()
   createdAt?: Date;
 
-  @IsEnum(['icon', 'evm'])
-  chain?: 'icon' | 'evm';
+  @IsEnum(["icon", "evm"])
+  chain?: "icon" | "evm";
 }

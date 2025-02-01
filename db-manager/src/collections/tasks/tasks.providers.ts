@@ -1,7 +1,7 @@
-import { Connection } from 'mongoose';
-import { TaskSchema } from './schemas/tasks.schema';
-import { DB_CONNECTION } from '../../constants';
-import MONGO_CONFIG from '../../config/mongo.config';
+import { Connection } from "mongoose";
+import { TaskSchema } from "./schemas/tasks.schema";
+import { DB_CONNECTION } from "../../constants";
+import MONGO_CONFIG from "../../config/mongo.config";
 
 export const tasksProviders = [
   {

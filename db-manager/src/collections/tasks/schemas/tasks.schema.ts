@@ -1,4 +1,4 @@
-import * as mongoose from 'mongoose';
+import * as mongoose from "mongoose";
 const { Schema } = mongoose;
 
 export const TaskSchema = new Schema({
@@ -10,5 +10,5 @@ export const TaskSchema = new Schema({
   rewardFormula: { type: [String], required: true },
   createdAt: { type: Date, default: Date.now },
   // TODO: the values of the enum should be defined in a separate file
-  chain: { type: String, required: true, enum: ['icon', 'evm'] },
+  chain: { type: String, required: true, enum: ["icon", "evm"] },
 });

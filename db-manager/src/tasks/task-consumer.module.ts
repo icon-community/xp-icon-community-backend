@@ -1,8 +1,8 @@
-import { Module } from '@nestjs/common';
-import { RabbitMQModule } from '../rabbitmq/rabbitmq.module';
-import { TaskConsumerService } from './task-consumer.service';
-import { TaskModule } from './task.module';
-import { Logger } from '@nestjs/common';
+import { Module } from "@nestjs/common";
+import { RabbitMQModule } from "../rabbitmq/rabbitmq.module";
+import { TaskConsumerService } from "./task-consumer.service";
+import { TaskModule } from "./task.module";
+import { Logger } from "@nestjs/common";
 
 @Module({
   imports: [RabbitMQModule, TaskModule],
