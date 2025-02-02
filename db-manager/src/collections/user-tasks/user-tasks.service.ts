@@ -40,9 +40,15 @@ export class UserTasksService extends BaseService<
     return super.findByQuery({ taskId });
   }
 
-  async findUserTasksBySeason(
+  async findBySeasonId(seasonId: Types.ObjectId): Promise<UserTaskDocument> {
+    return super.findByQuery({ seasonId });
+  }
+
+  async findByAllIds(
+    userId: Types.ObjectId,
+    taskId: Types.ObjectId,
     seasonId: Types.ObjectId,
   ): Promise<UserTaskDocument> {
-    return super.findByQuery({ seasonId });
+    return super.findByQuery({ userId, taskId, seasonId });
   }
 }

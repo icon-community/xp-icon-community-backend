@@ -3,6 +3,7 @@ import { TaskInput } from "../../shared/types/GeneralTypes";
 import { SeasonsService } from "../../collections/seasons/seasons.service";
 import { TasksService } from "../../collections/tasks/tasks.service";
 import { UsersService } from "../../collections/users/users.service";
+import { UserTasksService } from "../../collections/user-tasks/user-tasks.service";
 import { Types } from "mongoose";
 
 export class BaseTask {
@@ -10,16 +11,19 @@ export class BaseTask {
   protected readonly seasonsService: SeasonsService;
   protected readonly tasksService: TasksService;
   protected readonly usersService: UsersService;
+  protected readonly userTasksService: UserTasksService;
 
   constructor(
     seasonsService: SeasonsService,
     tasksService: TasksService,
     usersService: UsersService,
+    userTasksService: UserTasksService,
   ) {
     this.logger = new Logger(this.constructor.name);
     this.seasonsService = seasonsService;
     this.tasksService = tasksService;
     this.usersService = usersService;
+    this.userTasksService = userTasksService;
   }
 
   async execute(
@@ -44,20 +48,7 @@ export class BaseTask {
         });
         return;
       }
-      /*
-       * {
-  _id: new ObjectId('679ae970e0de8eead56da1a3'),
-  seedId: 'DEPOSIT_AVAX_COLLATERAL_ICON',
-  type: 'onchain',
-  description: 'for depositing AVAX collateral, the user will receive 1 XP per USD value of the collateral deposited that day. It will be done daily (per chain period)',
-  criteria: [],
-  title: 'deposit AVAX collateral',
-  rewardFormula: [ 'amount', 'return amount * 1' ],
-  chain: 'icon',
-  createdAt: 2025-01-30T02:52:32.504Z,
-  __v: 0
-}
-*/
+
       // Fetch active seasons from the database
       const activeSeasons = await this.seasonsService.findActiveSeasons();
 
@@ -134,12 +125,23 @@ export class BaseTask {
             });
             continue;
           }
-          // Fetch the currentUser's task document
-          // const currentUserTaskDocument =
-          //   await this.tasksService.findUserTaskDocument(
-          //     currentUser._id,
-          //     season._id,
-          //   );
+
+          // initialize user-task data
+          let userTasksData = {};
+
+          // Fetch the current user-task document
+          const currentUserTaskDocument =
+            await this.userTasksService.findByAllIds(
+              new Types.ObjectId(currentUser._id.toString()),
+              new Types.ObjectId(targetTask._id.toString()),
+              new Types.ObjectId(season._id.toString()),
+            );
+
+          // if the user-task document from the database
+          // is not null, copy the data
+          if (currentUserTaskDocument != null) {
+            userTasksData = { ...currentUserTaskDocument };
+          }
 
           // Check if the task has already been executed
           //TODO: continue
