@@ -16,6 +16,10 @@ update-tasks-and-seasons:
 	@echo "Starting script to update seasons"
 	docker exec -e MONGO_CONTAINER=mongodb-prod blockchain-scraper node scripts/updateSeasons.js
 
+update-tasks-force:
+	@echo "> Running script to update tasks"
+	docker exec -e MONGO_CONTAINER=mongodb-prod -e FORCE_UPDATE_TASKS=true blockchain-scraper node scripts/updateTasks.js
+
 ## development commands
 test-scraper-mainnet:
 	@echo "> Running scraper tests"

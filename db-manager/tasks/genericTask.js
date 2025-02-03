@@ -2,7 +2,9 @@
 // balanced related data (collateral, loans, etc) from
 // the blockchain and updating the database with the
 // latest amounts.
-const { chains, tasks: TASKS_LABELS } = require("../common/utils/config");
+const { getKeyByValue } = require("../common/utils/utils");
+const CONFIG = require("../common/utils/config");
+const { chains, tasks: TASKS_LABELS } = CONFIG;
 const {
   userService,
   taskService,
@@ -18,7 +20,6 @@ const {
   updateOrCreateUserTask,
   getUserTasksBySeasonAndUserId,
 } = userTaskService;
-const config = require("../common/utils/config");
 
 async function genericTask(taskInput, db, seedId, callback) {
   const { height, prepTerm } = taskInput;
@@ -303,6 +304,10 @@ async function userReferralTaskMainLogic(
 ) {
   try {
     const xpArray = [];
+    const seasonLabel = getKeyByValue(
+      CONFIG.seasonsRoutes,
+      activeSeason.number,
+    );
     if (targetTask.seedId === TASKS_LABELS.usingReferralCode) {
       // this is the task for the case when this user is
       // the one using a referral code
@@ -313,7 +318,7 @@ async function userReferralTaskMainLogic(
       const referralDocs =
         await referralService.getReferralByReferredIdAndSeason(
           validUser._id,
-          config.seasonsRoutes[activeSeason.number],
+          seasonLabel,
           db.connection,
         );
 
@@ -433,7 +438,7 @@ async function userReferralTaskMainLogic(
       const referralDocs =
         await referralService.getReferralByReferrerIdAndSeason(
           validUser._id,
-          config.seasonsRoutes[activeSeason.number],
+          seasonLabel,
           db.connection,
         );
 

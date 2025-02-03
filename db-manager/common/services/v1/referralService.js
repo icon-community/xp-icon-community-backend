@@ -21,33 +21,36 @@ async function updateOrCreateReferral(query, update, connection) {
 }
 
 async function getReferralByReferrerIdAndSeason(
-  reffererUserId,
+  referrerUserId,
   seasonLabel,
   connection,
 ) {
-  return await getEntryByParam(
+  const result = await getEntryByParam(
     {
-      referrerUserId: reffererUserId,
+      referrerUserId: referrerUserId,
       seasonLabel: seasonLabel,
     },
     REFERRALS,
     connection,
   );
+
+  return result;
 }
 
 async function getReferralByReferredIdAndSeason(
-  refferedUserId,
+  referredUserId,
   seasonLabel,
   connection,
 ) {
-  return await getEntryByParam(
+  const result = await getEntryByParam(
     {
-      referredUserId: refferedUserId,
+      referredUserId: referredUserId,
       seasonLabel: seasonLabel,
     },
     REFERRALS,
     connection,
   );
+  return result;
 }
 
 module.exports = {
