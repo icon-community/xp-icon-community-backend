@@ -3,7 +3,7 @@
     "number": 1,
     "blockStart": 91775674,
     "blockEnd": 92422451,
-    "active": true,
+    "active": false,
     "tasks": [
       "LOCKING_SAVINGS_RATE_ICON",
       "REGISTER_NEW_USER",

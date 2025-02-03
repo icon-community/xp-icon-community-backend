@@ -87,7 +87,8 @@ async function updateOrCreateEntry(
     if (!model) {
       throw new Error(`Model ${collectionId} not found`);
     }
-    const result = await model.findOneAndUpdate(query, update, {
+    const updateObj = update.$set ? update : { $set: update };
+    const result = await model.findOneAndUpdate(query, updateObj, {
       new: true,
       upsert: upsert,
     });

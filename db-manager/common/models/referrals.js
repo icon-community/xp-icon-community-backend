@@ -62,14 +62,13 @@ const referralSchema = new Schema(
     },
   },
   {
-    collection: config.collections.referrals,
+    collection: COLLECTION_NAME,
     timestamps: {
       createdAt: true,
     },
     autoCreate: true,
     autoIndex: true,
   },
-  { collection: COLLECTION_NAME },
 );
 
 referralSchema.index({ referredUserId: 1, seasonLabel: 1 }, { unique: true });
