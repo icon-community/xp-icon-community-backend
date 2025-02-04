@@ -1,13 +1,15 @@
 import { Logger } from "@nestjs/common";
 import { TaskInput } from "../../shared/types/GeneralTypes";
+import { UserTaskStatus } from "../../shared/enum/general-enum";
 import { SeasonsService } from "../../collections/seasons/seasons.service";
 import { TasksService } from "../../collections/tasks/tasks.service";
 import { UsersService } from "../../collections/users/users.service";
 import { UserTasksService } from "../../collections/user-tasks/user-tasks.service";
+import { XpEarned } from "../../collections/user-tasks/schemas/user-tasks.schema";
 import { Types } from "mongoose";
 
 export class BaseTask {
-  private readonly logger: Logger;
+  readonly logger: Logger;
   protected readonly seasonsService: SeasonsService;
   protected readonly tasksService: TasksService;
   protected readonly usersService: UsersService;
@@ -28,7 +30,7 @@ export class BaseTask {
 
   async execute(
     taskInput: TaskInput,
-    callback: (arg: TaskInput) => Promise<void>,
+    callback: (arg: TaskInput) => Promise<XpEarned>,
     taskType: string,
   ): Promise<void> {
     try {
@@ -126,39 +128,90 @@ export class BaseTask {
             continue;
           }
 
-          // initialize user-task data
-          let userTasksData = {};
-
-          // Fetch the current user-task document
-          const currentUserTaskDocument =
-            await this.userTasksService.findByAllIds(
-              new Types.ObjectId(currentUser._id.toString()),
-              new Types.ObjectId(targetTask._id.toString()),
-              new Types.ObjectId(season._id.toString()),
+          try {
+            await callback(
+              taskInput,
+              userDocument,
+              seasonDocument,
+              taskDocument,
             );
-
-          // if the user-task document from the database
-          // is not null, copy the data
-          if (currentUserTaskDocument != null) {
-            userTasksData = { ...currentUserTaskDocument };
+          } catch (err) {
+            this.logger.error({
+              level: "error",
+              message: `${this.constructor.name} error: ${err.message}`,
+              error: err,
+            });
           }
 
-          // Check if the task has already been executed
-          //TODO: continue
-          // Execute custom task logic from child class
-          await callback(taskInput);
+          // // initialize user-task data
+          // const userTasksData = {
+          //   userId: new Types.ObjectId(currentUser._id.toString()),
+          //   taskId: new Types.ObjectId(targetTask._id.toString()),
+          //   seasonId: new Types.ObjectId(season._id.toString()),
+          //   xpEarned: [],
+          //   status: UserTaskStatus.PENDING,
+          //   walletAddress: currentUser.walletAddress,
+          // };
+
+          // // Fetch the current user-task document
+          // const currentUserTaskDocument =
+          //   await this.userTasksService.findByAllIds(
+          //     userTasksData.userId,
+          //     userTasksData.taskId,
+          //     userTasksData.seasonId,
+          //   );
+
+          // let xpObj = {
+          //   period: taskInput.prepTerm,
+          //   xp: 0,
+          //   block: taskInput.height,
+          // };
+          // try {
+          //   // Execute custom task logic from child class
+          //   // to calculate the new xp
+          //   xpObj = await callback(taskInput);
+
+          //   // TODO push new xp to userTasksData.xpEarned
+          // } catch (err) {
+          //   this.logger.error(
+          //     `Error calculating new XP on task ${this.constructor.name}: ${err.message}`,
+          //   );
+          //   continue;
+          // }
+          // if (currentUserTaskDocument == null) {
+          //   userTasksData.xpEarned.push(xpObj);
+          //   await this.userTasksService.create(userTasksData);
+          // } else {
+          //   // Check if the task has already been executed
+          //   if (currentUserTaskDocument.xpEarned.length > 0) {
+          //     const taskAlreadyExecuted = currentUserTaskDocument.xpEarned.some(
+          //       (xpDoc: XpEarned) => {
+          //         return xpDoc.period === taskInput.prepTerm;
+          //       },
+          //     );
+
+          //     if (taskAlreadyExecuted) {
+          //       this.logger.log({
+          //         // If the task has already been executed, skip the user
+          //         level: "info",
+          //         message: `${this.constructor.name} task ${taskType} already executed for user ${currentUser._id} in season ${season._id}. Task execution skipped.`,
+          //       });
+
+          //       continue;
+          //     }
+          //     // add new xp to the existing user-task document
+          //     await this.userTasksService.addXp(
+          //       currentUserTaskDocument._id,
+          //       xpObj,
+          //     );
+          //   }
+          // }
         }
       }
     } catch (err) {
-      this.logger.error({
-        level: "error",
-        message: `${this.constructor.name} error: ${err.message}`,
-        error: err,
-      });
+      throw new Error(
+        `Error executing task ${this.constructor.name}: ${err.message}`,
+      );
     }
   }
-
-  // async addXpToUserTaskDocument(documentId: string, data: any): Promise<void> {
-  //   //
-  // }
 }

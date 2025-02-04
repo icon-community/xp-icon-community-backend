@@ -8,7 +8,7 @@ import { LastBlockDto } from "../shared/dto/json-rpc-services.dto";
 import { TaskInput } from "../shared/types/GeneralTypes";
 import { Logger } from "@nestjs/common";
 import { getInitBlock } from "./utils";
-import { Seasons } from "../collections/seasons/seasons.interface";
+import { SeasonResponse } from "../collections/seasons/schemas/seasons.schema";
 
 // Amount of block from the period end block to fetch all
 // the tasks related information.
@@ -32,13 +32,13 @@ export default class BlockMonitorTaskRunner {
   private readonly bypassTasks: boolean;
   private tasksRunning: boolean;
   private readonly logger: Logger;
-  private readonly dbSeasonGetter: () => Promise<Seasons[]>;
+  private readonly dbSeasonGetter: () => Promise<SeasonResponse[]>;
 
   /**
    * Constructor for the BlockMonitorTaskRunner class.
    */
   constructor(
-    dbSeasonGetter: () => Promise<Seasons[]>,
+    dbSeasonGetter: () => Promise<SeasonResponse[]>,
     tasks: Array<(input: TaskInput) => Promise<void>> = [],
     bypassTasks = false,
   ) {

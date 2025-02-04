@@ -1,7 +1,7 @@
 import { Module } from "@nestjs/common";
 import { MongooseModule } from "@nestjs/mongoose";
 import { ReferralsService } from "./referrals.service";
-import { Referral, ReferralSchema } from "./schemas/referrals.schema";
+import { ReferralSchema } from "./schemas/referrals.schema";
 import MONGO_CONFIG from "../../config/mongo.config";
 
 @Module({

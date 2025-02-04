@@ -1,8 +1,11 @@
 import { Prop, Schema, SchemaFactory } from "@nestjs/mongoose";
-import { Document, Schema as MongooseSchema } from "mongoose";
+import { Document, Schema as MongooseSchema, Types } from "mongoose";
 import MONGO_CONFIG from "../../../config/mongo.config";
 
 export type ReferralDocument = Referral & Document;
+export interface ReferralResponse extends Referral {
+  _id: Types.ObjectId;
+}
 
 @Schema({
   timestamps: true, // This will automatically handle createdAt
@@ -59,3 +62,4 @@ export class Referral {
 }
 
 export const ReferralSchema = SchemaFactory.createForClass(Referral);
+ReferralSchema.set("collection", MONGO_CONFIG.collections.referrals);

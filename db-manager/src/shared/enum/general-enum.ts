@@ -26,3 +26,14 @@ export enum TokensEnum {
   weETH = "weETH",
   wstETH = "wstETH",
 }
+
+export enum UserTaskStatus {
+  PENDING = "pending",
+  COMPLETED = "completed",
+  FAILED = "failed",
+}
+
+export enum Chains {
+  icon = "icon",
+  evm = "evm",
+}

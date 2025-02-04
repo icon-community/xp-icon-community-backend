@@ -1,5 +1,7 @@
 import { Prop, Schema, SchemaFactory } from "@nestjs/mongoose";
-import { Document, Schema as MongooseSchema } from "mongoose";
+import { Document, Schema as MongooseSchema, Types } from "mongoose";
+import MONGO_CONFIG from "../../../config/mongo.config";
+import { Chains } from "../../../shared/enum/general-enum";
 
 @Schema()
 class LinkedWallet {
@@ -12,16 +14,16 @@ class LinkedWallet {
   @Prop({
     type: String,
     required: true,
-    enum: ["evm", "icon"],
+    enum: Chains,
   })
-  type: "evm" | "icon";
+  type: Chains;
 }
 
 @Schema()
 class Season {
   @Prop({
     type: MongooseSchema.Types.ObjectId,
-    ref: "Season",
+    ref: MONGO_CONFIG.collections.seasons,
     required: [true, "Please specify field"],
   })
   seasonId: MongooseSchema.Types.ObjectId;
@@ -34,6 +36,9 @@ class Season {
 }
 
 export type UserDocument = User & Document;
+export interface UserResponse extends User {
+  _id: Types.ObjectId;
+}
 
 @Schema({
   timestamps: true, // This will automatically handle createdAt and updatedAt
@@ -74,3 +79,4 @@ export class User {
 }
 
 export const UserSchema = SchemaFactory.createForClass(User);
+UserSchema.set("collection", MONGO_CONFIG.collections.users);

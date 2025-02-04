@@ -4,7 +4,7 @@ import rqst from "rqst";
 import { parseUrl } from "./lib";
 import { ConfigHelperService } from "../config/config-helper.service";
 import { JsonRpcRequest } from "../shared/types/GeneralTypes";
-import { Seasons } from "../collections/seasons/seasons.interface";
+import { SeasonResponse } from "../collections/seasons/schemas/seasons.schema";
 import { Logger } from "@nestjs/common";
 const logger = new Logger("utils");
 const configHelperService = new ConfigHelperService();
@@ -189,7 +189,7 @@ export async function makeJsonRpcCall(data: string, url: string) {
  * database and returns that blockStart
  */
 export async function getInitBlock(
-  allSeasons: Seasons[],
+  allSeasons: SeasonResponse[],
 ): Promise<number | null> {
   // This function will try to first fetch the last block from the seed file and if that fails, it will try to fetch it from the database by
   // looking for the active season and returning the blockStart of that season

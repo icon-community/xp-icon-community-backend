@@ -1,8 +1,14 @@
 import { Prop, Schema, SchemaFactory } from "@nestjs/mongoose";
-import { Document, Schema as MongooseSchema } from "mongoose";
+import { Document, Schema as MongooseSchema, Types } from "mongoose";
+import MONGO_CONFIG from "../../../config/mongo.config";
+import { UserTaskStatus } from "../../../shared/enum/general-enum";
+
+export interface UserTaskResponse extends UserTaskDocument {
+  _id: Types.ObjectId;
+}
 
 @Schema()
-class XpEarned {
+export class XpEarned {
   @Prop({
     type: Number,
     required: [true, "Please specify field"],
@@ -25,7 +31,7 @@ class XpEarned {
     type: MongooseSchema.Types.Mixed,
     required: false,
   })
-  details: any;
+  details?: any;
 }
 
 export type UserTaskDocument = UserTask & Document;
@@ -57,10 +63,10 @@ export class UserTask {
 
   @Prop({
     type: String,
-    enum: ["pending", "completed", "failed"],
-    default: "pending",
+    enum: Object.values(UserTaskStatus),
+    default: UserTaskStatus.PENDING,
   })
-  status: "pending" | "completed" | "failed";
+  status: UserTaskStatus;
 
   @Prop({
     type: String,
@@ -76,3 +82,4 @@ export class UserTask {
 }
 
 export const UserTaskSchema = SchemaFactory.createForClass(UserTask);
+UserTaskSchema.set("collection", MONGO_CONFIG.collections.userTasks);

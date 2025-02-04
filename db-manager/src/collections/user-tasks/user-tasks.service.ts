@@ -1,7 +1,11 @@
 import { Model, Types } from "mongoose";
 import { Injectable } from "@nestjs/common";
 import { InjectModel } from "@nestjs/mongoose";
-import { UserTaskDocument } from "./schemas/user-tasks.schema";
+import {
+  XpEarned,
+  UserTaskDocument,
+  UserTaskResponse,
+} from "./schemas/user-tasks.schema";
 import { CreateUserTaskDto, UpdateUserTaskDto } from "./dto";
 import MONGO_CONFIG from "../../config/mongo.config";
 import { BaseService } from "../shared/base/base.service";
@@ -21,34 +25,48 @@ export class UserTasksService extends BaseService<
 
   async create(
     createUserTaskDto: CreateUserTaskDto,
-  ): Promise<UserTaskDocument> {
-    return super.create(createUserTaskDto);
+  ): Promise<UserTaskResponse> {
+    return super.create(createUserTaskDto) as Promise<UserTaskResponse>;
+  }
+
+  async addXp(
+    docId: Types.ObjectId,
+    newXp: XpEarned,
+  ): Promise<UserTaskResponse> {
+    return super.update(
+      { _id: docId } as any,
+      { $push: { xpEarned: newXp } } as any,
+    ) as Promise<UserTaskResponse>;
   }
 
   async update(
     query: UpdateUserTaskDto,
     updateUserTaskDto: UpdateUserTaskDto,
-  ): Promise<UserTaskDocument> {
-    return super.update(query, updateUserTaskDto);
+  ): Promise<UserTaskResponse> {
+    return super.update(query, updateUserTaskDto) as Promise<UserTaskResponse>;
   }
 
-  async findByUserId(userId: Types.ObjectId): Promise<UserTaskDocument> {
-    return super.findByQuery({ userId });
+  async findByUserId(userId: Types.ObjectId): Promise<UserTaskResponse> {
+    return super.findByQuery({ userId }) as Promise<UserTaskResponse>;
   }
 
-  async findByTaskId(taskId: Types.ObjectId): Promise<UserTaskDocument> {
-    return super.findByQuery({ taskId });
+  async findByTaskId(taskId: Types.ObjectId): Promise<UserTaskResponse> {
+    return super.findByQuery({ taskId }) as Promise<UserTaskResponse>;
   }
 
-  async findBySeasonId(seasonId: Types.ObjectId): Promise<UserTaskDocument> {
-    return super.findByQuery({ seasonId });
+  async findBySeasonId(seasonId: Types.ObjectId): Promise<UserTaskResponse> {
+    return super.findByQuery({ seasonId }) as Promise<UserTaskResponse>;
   }
 
   async findByAllIds(
     userId: Types.ObjectId,
     taskId: Types.ObjectId,
     seasonId: Types.ObjectId,
-  ): Promise<UserTaskDocument> {
-    return super.findByQuery({ userId, taskId, seasonId });
+  ): Promise<UserTaskResponse> {
+    return super.findByQuery({
+      userId,
+      taskId,
+      seasonId,
+    }) as Promise<UserTaskResponse>;
   }
 }
