@@ -1,4 +1,4 @@
-import { FormattedTask, FormattedUserTask } from "../models/types/FormattedTypes";
+import { FormattedUserTask } from "../models/types/FormattedTypes";
 import { UserTaskDocument } from "../../db/schemas/UserTask.schema";
 
 export function sumXpTotal(arrayOfTasks: { task: { XPEarned_total_task: number } }[]): number {

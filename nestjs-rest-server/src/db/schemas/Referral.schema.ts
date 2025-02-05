@@ -28,7 +28,7 @@ export const ReferralSchema = new Schema<IReferral>(
       unique: true,
       required: [true, "Please specify field"],
       validate: {
-        validator: function (v) {
+        validator: function (v): boolean {
           return v !== this.referrerUserAddress;
         },
         message: "referredUserAddress must be different from referrerUserAddress",

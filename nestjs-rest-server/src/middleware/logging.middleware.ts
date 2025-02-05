@@ -5,6 +5,7 @@ import * as morgan from "morgan";
 export class HttpLoggerMiddleware implements NestMiddleware {
   private readonly logger = new Logger(HttpLoggerMiddleware.name);
 
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   use(req: any, res: any, next: () => void): void {
     morgan(process.env.NODE_ENV === "prod" ? "common" : "dev", {
       stream: {
