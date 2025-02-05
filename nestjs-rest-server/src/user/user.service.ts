@@ -331,7 +331,7 @@ export class UserService {
       }
 
       // add season to user
-      const newSeason: { seasonId: any; registrationBlock: any } = {
+      const newSeason: { seasonId: Types.ObjectId; registrationBlock: number } = {
         seasonId: season._id,
         registrationBlock: latestBlock.height,
       };
@@ -387,6 +387,7 @@ export class UserService {
       } else {
         throw new Error(JSON.stringify(response.data.data));
       }
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (e: any) {
       if (e?.response?.status === 404) {
         throw new NotFoundException(`Email ${email} not found`);

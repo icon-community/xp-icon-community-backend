@@ -5,6 +5,7 @@ import { StrKey } from "@stellar/stellar-base";
 import { isEthereumAddress } from "class-validator";
 import { isValidSuiAddress } from "@mysten/sui/utils";
 
+// eslint-disable-next-line @typescript-eslint/explicit-function-return-type
 export function validateUtil<Type extends object>(
   config: Record<string, unknown>,
   envVariablesClass: ClassConstructor<Type>,

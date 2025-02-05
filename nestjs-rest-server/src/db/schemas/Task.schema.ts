@@ -8,7 +8,7 @@ export interface ITask {
   seedId: string;
   type: string;
   description: string;
-  criteria: any;
+  criteria: Schema.Types.Mixed;
   title: string;
   rewardFormula: [string];
   chain: Chains;

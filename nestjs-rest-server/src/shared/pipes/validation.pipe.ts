@@ -3,7 +3,9 @@ import { validate } from "class-validator";
 import { plainToInstance } from "class-transformer";
 
 @Injectable()
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export class ValidationPipe implements PipeTransform<any> {
+  // eslint-disable-next-line @typescript-eslint/explicit-function-return-type, @typescript-eslint/no-explicit-any
   async transform(value: any, { metatype }: ArgumentMetadata) {
     if (!metatype || !this.toValidate(metatype)) {
       return value;
