@@ -39,7 +39,7 @@ export class TaskDbService {
       .find({
         _id: { $in: [...taskIds] },
       })
-      .lean()
+      .lean<ITask[]>()
       .exec();
   }
 }
