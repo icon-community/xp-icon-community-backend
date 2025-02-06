@@ -65,10 +65,10 @@
   {
     "seedId": "DEPOSIT_NATIVE_SUI_COLLATERAL",
     "type": "xchain",
-    "description": "for depositing native SUI collateral, the user will receive 1 XP per USD value of the collateral deposited that day. It will be done daily (per chain period)",
+    "description": "for depositing native SUI collateral, the user will receive 0.5 XP per USD value of the collateral deposited that day. It will be done daily (per chain period)",
     "criteria": [],
     "title": "deposit native crosschain collateral",
-    "rewardFormula": ["amount", "return amount * 1"],
+    "rewardFormula": ["amount", "return amount * 0.5"],
     "chain": "icon"
   },
   {

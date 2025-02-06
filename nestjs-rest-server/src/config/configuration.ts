@@ -76,7 +76,6 @@ export const iconChainConfigs: Record<IconNetwork, IconNetworkConfig> = {
 
 export const seasonsConfig = {
   routes: {
-    sui: 1,
-    "growth-test-season": 2,
+    "test-mirai-season": 1,
   } as Record<SeasonLabel, number>,
 } as const;

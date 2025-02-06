@@ -131,8 +131,7 @@ const config = {
     },
   },
   seasonsRoutes: {
-    sui: 1,
-    "growth-test-season": 2,
+    "test-mirai-season": 1,
     // iconteam: "1",
     // ripdao: "2",
     // vybzdao: "3",
