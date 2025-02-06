@@ -1,4 +1,3 @@
 export enum SeasonLabel {
-  sui = "sui",
-  "growth-test-season" = "growth-test-season",
+  "test-mirai-season" = "test-mirai-season",
 }

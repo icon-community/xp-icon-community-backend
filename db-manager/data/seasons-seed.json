@@ -1,29 +1,8 @@
 [
   {
     "number": 1,
-    "blockStart": 91775674,
-    "blockEnd": 92422451,
-    "active": false,
-    "tasks": [
-      "LOCKING_SAVINGS_RATE_ICON",
-      "REGISTER_NEW_USER",
-      "DEPOSIT_NATIVE_SUI_COLLATERAL",
-      "MINTING_BNUSD_SUI",
-      "USING_REFERRAL_CODE",
-      "REFERRING_USER",
-      "DAILY_CHECK_IN_SUI_COLLATERAL",
-      "HANA_NEWSLETTER",
-      "LINK_TWITTER_X",
-      "LINK_GOOGLE",
-      "DEPOSIT_M_SUI_COLLATERAL",
-      "MINTING_BNUSD_M_SUI"
-    ],
-    "contract": "cx0ac2a377138d38364ae79b1553ac05cc2e911456"
-  },
-  {
-    "number": 2,
-    "blockStart": 92524061,
-    "blockEnd": 92939873,
+    "blockStart": 93069229,
+    "blockEnd": 93241703,
     "active": true,
     "tasks": [
       "REGISTER_NEW_USER",
