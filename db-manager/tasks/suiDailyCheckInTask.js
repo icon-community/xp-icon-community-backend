@@ -2,10 +2,11 @@
 const dailyCheckInTask = require("./dailyCheckInTask");
 
 /*
- * (1 + streak count / 100) * (value of deposited collateral in USD / 2)
+ * (amount)*(multiplier/10)
  */
 function rewardCalculator(amount, multiplier) {
-  return (1 + multiplier / 100) * (amount / 2);
+  const result = (amount * multiplier) / 10;
+  return result;
 }
 
 async function suiDailyCheckInTask(taskInput, db) {
