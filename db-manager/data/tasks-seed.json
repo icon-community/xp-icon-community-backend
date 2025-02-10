@@ -115,7 +115,7 @@
   {
     "seedId": "REFERRING_USER",
     "type": "referral",
-    "description": "Once per user using a referral code. The referrer will receive 10000 XP for each new user that uses their referral code.",
+    "description": "Once per user using a referral code. The referrer will receive 1000 XP for each new user that uses their referral code.",
     "criteria": [
       {
         "description": "gains the xp after the new user uses the referral code and accumulates 10000 XP",
@@ -141,7 +141,7 @@
   {
     "seedId": "DAILY_CHECK_IN_SUI_COLLATERAL",
     "type": "xchain",
-    "description": "for depositing native SUI collateral and making daily check in, the user will receive 1 + (streak count/100) * (value of deposited collateral in USD) XP. It will be done daily (per chain period)",
+    "description": "for depositing native SUI collateral and making daily check in, the user will receive (value of deposited collateral in USD) * (streak count/10) XP. It will be done daily (per chain period)",
     "criteria": {},
     "title": "daily check in",
     "rewardFormula": ["amount", "return amount * 1"],
