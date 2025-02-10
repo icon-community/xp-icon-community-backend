@@ -1,8 +1,8 @@
 [
   {
     "number": 1,
-    "blockStart": 93069229,
-    "blockEnd": 93241703,
+    "blockStart": 93241703,
+    "blockEnd": 95095798,
     "active": true,
     "tasks": [
       "REGISTER_NEW_USER",

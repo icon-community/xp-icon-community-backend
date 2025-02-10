@@ -131,11 +131,7 @@ const config = {
     },
   },
   seasonsRoutes: {
-    "test-mirai-season": 1,
-    // iconteam: "1",
-    // ripdao: "2",
-    // vybzdao: "3",
-    // mrgryzzly: "4",
+    "mirai-season": 1,
     // uncomment these during testing
     // test1: "1",
     // test2: "2",
