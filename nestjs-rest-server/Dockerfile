@@ -8,6 +8,7 @@ COPY package*.json ./
 
 # Install app dependencies
 RUN npm ci
+RUN npm run install
 
 FROM builder AS prod
 
@@ -21,4 +22,4 @@ FROM builder AS dev
 
 COPY *.json ./
 
-CMD ["/bin/sh", "-c", "npm install && npm run start:dev"]
+CMD ["/bin/sh", "-c", "npm run start:dev"]
