@@ -8,7 +8,7 @@ COPY package*.json ./
 
 # Install app dependencies
 RUN npm ci
-RUN npm run install
+RUN npm install
 
 FROM builder AS prod
 
