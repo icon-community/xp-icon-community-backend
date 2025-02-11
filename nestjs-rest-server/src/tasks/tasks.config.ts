@@ -27,7 +27,7 @@ export const tasks: Record<TaskLabel, TaskConfig> = {
     description: "One time reward for subscribing linked email to hana newsletter",
     criteria: [],
     title: "hana newsletter",
-    rewardFormula: ["amount", "return 6000"],
+    rewardFormula: ["amount", "return 3000"],
     chain: ChainType.icon,
   },
   [TaskLabel.LINK_TWITTER_X]: {

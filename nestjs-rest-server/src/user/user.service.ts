@@ -47,6 +47,7 @@ import { TasksService } from "../tasks/tasks.service";
 import { XpgoConfigService } from "../config/xpgo-config.service";
 import { retry } from "../shared/utils/general-util";
 import { MaileriteSubscriberDto } from "./dto/mailerite-subscriber.dto";
+import { ReferralQueryParam } from "./user-queries";
 
 @Injectable()
 export class UserService {
@@ -95,7 +96,7 @@ export class UserService {
 
       return formatUser(updatedUser);
     } catch (e: unknown) {
-      console.error(e);
+      this.logger.error(e);
       throw new InternalServerErrorException("Failed to link user social");
     }
   }
@@ -121,122 +122,131 @@ export class UserService {
   }
 
   async getUserBySeason(userWallet: string, seasonLabel: SeasonLabel): Promise<FormattedUserSeason | HttpException> {
-    const seasonDbLabel = seasonsConfig.routes[seasonLabel];
+    try {
+      const seasonDbLabel = seasonsConfig.routes[seasonLabel];
 
-    if (!seasonDbLabel) {
-      throw new Error("Invalid season");
-    }
-
-    const user = await this.userDb.getUserByAddress(userWallet);
-    const formattedUser = formatUserDocument(user);
-
-    if (!user || !formattedUser) {
-      throw new BadRequestException(UserErrorCodes.USER_NOT_FOUND);
-    }
-
-    // from the user data fetch the seasons that the
-    // user is registered in
-    const userSeasons = user.seasons;
-
-    // fetch the season by the provided season label
-    const season = await this.seasonDb.getSeasonByNumberId(seasonDbLabel);
-
-    // if the season is not found, throw an error
-    if (!season) {
-      throw new BadRequestException(SeasonErrorCodes.SEASON_NOT_FOUND);
-    }
-
-    // verify that the user is registered in the season
-    // by checking if the id of season is inside the
-    // userSeasons array
-    let flag = false;
-    userSeasons.forEach((registeredSeasons) => {
-      if (registeredSeasons.seasonId.equals(season._id)) {
-        flag = true;
-      }
-    });
-
-    if (flag === false) {
-      throw new BadRequestException(SeasonErrorCodes.SEASON_NOT_REGISTERED);
-    }
-
-    const formattedSeason = formatSeasonDocument(season);
-
-    const seasonTasks = (await this.taskDb.getTasksByIds(season.tasks)) ?? [];
-
-    const tasks: FormattedUserBySeasonTask[] = [];
-    const userAboveTasks = [];
-    const userBelowTasks = [];
-
-    const rankings = await this.rankingService.getRankingOfSeason(seasonDbLabel);
-
-    const thisUserIndex = rankings.findIndex((userIndex) => userIndex._id.equals(user._id));
-    const userAbove = thisUserIndex - 1 < 0 ? null : rankings[thisUserIndex - 1].address;
-    const userBelow = thisUserIndex + 1 >= rankings.length ? null : rankings[thisUserIndex + 1].address;
-
-    for (let i = 0; i < seasonTasks.length; i++) {
-      const taskFromDb = seasonTasks[i];
-
-      if (taskFromDb == null) {
-        console.log("Task not found");
-        continue;
+      if (!seasonDbLabel) {
+        return new BadRequestException(SeasonErrorCodes.SEASON_NOT_FOUND);
       }
 
-      if (userAbove != null) {
-        const totalXp = await this.getTaskTotalXp(rankings[thisUserIndex - 1]._id, season.tasks[i]._id, season._id);
-        userAboveTasks.push({
-          task: {
-            XPEarned_total_task: totalXp,
-          },
-        });
+      const user = await this.userDb.getUserByAddress(userWallet);
+      if (!user) {
+        return new BadRequestException(UserErrorCodes.USER_NOT_FOUND);
+      }
+      const formattedUser = formatUserDocument(user);
+
+      // from the user data fetch the seasons that the
+      // user is registered in
+      const userSeasons = user.seasons;
+
+      // fetch the season by the provided season label
+      const season = await this.seasonDb.getSeasonByNumberId(seasonDbLabel);
+
+      // if the season is not found, throw an error
+      if (!season) {
+        return new BadRequestException(SeasonErrorCodes.SEASON_NOT_FOUND);
       }
 
-      if (userBelow != null) {
-        const totalXp = await this.getTaskTotalXp(rankings[thisUserIndex + 1]._id, season.tasks[i]._id, season._id);
-        userBelowTasks.push({
-          task: {
-            XPEarned_total_task: totalXp,
-          },
-        });
+      // verify that the user is registered in the season
+      // by checking if the id of season is inside the
+      // userSeasons array
+      const isRegistered = userSeasons.some((registeredSeasons) => registeredSeasons.seasonId.equals(season._id));
+
+      if (isRegistered === false) {
+        return new BadRequestException(SeasonErrorCodes.SEASON_NOT_REGISTERED);
       }
 
-      const userTasks = formatUserTaskDocuments(
-        await this.userTaskDb.getUserTaskByAllIds(user._id, season.tasks[i]._id, season._id),
-      );
+      const formattedSeason = formatSeasonDocument(season);
 
-      if (userTasks == null || userTasks.length == 0) {
-        continue;
-      }
+      // find all the tasks registered in the season
+      // this value is not necessarily the same as the
+      // tasks that the user has completed (userTasks)
+      const seasonTasks = (await this.taskDb.getTasksByIds(season.tasks)) ?? [];
 
-      const taskTotalXp = calculateTaskTotalXp(userTasks);
-      const xp = {
-        status: userTasks[0].status,
-        xpEarned: userTasks.map((task) => task.xpEarned).flat(),
-      } satisfies FormattedUserTask;
+      // find the rankings of the season
+      const rankings = await this.rankingService.getRankingOfSeason(seasonDbLabel);
 
-      tasks.push({
-        task: {
-          ...taskFromDb,
-          XPEarned_total_task: taskTotalXp,
-        },
-        xp,
+      // find this user in the rankings and initialize
+      // and empty array to store the tasks of this user
+      const thisUserIndex = rankings.findIndex((userIndex) => userIndex._id.equals(user._id));
+      const tasks: FormattedUserBySeasonTask[] = [];
+
+      // find the user above in the rankings and initialize
+      // and empty array to store the tasks of this user
+      const userAbove = thisUserIndex - 1 < 0 ? null : rankings[thisUserIndex - 1].address;
+      const userAboveRankingData = rankings.find((userObj) => {
+        return userObj.address == userAbove;
       });
-    }
+      const userAboveTasksXp = userAboveRankingData ? userAboveRankingData.total : null;
 
-    return {
-      user: formattedUser,
-      season: {
-        ...formattedSeason,
-        Rank: thisUserIndex + 1,
-        Address_above: userAbove,
-        Address_below: userBelow,
-        Address_above_XP: sumXpTotal(userAboveTasks),
-        Address_below_XP: sumXpTotal(userBelowTasks),
-        XPEarned_total: sumXpTotal(tasks),
-        XPEarned_24hrs: sumXp24hrs(tasks),
-        tasks: tasks,
-      },
-    };
+      // find the user below in the rankings and initialize
+      // and empty array to store the tasks of this user
+      const userBelow = thisUserIndex + 1 >= rankings.length ? null : rankings[thisUserIndex + 1].address;
+      const userBelowRankingData = rankings.find((userObj) => {
+        return userObj.address == userBelow;
+      });
+      const userBelowTasksXp = userBelowRankingData ? userBelowRankingData.total : null;
+
+      for (let i = 0; i < seasonTasks.length; i++) {
+        const taskFromDb = seasonTasks[i];
+
+        if (taskFromDb == null) {
+          this.logger.log("Task not found");
+          continue;
+        }
+
+        const userTaskTemplate = {
+          status: null,
+          xpEarned: [],
+        };
+
+        const userTasks = formatUserTaskDocuments(
+          await this.userTaskDb.getUserTaskByAllIds(user._id, taskFromDb._id, season._id),
+        );
+
+        if (userTasks == null || userTasks.length == 0) {
+          continue;
+        }
+        const userTaskReal = {
+          ...userTaskTemplate,
+          ...userTasks[0],
+        };
+
+        const taskTotalXp = calculateTaskTotalXp([userTaskReal]);
+        const xp = {
+          status: userTaskReal.status,
+          xpEarned: userTaskReal.xpEarned,
+        } satisfies FormattedUserTask;
+
+        tasks.push({
+          task: {
+            ...taskFromDb,
+            XPEarned_total_task: taskTotalXp,
+          },
+          xp,
+        });
+      }
+
+      const result = {
+        user: formattedUser,
+        season: {
+          ...formattedSeason,
+          Rank: thisUserIndex + 1,
+          Address_above: userAbove,
+          Address_below: userBelow,
+          Address_above_XP: userAboveTasksXp,
+          Address_below_XP: userBelowTasksXp,
+          XPEarned_total: sumXpTotal(tasks),
+          XPEarned_24hrs: sumXp24hrs(tasks),
+          tasks: tasks,
+        },
+      };
+
+      return result;
+    } catch (err) {
+      this.logger.error(err);
+      return new InternalServerErrorException("Failed to get user by season");
+    }
   }
 
   async getTaskTotalXp(userId: Types.ObjectId, taskId: Types.ObjectId, seasonId: Types.ObjectId): Promise<number> {
@@ -259,7 +269,7 @@ export class UserService {
     return referralCode;
   }
 
-  async registerUser(publicAddress: string, referralCode?: string): Promise<UserResponseDto> {
+  async registerUser(publicAddress: string, referralQueryParam: ReferralQueryParam): Promise<UserResponseDto> {
     try {
       const createUserDto: CreateUserDto = {
         walletAddress: publicAddress,
@@ -270,9 +280,14 @@ export class UserService {
       const rawUser = await this.userDb.createUser(createUserDto);
 
       // handle referral after user creation
-      if (referralCode) {
+      if (referralQueryParam.referralCode && referralQueryParam.seasonLabel) {
         try {
-          await this.referralService.createUserReferral(referralCode, publicAddress, rawUser._id);
+          await this.referralService.createUserReferral(
+            referralQueryParam.referralCode,
+            referralQueryParam.seasonLabel,
+            publicAddress,
+            rawUser._id,
+          );
         } catch {
           // gracefully log an error but do not throw
           this.logger.error("Failed to create referral");
@@ -316,7 +331,7 @@ export class UserService {
       }
 
       // add season to user
-      const newSeason: { seasonId: any; registrationBlock: any } = {
+      const newSeason: { seasonId: Types.ObjectId; registrationBlock: number } = {
         seasonId: season._id,
         registrationBlock: latestBlock.height,
       };
@@ -372,6 +387,7 @@ export class UserService {
       } else {
         throw new Error(JSON.stringify(response.data.data));
       }
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (e: any) {
       if (e?.response?.status === 404) {
         throw new NotFoundException(`Email ${email} not found`);

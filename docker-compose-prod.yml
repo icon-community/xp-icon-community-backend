@@ -75,6 +75,7 @@ services:
     container_name: rest-server1
     build:
       context: ./nestjs-rest-server
+      target: prod
 
     restart: always
     ports:
@@ -92,6 +93,7 @@ services:
   #   container_name: rest-server2
   #   build:
   #     context: ./nestjs-rest-server
+  #     target: prod
   #   restart: always
   #   ports:
   #     - "3502:3500"
@@ -106,6 +108,7 @@ services:
   #   container_name: rest-server3
   #   build:
   #     context: ./nestjs-rest-server
+  #     target: prod
   #   restart: always
   #   ports:
   #     - "3503:3500"

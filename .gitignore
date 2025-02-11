@@ -19,3 +19,9 @@ bin
 test-docker
 .prettierignore
 .prettierrc
+.history
+.tmp
+dev-db
+db-manager/dev-db
+dist
+rabbitmq-data

@@ -29,7 +29,7 @@ export const SeasonsSchema = new Schema<ISeason>(
       type: Number,
       required: true,
       validate: {
-        validator: function (v) {
+        validator: function (v): boolean {
           return v > this.blockStart;
         },
         message: "blockEnd must be greater than blockStart",

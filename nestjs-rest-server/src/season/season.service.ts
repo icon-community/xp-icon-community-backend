@@ -32,6 +32,13 @@ export class SeasonService {
   ): Promise<RewardsDto[]> {
     const filterData = !filter ? {} : filter;
 
+    const parsedTotal = parseInt(total);
+    const parsedBaseline = parseInt(baseline);
+
+    if (isNaN(parsedTotal) || isNaN(parsedBaseline)) {
+      throw new BadRequestException("Invalid total or baseline");
+    }
+
     const omitFilter = filterData.omit == null ? [] : filterData.omit;
     const seasonDbLabel = seasonsConfig.routes[seasonLabel];
     const rankings = await this.rankingService.getRankingOfSeason(seasonDbLabel);
@@ -60,13 +67,13 @@ export class SeasonService {
       }
     }
 
-    if (baseline * participants >= total) {
+    if (parsedBaseline * participants >= parsedTotal) {
       throw new Error("Baseline is too high");
     }
 
-    const totalWithoutBaseline = total - baseline * participants;
+    const totalWithoutBaseline = parsedTotal - parsedBaseline * participants;
 
-    return rankData.map((obj) => {
+    const result = rankData.map((obj) => {
       const { total, address } = obj;
 
       if (omitFilter.includes(address)) {
@@ -79,17 +86,20 @@ export class SeasonService {
       if (total === 0) {
         return {
           ...obj,
-          amount: baseline,
+          amount: parsedBaseline,
         };
       }
 
-      const amount = (total / totalPoints) * totalWithoutBaseline + baseline;
+      const multiplier = (total / totalPoints) * totalWithoutBaseline;
+      const amount = multiplier + parsedBaseline;
 
       return {
         ...obj,
         amount: amount,
       };
     });
+
+    return result;
   }
 
   async getSeasonDocument(seasonLabel: SeasonLabel): Promise<SeasonsDocument> {

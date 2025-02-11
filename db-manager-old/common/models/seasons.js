@@ -4,6 +4,7 @@
 const mongoose = require("mongoose");
 const Schema = mongoose.Schema;
 const config = require("../utils/config");
+const COLLECTION_NAME = config.collections.season;
 
 // validating that the environment variable has
 // an entry for the tasks collections
@@ -14,44 +15,47 @@ if (config.collections.task == null) {
 /*
  * Season Schema
  */
-const seasonSchema = new Schema({
-  number: {
-    type: Number,
-    required: true,
-    unique: true,
-    index: true,
-  },
-  blockStart: {
-    type: Number,
-    required: true,
-  },
-  blockEnd: {
-    type: Number,
-    required: true,
-    validate: {
-      validator: function (v) {
-        return v > this.blockStart;
-      },
-      message: "blockEnd must be greater than blockStart",
+const seasonSchema = new Schema(
+  {
+    number: {
+      type: Number,
+      required: true,
+      unique: true,
+      index: true,
     },
-  },
-  active: {
-    type: Boolean,
-    required: true,
-    default: true,
-  },
-  contract: {
-    type: String,
-    required: true,
-  },
-  tasks: [
-    {
-      type: Schema.Types.ObjectId,
-      ref: config.collections.task,
+    blockStart: {
+      type: Number,
       required: true,
     },
-  ],
-});
+    blockEnd: {
+      type: Number,
+      required: true,
+      validate: {
+        validator: function (v) {
+          return v > this.blockStart;
+        },
+        message: "blockEnd must be greater than blockStart",
+      },
+    },
+    active: {
+      type: Boolean,
+      required: true,
+      default: true,
+    },
+    contract: {
+      type: String,
+      required: true,
+    },
+    tasks: [
+      {
+        type: Schema.Types.ObjectId,
+        ref: config.collections.task,
+        required: true,
+      },
+    ],
+  },
+  { collection: COLLECTION_NAME },
+);
 
 //NOTE: the following code block restricts the number
 //of active seasons to 1
@@ -67,5 +71,4 @@ const seasonSchema = new Schema({
 //   next();
 // });
 
-// const Season = mongoose.model("Season", seasonSchema);
 module.exports = seasonSchema;

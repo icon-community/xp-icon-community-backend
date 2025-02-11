@@ -1,5 +1,7 @@
 const mongoose = require("mongoose");
+const config = require("../utils/config");
 const { Schema } = mongoose;
+const COLLECTION_NAME = config.collections.dailyCheckIn;
 
 const dailyCheckInSchema = new Schema(
   {
@@ -18,6 +20,7 @@ const dailyCheckInSchema = new Schema(
       default: Date.now,
     },
   },
+  { collection: COLLECTION_NAME },
 );
 
 module.exports = dailyCheckInSchema;

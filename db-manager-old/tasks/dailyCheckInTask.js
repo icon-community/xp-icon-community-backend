@@ -1,5 +1,7 @@
 const {
   getXChainCollateralInUSDValue,
+  getSuiXChainCollateralInUSDValue,
+  getmSuiXChainCollateralInUSDValue,
 } = require("../common/utils/json-rpc-services");
 const {
   userService,
@@ -9,7 +11,7 @@ const {
 } = require("../common/services/v1/");
 const { chains, tasks: TASKS_LABELS } = require("../common/utils/config");
 const {
-  getUserDailyCheckIn,
+  getUserDailyCheckInByWalletAddress,
 } = require("../common/services/v1/dailyCheckInService");
 const { getActiveSeason } = seasonService;
 const { getTaskBySeedId } = taskService;
@@ -18,13 +20,22 @@ const { getUserTaskByAllIds, updateOrCreateUserTask } = userTaskService;
 
 // Daily check in task using consecutive streak count and deposited cross-chain/sui collateral to calculate daily xp
 
-async function dailyCheckInTask(taskInput, db, chain) {
+async function dailyCheckInTask(
+  taskInput,
+  db,
+  chain,
+  rewardsCalculator = null,
+) {
   try {
     let SEED_ID;
     if (chain === "sui") {
-      SEED_ID = TASKS_LABELS.dailyCheckInSui
+      SEED_ID = TASKS_LABELS.dailyCheckInSui;
     } else if (chain === "cross-chain") {
-      SEED_ID = TASKS_LABELS.dailyCheckInCrossChain
+      SEED_ID = TASKS_LABELS.dailyCheckInCrossChain;
+    }
+
+    if (rewardsCalculator === null) {
+      throw new Error("rewardsCalculator is required");
     }
 
     const { height, prepTerm } = taskInput;
@@ -153,50 +164,76 @@ async function dailyCheckInTask(taskInput, db, chain) {
             }
           }
 
-          // calculate total daily check in xp as: XP = 1 + (streak count/100) * (value of deposited collateral in USD) / 2
           let totalDailyXp = 0;
 
           const allXCallAddresses = [];
           if (SEED_ID === TASKS_LABELS.dailyCheckInSui) {
-            validUser.linkedWallets.forEach(xChainWallet => {
+            validUser.linkedWallets.forEach((xChainWallet) => {
               if (xChainWallet.type === "sui") {
-                allXCallAddresses.push(`${xChainWallet.type}/${xChainWallet.address}`)
+                allXCallAddresses.push(
+                  `${xChainWallet.type}/${xChainWallet.address}`,
+                );
               }
-            })
+            });
           } else {
-            validUser.linkedWallets.forEach(xChainWallet => {
+            validUser.linkedWallets.forEach((xChainWallet) => {
               if (xChainWallet.type === "evm") {
-                allXCallAddresses.push(...chains.evm.map(chain => `${chain}/${xChainWallet.address}`));
+                allXCallAddresses.push(
+                  ...chains.evm.map(
+                    (chain) => `${chain}/${xChainWallet.address}`,
+                  ),
+                );
               } else if (["sui", "stellar"].includes(xChainWallet.type)) {
-                allXCallAddresses.push(`${xChainWallet.type}/${xChainWallet.address}`)
+                allXCallAddresses.push(
+                  `${xChainWallet.type}/${xChainWallet.address}`,
+                );
               }
-            })
+            });
           }
-
           for (const xCallAddress of allXCallAddresses) {
-            const depositedCollateralUsd =
-              await getXChainCollateralInUSDValue(xCallAddress, height);
+            let depositedCollateralUsd = 0;
+            if (xCallAddress.startsWith("sui")) {
+              const suiCollateralUsd = await getSuiXChainCollateralInUSDValue(
+                xCallAddress,
+                height,
+              );
+              const mSuiCollateralUsd = await getmSuiXChainCollateralInUSDValue(
+                xCallAddress,
+                height,
+              );
+              depositedCollateralUsd = suiCollateralUsd + mSuiCollateralUsd;
+            } else {
+              depositedCollateralUsd = await getXChainCollateralInUSDValue(
+                xCallAddress,
+                height,
+              );
+            }
 
             if (depositedCollateralUsd && depositedCollateralUsd > 0) {
-              const dailyCheckInDoc = await getUserDailyCheckIn(
-                validUser._id,
+              const dailyCheckInArr = await getUserDailyCheckInByWalletAddress(
+                validUser.walletAddress,
                 db.connection,
               );
 
-              if (!dailyCheckInDoc ||
-                dailyCheckInDoc.length === 0 || 
-                dailyCheckInDoc.streakCounter === 0) {
+              if (!dailyCheckInArr || dailyCheckInArr.length === 0) {
                 console.log(
-                  `-- dailyCheckInDoc undefined or streakCounter is 0, skipping ${xCallAddress} --`,
+                  `-- dailyCheckInArr undefined or empty, skipping ${xCallAddress} --`,
+                );
+                continue;
+              }
+
+              const dailyCheckInDoc = dailyCheckInArr[0];
+              if (dailyCheckInDoc.streakCounter === 0) {
+                console.log(
+                  `-- streakCounter is 0, skipping ${xCallAddress} --`,
                 );
                 continue;
               }
 
               // add collateral
-              totalDailyXp += Math.round(
-                1 +
-                (dailyCheckInDoc.streakCounter / 100) *
-                (depositedCollateralUsd / 2),
+              totalDailyXp += rewardsCalculator(
+                depositedCollateralUsd,
+                dailyCheckInDoc.streakCounter,
               );
             } else {
               console.log(`-- depositedCollateralUsd undefined or 0 --`);
@@ -227,7 +264,7 @@ async function dailyCheckInTask(taskInput, db, chain) {
       await db.stop();
     }
   } catch (err) {
-    console.log("Error running dailyCheckInTask");
+    console.error("Error running dailyCheckInTask");
     console.log(err);
   }
 }

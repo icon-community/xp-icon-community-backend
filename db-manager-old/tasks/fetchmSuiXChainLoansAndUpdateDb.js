@@ -3,25 +3,25 @@
 // updating the database with the latest debt amounts.
 const genericTask = require("./genericTask");
 const { tasks } = require("../common/utils/config");
-const SEED_ID = tasks.mintingBnusdSui;
+const SEED_ID = tasks.mintingBnusdMSui;
 const {
-  getSuiXChainDebtInUSDValue,
+  getmSuiXChainDebtInUSDValue,
 } = require("../common/utils/json-rpc-services");
 
-async function fetchSuiXChainLoansAndUpdateDb(taskInput, db) {
+async function fetchMSuiXChainLoansAndUpdateDb(taskInput, db) {
   try {
     console.log("========");
-    console.log("> Running fetchSuiXChainLoansAndUpdateDb task");
+    console.log("> Running fetchMSuiXChainLoansAndUpdateDb task");
     return await genericTask(
       taskInput,
       db,
       SEED_ID,
-      getSuiXChainDebtInUSDValue,
+      getmSuiXChainDebtInUSDValue,
     );
   } catch (err) {
-    console.log("Error running fetchSuiXChainLoansAndUpdateDb task");
+    console.log("Error running fetchMSuiXChainLoansAndUpdateDb task");
     console.log(err);
   }
 }
 
-module.exports = fetchSuiXChainLoansAndUpdateDb;
+module.exports = fetchMSuiXChainLoansAndUpdateDb;

@@ -1,58 +1,92 @@
-# XP ICON COMMUNITY BACKEND
-
-Backend for the XP ICON Community project.
+# Hana Rewards Backend
 
 ## Project structure
 ```
-project-root/
-│
-├───common/                       # Common files for the project
-│   ├───services/                 # Business logic or services
-│   ├───models/                   # Database models (MongoDB schemas)
-│
-├───db/                           # MongoDB database files
-│   └───docker-compose.yml        # Docker Compose file for running MongoDB
-│
-├───db-manager/                   # Database management scripts or jobs
-│   └───blockchain-scraper.js     # Script for fetching data from blockchain
-│   ├───data/                     # Seed files for database initialization
-│   ├───scripts/                  # Scripts for updating tasks and seasons in the database
-│   ├───tasks/                    # Tasks for the blockchain scraper
-│   ├───utils/                    # Utility functions
-│
-├───rest-server/                  # Source code for the REST API server
-│   ├───controllers/              # Route controllers
-│   ├───routes/                   # API route definitions
-│   └───utils/                    # Backend Utility functions
-│
-├───smart-contract/               # Source code for smart contract
-│
-├───tests/                        # Unit and integration tests
-│
-├───utils/                       # Global utility files (e.g., database connection)
-
+./
+├── db-manager/                 # Blockchain scraper and database management scripts
+├── docker-compose-dev.yml
+├── docker-compose-prod.yml
+├── Makefile
+├── nestjs-rest-server/         # REST API server
+├── nginx/                      # Nginx configuration files
+├── smart-contract/             # Smart contract source code
 ```
 
-## Development setup
+## Pre-requisites
+- Node.js
+- Docker
+- Docker Compose
+- MongoDB
 
-First of all `npm install` to install all the dependencies.
+## REST API Server
 
-Eslint is used for linting, I recommend to setup eslint in your editor. The project is using the latest Eslint (v9) which uses flat configuration files (`eslint.config.js`) instead of the old hierarchical configuration files (`.eslintrc`).
+* `GET /v1/auth/challenge/:address`
+    - **Description**: Generates a challenge string for the given user address.
+    - **Path Parameters**:
+    - `address` (string): The user's wallet address.
+    - **Response**: Returns a challenge string.
 
-Migration guide -> https://eslint.org/docs/latest/use/configure/migration-guide
+* `POST /v1/auth/challenge/verify`
+    - **Description**: Verifies the provided challenge response.
+    - **Request Body**:
+  ```json
+  {
+    "message": "<string>"
+  }
+  ```
+    - **Response**: Returns a JWT token upon successful verification.
 
-For prettier  we are using V3 this should be easier to setup in your editor.
+* `POST /v1/auth/logout`
+    - **Description**: Logs out the user by invalidating the JWT token.
+    - **Headers**: `Authorization`: Bearer {Token}
+    - **Response**: Confirmation of logout.
 
-## Backend server
-### Routes
+* `GET /v1/daily-check-in`
+    - **Description**: Retrieves the current daily check-in status for the user.
+    - **Headers**: `Authorization`: Bearer {Token}
+    - **Response**: Status of the daily check-in.
 
-The following routes are available:
+* `POST /v1/daily-check-in`
+    - **Description**: Marks the user’s daily check-in.
+    - **Headers**: `Authorization`: Bearer {Token}
+    - **Response**: Confirmation of the daily check-in.
 
-- `/v1/user/:userWallet/season/:seasonId` - GET - Get season data for a user
-- `/v1/user/:userWallet/` - GET - **Not implemented** Get all seasons for a user
-- `/v1/season/:seasonId/` - GET - Return data related to the season
-- `/v1/season/:seasonId/` - POST - { baseline: number, total: number, filter: { omit(?): Address[] } } - Receives data for calculation of season rewards to each user. Examples:
+* `GET /v1/referral/:address`
+    - **Description**: Retrieves referral details for the specified address.
+    - **Path Parameters**:
+        - `address` (string): The user's wallet address.
+    - **Headers**: `Authorization`: Bearer {Token}
+    - **Response**: Referral details.
 
+* `GET /v1/referral/:address/period`
+    - **Description**: Retrieves referral details for a specified period.
+    - **Path Parameters**:
+        - `address` (string): The user's wallet address.
+    - **Headers**: `Authorization`: Bearer {Token}
+    - **Response**: Referral details for the period.
+
+* `GET /v1/season/:seasonLabel`
+    - **Description**: Retrieves details about a specific season.
+    - **Path Parameters**:
+        - `seasonLabel` (string): The identifier for the season.
+    - **Response**: Season details.
+
+* `POST /v1/season/:seasonLabel`
+    - **Description**: Creates or updates a season with baseline and total information.
+    - **Path Parameters**:
+        - `seasonLabel` (string): The identifier for the season.
+    - **Request Body**:
+  ```json
+  {
+    "baseline": <number>,
+    "total": <number>,
+    "filter": {
+      "omit": ["<string>"]
+    }
+  }
+  ```
+    - **Response**: Confirmation of season creation or update.
+    - **Example**:
 ``` bash
 # with filter
 curl -X POST -H "Content-Type: application/json" --data '{"total": "10000", "baseline": "10","filter":{"omit":["hxd4eb0a6c591b5e7a76e9a6677da055ebfdd897da","hxd83405d540ac959c2921be4ef735a5ab7114a748","hxad77420520a8dfe69ce3c4a8055cfcf0fa3e3c2c"]}}' http://localhost:3500/v1/season/seasonLabel
@@ -61,8 +95,137 @@ curl -X POST -H "Content-Type: application/json" --data '{"total": "10000", "bas
 curl -X POST -H "Content-Type: application/json" --data '{"total": "10000", "baseline": "10"}' http://localhost:3500/v1/season/seasonLabel
 ```
 
-- `/v1/season/:seasonId/task/:taskId` - GET - **Not implemented**
+* `GET /v1/season/:seasonLabel/task/:taskLabel`
+    - **Description**: Retrieves details of a specific task within a season.
+    - **Path Parameters**:
+        - `seasonLabel` (string): The identifier for the season.
+        - `taskLabel` (string): The identifier for the task.
+    - **Response**: Task details.
 
+* `POST /v1/tasks/claimable`
+    - **Description**: Retrieves tasks claimable by the user.
+    - **Headers**: `Authorization`: Bearer {Token}
+    - **Request Body**:
+  ```json
+  {
+    "season": "<string>",
+    "taskLabel": "<string>",
+    "details": {
+      "kind": "<string>",
+      "email": "<string>",
+      "provider": "<string>"
+    }
+  }
+  ```
+    - **Response**: Claimable tasks.
+
+* `POST /v1/tasks/claim`
+    - **Description**: Claims a specified task for the user.
+    - **Headers**: `Authorization`: Bearer {Token}
+    - **Request Body**:
+  ```json
+  {
+    "season": "<string>",
+    "taskLabel": "<string>",
+    "details": {
+      "kind": "<string>",
+      "email": "<string>",
+      "provider": "<string>"
+    }
+  }
+  ```
+    - **Response**: Confirmation of task claim.
+
+* `GET /v1/user/hana-newsletter/subscriber`
+    - **Description**: Checks if the user is subscribed to the Hana newsletter.
+    - **Headers**:  `Authorization`: Bearer {Token}
+    - **Response**: Subscription status.
+
+* `POST /v1/user/hana-newsletter/subscribe`
+    - **Description**: Subscribes the user to the Hana newsletter.
+    - **Headers**: `Authorization`: Bearer {Token}
+    - **Request Body**:
+  ```json
+  {
+    "season": "<string>",
+    "taskLabel": "<string>",
+    "email": "<string>"
+  }
+  ```
+    - **Response**: Confirmation of subscription.
+
+* `POST /v1/user/register`
+    - **Description**: Registers a new user with a referral code.
+    - **Headers**: `Authorization`: Bearer {Token}
+    - **Request Body**:
+  ```json
+  {
+    "referralCode": "<string>"
+  }
+  ```
+    - **Response**: Confirmation of user registration.
+
+* `POST /v1/user/register-season`
+    - **Description**: Registers a user for a specific season.
+    - **Headers**: `Authorization`: Bearer {Token}
+    - **Request Body**:
+  ```json
+  {
+    "address": "<string>",
+    "seasonLabel": "<string>"
+  }
+  ```
+    - **Response**: Confirmation of season registration.
+
+* `POST /v1/user/link-social`
+    - **Description**: Links a social account to the user's profile.
+    - **Headers**: `Authorization`: Bearer {Token}
+    - **Request Body**:
+  ```json
+  {
+    "provider": "<string>",
+    "providerAccountId": "<string>",
+    "name": "<string>",
+    "email": "<string>",
+    "imageUrl": "<string>",
+    "seasonLabel": "<string>"
+  }
+  ```
+    - **Response**: Confirmation of social account linkage.
+
+* `POST /v1/user/link-wallet`
+    - **Description**: Links a wallet to the user's profile.
+    - **Headers**: `Authorization`: Bearer {Token}
+    - **Request Body**:
+  ```json
+  {
+    "address": "<string>",
+    "type": "<string>",
+    "accessToken": "<string>"
+  }
+  ```
+    - **Response**: Confirmation of wallet linkage.
+
+* `GET /v1/user/:address`
+    - **Description**: Retrieves user details for the specified address.
+    - **Path Parameters**:
+        - `address` (string): The user's wallet address.
+    - **Headers**: `Authorization`: Bearer {Token}
+    - **Response**: User details.
+
+* `GET /v1/user/:userWallet/season/:season`
+    - **Description**: Retrieves details about a user's participation in a specific season.
+    - **Path Parameters**:
+        - `userWallet` (string): The user's wallet address.
+        - `season` (string): The season identifier.
+    - **Response**: User season details.
+
+* `GET /v1/user/:referral-code`
+    - **Description**: Retrieves user details using a referral code.
+    - **Path Parameters**:
+        - `referral-code` (string): The referral code.
+    - **Headers**: `Authorization`: Bearer {Token}
+    - **Response**: User details.
 
 ## Blockchain scraper
 The blockchain scraper is a script that fetches data from the ICON blockchain and stores it in the database. The script is located in the `db-manager` directory.

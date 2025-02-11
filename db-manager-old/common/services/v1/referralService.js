@@ -20,26 +20,43 @@ async function updateOrCreateReferral(query, update, connection) {
   return await updateOrCreateEntry(query, update, REFERRALS, connection);
 }
 
-async function getReferralByReferrerId(reffererUserId, connection) {
-  return await getEntryByParam(
-    { referrerUserId: reffererUserId },
+async function getReferralByReferrerIdAndSeason(
+  referrerUserId,
+  seasonLabel,
+  connection,
+) {
+  const result = await getEntryByParam(
+    {
+      referrerUserId: referrerUserId,
+      seasonLabel: seasonLabel,
+    },
     REFERRALS,
     connection,
   );
+
+  return result;
 }
 
-async function getReferralByReferredId(refferedUserId, connection) {
-  return await getEntryByParam(
-    { referredUserId: refferedUserId },
+async function getReferralByReferredIdAndSeason(
+  referredUserId,
+  seasonLabel,
+  connection,
+) {
+  const result = await getEntryByParam(
+    {
+      referredUserId: referredUserId,
+      seasonLabel: seasonLabel,
+    },
     REFERRALS,
     connection,
   );
+  return result;
 }
 
 module.exports = {
   createReferral,
   getAllReferrals,
   updateOrCreateReferral,
-  getReferralByReferrerId,
-  getReferralByReferredId,
+  getReferralByReferrerIdAndSeason,
+  getReferralByReferredIdAndSeason,
 };

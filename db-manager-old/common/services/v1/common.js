@@ -63,7 +63,8 @@ async function getEntryByParam(param, collectionId, connection = null) {
     if (!model) {
       throw new Error(`Model ${collectionId} not found`);
     }
-    return await model.find(param);
+    const result = await model.find(param);
+    return result;
   } catch (err) {
     console.log("Error on getEntryByParam:");
     console.log(err);
@@ -86,7 +87,8 @@ async function updateOrCreateEntry(
     if (!model) {
       throw new Error(`Model ${collectionId} not found`);
     }
-    const result = await model.findOneAndUpdate(query, update, {
+    const updateObj = update.$set ? update : { $set: update };
+    const result = await model.findOneAndUpdate(query, updateObj, {
       new: true,
       upsert: upsert,
     });

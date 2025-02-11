@@ -8,10 +8,10 @@ class Filter {
 
 export class CalculateSeasonReqDto {
   @IsNumber()
-  total: number;
+  total: string;
 
   @IsNumber()
-  baseline: number;
+  baseline: string;
 
   @IsOptional()
   filter?: Filter;

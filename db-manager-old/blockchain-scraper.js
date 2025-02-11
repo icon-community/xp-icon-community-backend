@@ -20,9 +20,11 @@ const {
   fetchXChainCollateralsAndUpdateDb,
   fetchSuiXChainLoansAndUpdateDb,
   fetchSuiXChainCollateralsAndUpdateDb,
+  fetchMSuiXChainLoansAndUpdateDb,
+  fetchMSuiXChainCollateralsAndUpdateDb,
   fetchNewReferrersAndUpdateDb,
   fetchNewReferredAndUpdateDb,
-  dailyCheckInTask,
+  suiDailyCheckInTask,
 } = require("./tasks");
 const config = require("./common/utils/config");
 
@@ -123,6 +125,16 @@ async function main() {
     tasks.push(taskRunner(fetchSuiXChainLoansAndUpdateDb, db));
 
     // Run task that fetches cross chain collaterals on SUI
+    // deposited by each user using mSUI token
+    // and updates the db
+    tasks.push(taskRunner(fetchMSuiXChainCollateralsAndUpdateDb, db));
+
+    // Run task that fetches cross chain loans on SUI
+    // deposited by each user using mSUI token
+    // and updates the db
+    tasks.push(taskRunner(fetchMSuiXChainLoansAndUpdateDb, db));
+
+    // Run task that fetches cross chain collaterals on SUI
     // deposited by each user and updates the db
     tasks.push(taskRunner(fetchSuiXChainCollateralsAndUpdateDb, db));
 
@@ -134,7 +146,7 @@ async function main() {
     tasks.push(taskRunner(fetchNewReferredAndUpdateDb, db));
 
     // Run task that fetches cross chain collaterals deposited by each user and updates the db
-    tasks.push(taskRunner(dailyCheckInTask, db, "sui"));
+    tasks.push(taskRunner(suiDailyCheckInTask, db));
 
     // create monitor instance
     monitor = new Monitor(

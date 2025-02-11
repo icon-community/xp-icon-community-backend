@@ -10,9 +10,11 @@ const fetchXChainLoansAndUpdateDb = require("./fetchXChainLoansAndUpdateDb");
 const fetchXChainCollateralsAndUpdateDb = require("./fetchXChainCollateralsAndUpdateDb");
 const fetchSuiXChainLoansAndUpdateDb = require("./fetchSuiXChainLoansAndUpdateDb");
 const fetchSuiXChainCollateralsAndUpdateDb = require("./fetchSuiXChainCollateralsAndUpdateDb");
+const fetchMSuiXChainLoansAndUpdateDb = require("./fetchmSuiXChainLoansAndUpdateDb");
+const fetchMSuiXChainCollateralsAndUpdateDb = require("./fetchmSuiXChainCollateralsAndUpdateDb");
 const fetchNewReferrersAndUpdateDb = require("./fetchNewReferrersAndUpdateDb");
 const fetchNewReferredAndUpdateDb = require("./fetchNewReferredAndUpdateDb");
-const dailyCheckInTask = require("./dailyCheckInTask");
+const suiDailyCheckInTask = require("./suiDailyCheckInTask");
 
 module.exports = {
   fetchRegisteredUsersAndUpdateDb,
@@ -27,7 +29,9 @@ module.exports = {
   fetchXChainCollateralsAndUpdateDb,
   fetchSuiXChainLoansAndUpdateDb,
   fetchSuiXChainCollateralsAndUpdateDb,
+  fetchMSuiXChainLoansAndUpdateDb,
+  fetchMSuiXChainCollateralsAndUpdateDb,
   fetchNewReferrersAndUpdateDb,
   fetchNewReferredAndUpdateDb,
-  dailyCheckInTask
+  suiDailyCheckInTask,
 };

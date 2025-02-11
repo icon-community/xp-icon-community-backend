@@ -62,6 +62,7 @@ services:
     container_name: rest-server
     build:
       context: ./nestjs-rest-server
+      target: dev
     restart: always
     ports:
       - "3500:3500"
@@ -84,7 +85,18 @@ services:
     # mount the current directory into the container
     # to allow for hot-reloading
     volumes:
-      - .:/app
+      - ./nestjs-rest-server/src:/app/src
+    # command:
+    #   [
+    #     "npx",
+    #     "ts-node-dev",
+    #     "--transpile-only",
+    #     "--watch",
+    #     "src",
+    #     "--ignore-watch",
+    #     "node_modules",
+    #     "src/main.ts",
+    #   ]
 
 networks:
   mynetworkdev:

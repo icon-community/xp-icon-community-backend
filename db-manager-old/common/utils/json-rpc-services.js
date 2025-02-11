@@ -117,13 +117,27 @@ async function getDataFromStandings(wallet, token, data, height) {
         `token ${token} not found in standings at height ${height}`,
       );
     }
-    return parseInt(position.standings[token][data], 16) / 10 ** 18;
+    if (position.standings[token][data] == null) {
+      throw new Error(
+        `data ${data} not found in standings for token ${token} at height ${height}. Value is ${position.standings[token][data]}`,
+      );
+    }
+    const result = parseInt(position.standings[token][data], 16) / 10 ** 18;
+
+    if (isNaN(result)) {
+      throw new Error(
+        `Error converting ${data} value for ${token} to decimal. Value is ${position.standings[token][data]}`,
+      );
+    }
+
+    return result;
   } catch (err) {
     console.log(`Error getting ${data} value for ${token}`);
     console.log(err.message);
     const str = [
       "does not have a position in Balanced",
       "not found in standings",
+      "Error converting",
     ];
     for (let i = 0; i < str.length; i++) {
       if (err.message.includes(str[i])) {
@@ -238,6 +252,13 @@ async function getSuiXChainCollateralInUSDValue(wallet, height) {
   return getDataFromStandings(wallet, "SUI", "collateral_in_USD", height);
 }
 
+async function getmSuiXChainDebtInUSDValue(wallet, height) {
+  return getDataFromStandings(wallet, "mSUI", "total_debt_in_USD", height);
+}
+
+async function getmSuiXChainCollateralInUSDValue(wallet, height) {
+  return getDataFromStandings(wallet, "mSUI", "collateral_in_USD", height);
+}
 async function getLockedAmount(
   user,
   height = null,
@@ -355,4 +376,6 @@ module.exports = {
   getXChainDebtInUSDValue,
   getSuiXChainCollateralInUSDValue,
   getSuiXChainDebtInUSDValue,
+  getmSuiXChainCollateralInUSDValue,
+  getmSuiXChainDebtInUSDValue,
 };

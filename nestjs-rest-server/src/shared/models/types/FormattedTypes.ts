@@ -50,8 +50,8 @@ export type FormattedUserBySeason = {
   Rank: number;
   Address_above: string | null;
   Address_below: string | null;
-  Address_above_XP: number;
-  Address_below_XP: number;
+  Address_above_XP: number | null;
+  Address_below_XP: number | null;
   XPEarned_total: number;
   XPEarned_24hrs: number;
 };

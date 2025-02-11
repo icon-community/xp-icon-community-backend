@@ -13,7 +13,7 @@ import { DEFAULT_MAX_RETRY, DEFAULT_RETRY_DELAY_MS, SLOPE_POINT_VARIABLES } from
  * @param block - block number
  * @returns {number} time in seconds
  */
-export function findTimeGivenBlock(block: number) {
+export function findTimeGivenBlock(block: number): number | null {
   try {
     return Math.floor(SLOPE_POINT_VARIABLES.slope * (block - SLOPE_POINT_VARIABLES.x1) + SLOPE_POINT_VARIABLES.y1);
   } catch (err) {
@@ -35,7 +35,7 @@ export function findTimeGivenBlock(block: number) {
  * @param time - time in unix timestamp (seconds)
  * @returns {number} block number
  */
-export function findblockGivenTime(time: number) {
+export function findblockGivenTime(time: number): number | null {
   try {
     return Math.floor((time - SLOPE_POINT_VARIABLES.y1) / SLOPE_POINT_VARIABLES.slope + SLOPE_POINT_VARIABLES.x1);
   } catch (err) {
@@ -44,7 +44,7 @@ export function findblockGivenTime(time: number) {
   }
 }
 
-export function isValidHex(str: any): boolean {
+export function isValidHex(str: string): boolean {
   if (typeof str !== "string") {
     return false;
   }
