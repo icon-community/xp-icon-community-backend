@@ -2,6 +2,9 @@ import { Injectable } from "@nestjs/common";
 import { TasksService } from "../../collections/tasks/tasks.service";
 import { SeasonsService } from "../../collections/seasons/seasons.service";
 import { UsersService } from "../../collections/users/users.service";
+import { UserDocument } from "../../collections/users/schemas/users.schema";
+import { SeasonDocument } from "../../collections/seasons/schemas/seasons.schema";
+import { TaskDocument } from "../../collections/tasks/schemas/tasks.schema";
 import { UserTasksService } from "../../collections/user-tasks/user-tasks.service";
 import { XpEarned } from "../../collections/user-tasks/schemas/user-tasks.schema";
 import { ConfigHelperService } from "../../config/config-helper.service";
@@ -31,7 +34,12 @@ export class ProcessAvaxCollateralsTask extends BaseTask {
     }
   }
 
-  private async main(taskInput: TaskInput): Promise<XpEarned> {
+  private async main(
+    taskInput: TaskInput,
+    userDocument: UserDocument,
+    seasonDocument: SeasonDocument,
+    taskDocument: TaskDocument,
+  ): Promise<XpEarned> {
     try {
       const xpObj = {
         period: taskInput.prepTerm,

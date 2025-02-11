@@ -2,6 +2,8 @@ import { Injectable } from "@nestjs/common";
 import { TasksService } from "../../collections/tasks/tasks.service";
 import { SeasonsService } from "../../collections/seasons/seasons.service";
 import { UsersService } from "../../collections/users/users.service";
+import { UserDocument } from "../../collections/users/schemas/users.schema";
+import { UserTasksService } from "../../collections/user-tasks/user-tasks.service";
 import { ConfigHelperService } from "../../config/config-helper.service";
 import { TaskInput } from "../../shared/types/GeneralTypes";
 import { BaseTask } from "../base/base.task";
@@ -14,9 +16,10 @@ export class ProcessNewReferredTask extends BaseTask {
     tasksService: TasksService,
     seasonsService: SeasonsService,
     usersService: UsersService,
+    userTasksService: UserTasksService,
     private readonly configHelperService: ConfigHelperService,
   ) {
-    super(seasonsService, tasksService, usersService);
+    super(seasonsService, tasksService, usersService, userTasksService);
     this.taskType = RECURRING_TASKS_TYPES.usingReferralCode;
   }
 
@@ -24,7 +27,10 @@ export class ProcessNewReferredTask extends BaseTask {
     await super.execute(taskInput, this.main.bind(this), this.taskType);
   }
 
-  private async main(taskInput: TaskInput): Promise<void> {
+  private async main(
+    taskInput: TaskInput,
+    userDocument: UserDocument,
+  ): Promise<void> {
     // TODO: put task execution logic here
     void taskInput;
   }

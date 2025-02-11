@@ -131,9 +131,12 @@ export class BaseTask {
           try {
             await callback(
               taskInput,
-              userDocument,
-              seasonDocument,
-              taskDocument,
+              currentUser,
+              season,
+              targetTask,
+              // userDocument,
+              // seasonDocument,
+              // taskDocument,
             );
           } catch (err) {
             this.logger.error({
