@@ -1,27 +1,15 @@
-# Use official Node.js image as the base image
-FROM node:18-alpine
+FROM node:20-alpine
 
-# Install bash
-RUN apk add --no-cache bash
+WORKDIR /app
 
-# Set the working directory in the container
-WORKDIR /usr/src/app
+RUN apk update
+RUN apk add --no-cache libc6-compat
+RUN apk add --update --no-cache python3 build-base gcc && ln -sf /usr/bin/python3 /usr/bin/python
+RUN apk add g++ make py3-pip
 
-# Copy package.json and package-lock.json to the container
-COPY package*.json ./
+COPY . .
 
-# Install dependencies
 RUN npm install
 
-# Copy the entire project into the container
-COPY . .
-RUN chmod +x /usr/src/app/wait-for-it.sh
-
-# Build the NestJS application
-RUN npm run build
-
-# Expose the port the app will run on
-EXPOSE 3000
-
-# Command to run the application
-CMD ["npm", "run", "start:prod"]
+# Specify the command to run your application
+CMD ["node", "blockchain-scraper.js"]
