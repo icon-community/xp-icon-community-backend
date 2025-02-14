@@ -1,7 +1,10 @@
 import { Model } from "mongoose";
 import { Injectable } from "@nestjs/common";
 import { InjectModel } from "@nestjs/mongoose";
-import { DailyCheckInDocument } from "./schemas/daily-check-in.schema";
+import {
+  DailyCheckInDocument,
+  DailyCheckInResponse,
+} from "./schemas/daily-check-in.schema";
 import { CreateDailyCheckInDto, UpdateDailyCheckInDto } from "./dto";
 import MONGO_CONFIG from "../../config/mongo.config";
 import { BaseService } from "../shared/base/base.service";
@@ -10,7 +13,8 @@ import { BaseService } from "../shared/base/base.service";
 export class DailyCheckInService extends BaseService<
   DailyCheckInDocument,
   CreateDailyCheckInDto,
-  UpdateDailyCheckInDto
+  UpdateDailyCheckInDto,
+  DailyCheckInResponse
 > {
   constructor(
     @InjectModel(MONGO_CONFIG.collections.dailyCheckIn)
@@ -21,20 +25,20 @@ export class DailyCheckInService extends BaseService<
 
   async create(
     createDailyCheckInDto: CreateDailyCheckInDto,
-  ): Promise<DailyCheckInDocument> {
+  ): Promise<DailyCheckInResponse> {
     return super.create(createDailyCheckInDto);
   }
 
   async update(
     query: UpdateDailyCheckInDto,
     updateDailyCheckInDto: UpdateDailyCheckInDto,
-  ): Promise<DailyCheckInDocument> {
+  ): Promise<DailyCheckInResponse> {
     return super.update(query, updateDailyCheckInDto);
   }
 
   async findByWalletAddress(
     walletAddress: string,
-  ): Promise<DailyCheckInDocument> {
-    return super.findByQuery({ walletAddress });
+  ): Promise<DailyCheckInResponse> {
+    return super.findByQueryLean({ walletAddress });
   }
 }

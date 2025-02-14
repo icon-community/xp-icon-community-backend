@@ -1,7 +1,7 @@
 import { Model, Types } from "mongoose";
 import { Injectable } from "@nestjs/common";
 import { InjectModel } from "@nestjs/mongoose";
-import { ReferralDocument } from "./schemas/referrals.schema";
+import { ReferralDocument, ReferralResponse } from "./schemas/referrals.schema";
 import { CreateReferralDto, UpdateReferralDto } from "./dto";
 import MONGO_CONFIG from "../../config/mongo.config";
 import { BaseService } from "../shared/base/base.service";
@@ -10,7 +10,8 @@ import { BaseService } from "../shared/base/base.service";
 export class ReferralsService extends BaseService<
   ReferralDocument,
   CreateReferralDto,
-  UpdateReferralDto
+  UpdateReferralDto,
+  ReferralResponse
 > {
   constructor(
     @InjectModel(MONGO_CONFIG.collections.referrals)
@@ -21,42 +22,42 @@ export class ReferralsService extends BaseService<
 
   async create(
     createReferralDto: CreateReferralDto,
-  ): Promise<ReferralDocument> {
+  ): Promise<ReferralResponse> {
     return super.create(createReferralDto);
   }
 
   async update(
     query: UpdateReferralDto,
     updateReferralDto: UpdateReferralDto,
-  ): Promise<ReferralDocument> {
+  ): Promise<ReferralResponse> {
     return super.update(query, updateReferralDto);
   }
 
   async findByReferrerAddress(
     referrerUserAddress: string,
-  ): Promise<ReferralDocument[]> {
-    return this.referralsModel.find({ referrerUserAddress }).exec();
+  ): Promise<ReferralResponse[]> {
+    return super.findAllByQueryLean({ referrerUserAddress });
   }
 
   async findByReferredAddress(
     referredUserAddress: string,
-  ): Promise<ReferralDocument> {
-    return super.findByQuery({ referredUserAddress });
+  ): Promise<ReferralResponse> {
+    return super.findByQueryLean({ referredUserAddress });
   }
 
-  async findByReferralCode(referralCode: string): Promise<ReferralDocument> {
-    return super.findByQuery({ referralCode });
+  async findByReferralCode(referralCode: string): Promise<ReferralResponse> {
+    return super.findByQueryLean({ referralCode });
   }
 
   async findByReferrerId(
     referrerUserId: Types.ObjectId,
-  ): Promise<ReferralDocument[]> {
-    return this.referralsModel.find({ referrerUserId }).exec();
+  ): Promise<ReferralResponse[]> {
+    return super.findAllByQueryLean({ referrerUserId });
   }
 
   async findByReferredId(
     referredUserId: Types.ObjectId,
-  ): Promise<ReferralDocument> {
-    return super.findByQuery({ referredUserId });
+  ): Promise<ReferralResponse> {
+    return super.findByQueryLean({ referredUserId });
   }
 }

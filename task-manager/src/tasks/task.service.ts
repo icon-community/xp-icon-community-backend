@@ -67,7 +67,7 @@ export class TaskService {
       } catch (err) {
         this.logger.log({
           level: "error",
-          message: `Error executing task: ${task}. Message: ${err.message}`,
+          message: `Error executing task: ${task.label}. Message: ${err.message}`,
           error: err,
         });
       }
@@ -145,7 +145,7 @@ export class TaskService {
       } catch (err) {
         this.logger.log({
           level: "error",
-          message: `Error executing task: ${task}. Message: ${err.message}`,
+          message: `Error executing task: ${task.label}. Message: ${err.message}`,
           error: err,
         });
       }

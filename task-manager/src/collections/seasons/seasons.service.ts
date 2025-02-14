@@ -10,7 +10,8 @@ import { BaseService } from "../shared/base/base.service";
 export class SeasonsService extends BaseService<
   SeasonDocument,
   CreateSeasonDto,
-  UpdateSeasonDto
+  UpdateSeasonDto,
+  SeasonResponse
 > {
   constructor(
     @InjectModel(MONGO_CONFIG.collections.seasons)

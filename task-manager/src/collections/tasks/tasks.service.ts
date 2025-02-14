@@ -10,7 +10,8 @@ import { BaseService } from "../shared/base/base.service";
 export class TasksService extends BaseService<
   TaskDocument,
   CreateTaskDto,
-  UpdateTaskDto
+  UpdateTaskDto,
+  TaskResponse
 > {
   constructor(
     @InjectModel(MONGO_CONFIG.collections.tasks)
@@ -20,21 +21,21 @@ export class TasksService extends BaseService<
   }
 
   async create(createTaskDto: CreateTaskDto): Promise<TaskResponse> {
-    return super.create(createTaskDto) as Promise<TaskResponse>;
+    return super.create(createTaskDto);
   }
 
   async update(
     query: UpdateTaskDto,
     updateTaskDto: UpdateTaskDto,
   ): Promise<TaskResponse> {
-    return super.update(query, updateTaskDto) as Promise<TaskResponse>;
+    return super.update(query, updateTaskDto);
   }
 
   async findAll(): Promise<TaskResponse[]> {
-    return super.findAll() as Promise<TaskResponse[]>;
+    return super.findAllLean();
   }
 
   async findBySeedId(seedId: string): Promise<TaskResponse> {
-    return super.findByQuery({ seedId }) as Promise<TaskResponse>;
+    return super.findByQueryLean({ seedId });
   }
 }

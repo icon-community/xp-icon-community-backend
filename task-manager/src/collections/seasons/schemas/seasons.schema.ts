@@ -1,5 +1,5 @@
 import { Document, Schema as MongooseSchema, Types } from "mongoose";
-import { Prop, SchemaFactory } from "@nestjs/mongoose";
+import { Prop, Schema, SchemaFactory } from "@nestjs/mongoose";
 
 import MONGO_CONFIG from "../../../config/mongo.config";
 
@@ -9,6 +9,7 @@ export interface SeasonResponse extends SeasonDocument {
   _id: Types.ObjectId;
 }
 
+@Schema()
 export class Season {
   @Prop({ required: [true, "Please specify field"], unique: true, index: true })
   number: number;

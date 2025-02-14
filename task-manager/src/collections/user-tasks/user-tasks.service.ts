@@ -14,7 +14,8 @@ import { BaseService } from "../shared/base/base.service";
 export class UserTasksService extends BaseService<
   UserTaskDocument,
   CreateUserTaskDto,
-  UpdateUserTaskDto
+  UpdateUserTaskDto,
+  UserTaskResponse
 > {
   constructor(
     @InjectModel(MONGO_CONFIG.collections.userTasks)
@@ -47,15 +48,15 @@ export class UserTasksService extends BaseService<
   }
 
   async findByUserId(userId: Types.ObjectId): Promise<UserTaskResponse> {
-    return super.findByQuery({ userId }) as Promise<UserTaskResponse>;
+    return super.findByQueryLean({ userId });
   }
 
   async findByTaskId(taskId: Types.ObjectId): Promise<UserTaskResponse> {
-    return super.findByQuery({ taskId }) as Promise<UserTaskResponse>;
+    return super.findByQueryLean({ taskId });
   }
 
   async findBySeasonId(seasonId: Types.ObjectId): Promise<UserTaskResponse> {
-    return super.findByQuery({ seasonId }) as Promise<UserTaskResponse>;
+    return super.findByQueryLean({ seasonId });
   }
 
   async findByAllIds(
@@ -63,10 +64,10 @@ export class UserTasksService extends BaseService<
     taskId: Types.ObjectId,
     seasonId: Types.ObjectId,
   ): Promise<UserTaskResponse> {
-    return super.findByQuery({
+    return super.findByQueryLean({
       userId,
       taskId,
       seasonId,
-    }) as Promise<UserTaskResponse>;
+    });
   }
 }

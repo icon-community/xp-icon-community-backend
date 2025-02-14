@@ -1,5 +1,5 @@
 import { Document, Schema as MongooseSchema, Types } from "mongoose";
-import { Prop, SchemaFactory } from "@nestjs/mongoose";
+import { Prop, Schema, SchemaFactory } from "@nestjs/mongoose";
 import { Chains } from "../../../shared/enum/general-enum";
 import MONGO_CONFIG from "../../../config/mongo.config";
 
@@ -8,6 +8,7 @@ export interface TaskResponse extends TaskDocument {
   _id: Types.ObjectId;
 }
 
+@Schema()
 export class Task {
   @Prop({ required: true })
   seedId: string;

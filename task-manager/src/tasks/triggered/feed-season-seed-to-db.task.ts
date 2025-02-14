@@ -16,7 +16,9 @@ export class FeedSeasonSeedToDbTask {
   private async processTasksForSeason(season, existingTasks) {
     const arrOfTaskToSave = [];
     for (const taskId of season.tasks) {
-      const taskToSave = existingTasks.find((t) => t.seedId === taskId);
+      const taskToSave = existingTasks.find((t) => {
+        return t.seedId === taskId;
+      });
       if (!taskToSave) {
         this.logger.log({
           level: "error",
