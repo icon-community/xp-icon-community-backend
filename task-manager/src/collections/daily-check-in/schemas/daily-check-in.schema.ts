@@ -3,11 +3,7 @@ import { Document, Types } from "mongoose";
 import MONGO_CONFIG from "../../../config/mongo.config";
 
 export type DailyCheckInDocument = DailyCheckIn & Document;
-export interface DailyCheckInResponse extends DailyCheckIn {
-  _id: Types.ObjectId;
-}
-
-export interface DailyCheckInResponse extends DailyCheckIn {
+export interface DailyCheckInResponse extends DailyCheckInDocument {
   _id: Types.ObjectId;
 }
 

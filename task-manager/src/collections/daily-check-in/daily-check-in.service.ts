@@ -36,6 +36,10 @@ export class DailyCheckInService extends BaseService<
     return super.update(query, updateDailyCheckInDto);
   }
 
+  async findAll(): Promise<DailyCheckInResponse[]> {
+    return super.findAllLean();
+  }
+
   async findByWalletAddress(
     walletAddress: string,
   ): Promise<DailyCheckInResponse> {

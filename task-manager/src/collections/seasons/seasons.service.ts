@@ -31,6 +31,10 @@ export class SeasonsService extends BaseService<
     return super.update(query, updateSeasonDto) as Promise<SeasonResponse>;
   }
 
+  async findAll(): Promise<SeasonResponse[]> {
+    return super.findAllLean();
+  }
+
   async findActiveSeasons(): Promise<SeasonResponse[]> {
     return super.findByQuery({ active: true }) as unknown as Promise<
       SeasonResponse[]

@@ -4,7 +4,7 @@ import { TaskDocument } from "../../collections/tasks/schemas/tasks.schema";
 import { SeasonsService } from "../../collections/seasons/seasons.service";
 import { SeasonDocument } from "../../collections/seasons/schemas/seasons.schema";
 import { UsersService } from "../../collections/users/users.service";
-import { UserDocument } from "../../collections/users/schemas/users.schema";
+import { UserResponse } from "../../collections/users/schemas/users.schema";
 // import { UserTasksService } from "../../collections/user-tasks/user-tasks.service";
 import { TaskInput } from "../../shared/types/GeneralTypes";
 import { BaseTask } from "../base/base.task";
@@ -28,7 +28,7 @@ export class ProcessCrossChainLoansTask extends BaseTask {
 
   async processTask(
     taskInput: TaskInput,
-    userDocument: UserDocument,
+    userDocument: UserResponse,
     seasonDocument: SeasonDocument,
     taskDocument: TaskDocument,
   ): Promise<void> {

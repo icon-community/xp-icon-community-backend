@@ -5,7 +5,7 @@ import { SeasonDocument } from "../../collections/seasons/schemas/seasons.schema
 import { TasksService } from "../../collections/tasks/tasks.service";
 import { TaskDocument } from "../../collections/tasks/schemas/tasks.schema";
 import { UsersService } from "../../collections/users/users.service";
-import { UserDocument } from "../../collections/users/schemas/users.schema";
+import { UserResponse } from "../../collections/users/schemas/users.schema";
 import { Types } from "mongoose";
 
 export abstract class BaseTask {
@@ -48,7 +48,7 @@ export abstract class BaseTask {
   protected abstract getTaskType(): string;
   protected abstract processTask(
     taskInput: TaskInput,
-    userDocument: UserDocument,
+    userDocument: UserResponse,
     seasonDocument: SeasonDocument,
     taskDocument: TaskDocument,
   ): Promise<void>;
@@ -184,7 +184,7 @@ export abstract class BaseTask {
   }
 
   private isUserEligible(
-    user: UserDocument,
+    user: UserResponse,
     season: SeasonDocument,
     height: number,
   ): boolean {

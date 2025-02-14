@@ -11,26 +11,28 @@ export interface SeasonResponse extends SeasonDocument {
 
 @Schema()
 export class Season {
-  @Prop({ required: [true, "Please specify field"], unique: true, index: true })
+  @Prop({ required: true, unique: true })
   number: number;
 
-  @Prop({ required: [true, "Please specify field"] })
+  @Prop({ required: true })
   blockStart: number;
 
   @Prop({
-    required: [true, "Please specify field"],
-    validate: {
-      validator: (v: number) => v > (this as { blockStart: number }).blockStart,
-      message: "blockEnd must be greater than blockStart",
-    },
+    required: true,
+    validate: [{
+      validator: function(blockEnd: number) {
+        return !this.blockStart || blockEnd > this.blockStart;
+      },
+      message: 'blockEnd must be greater than blockStart'
+    }]
   })
   blockEnd: number;
 
   @Prop({ required: [true, "Please specify field"], default: true })
   active: boolean;
 
-  @Prop({ required: [true, "Please specify field"] })
-  tasks: MongooseSchema.Types.ObjectId[];
+  @Prop({ type: [Types.ObjectId], required: true })
+  tasks: Types.ObjectId[];
 }
 
 export const SeasonSchema = SchemaFactory.createForClass(Season);

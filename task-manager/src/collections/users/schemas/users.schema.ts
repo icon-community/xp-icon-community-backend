@@ -36,7 +36,7 @@ class Season {
 }
 
 export type UserDocument = User & Document;
-export interface UserResponse extends User {
+export interface UserResponse extends UserDocument {
   _id: Types.ObjectId;
 }
 

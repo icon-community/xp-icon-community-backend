@@ -3,6 +3,7 @@ import { Document, Schema as MongooseSchema, Types } from "mongoose";
 import MONGO_CONFIG from "../../../config/mongo.config";
 import { UserTaskStatus } from "../../../shared/enum/general-enum";
 
+export type UserTaskDocument = UserTask & Document;
 export interface UserTaskResponse extends UserTaskDocument {
   _id: Types.ObjectId;
 }
@@ -33,8 +34,6 @@ export class XpEarned {
   })
   details?: any;
 }
-
-export type UserTaskDocument = UserTask & Document;
 
 @Schema({
   timestamps: true, // This will automatically handle createdAt

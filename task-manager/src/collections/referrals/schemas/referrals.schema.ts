@@ -3,7 +3,7 @@ import { Document, Schema as MongooseSchema, Types } from "mongoose";
 import MONGO_CONFIG from "../../../config/mongo.config";
 
 export type ReferralDocument = Referral & Document;
-export interface ReferralResponse extends Referral {
+export interface ReferralResponse extends ReferralDocument {
   _id: Types.ObjectId;
 }
 

@@ -2,7 +2,7 @@ import { Injectable } from "@nestjs/common";
 import { TasksService } from "../../collections/tasks/tasks.service";
 import { SeasonsService } from "../../collections/seasons/seasons.service";
 import { UsersService } from "../../collections/users/users.service";
-import { UserDocument } from "../../collections/users/schemas/users.schema";
+import { UserResponse } from "../../collections/users/schemas/users.schema";
 import { SeasonDocument } from "../../collections/seasons/schemas/seasons.schema";
 import { TaskDocument } from "../../collections/tasks/schemas/tasks.schema";
 import { TaskInput } from "../../shared/types/GeneralTypes";
@@ -28,7 +28,7 @@ export class ProcessCrossChainCollateralsTask extends BaseTask {
 
   async processTask(
     taskInput: TaskInput,
-    userDocument: UserDocument,
+    userDocument: UserResponse,
     seasonDocument: SeasonDocument,
     taskDocument: TaskDocument,
   ): Promise<void> {
