@@ -1,15 +1,11 @@
 import { Logger } from "@nestjs/common";
 import { TaskInput } from "../../shared/types/GeneralTypes";
-import { UserTaskStatus } from "../../shared/enum/general-enum";
 import { SeasonsService } from "../../collections/seasons/seasons.service";
 import { SeasonDocument } from "../../collections/seasons/schemas/seasons.schema";
 import { TasksService } from "../../collections/tasks/tasks.service";
 import { TaskDocument } from "../../collections/tasks/schemas/tasks.schema";
 import { UsersService } from "../../collections/users/users.service";
 import { UserDocument } from "../../collections/users/schemas/users.schema";
-import { UserTasksService } from "../../collections/user-tasks/user-tasks.service";
-import { UserTasksDocument } from "../../collections/user-tasks/schemas/user-tasks.schema";
-import { XpEarned } from "../../collections/user-tasks/schemas/user-tasks.schema";
 import { Types } from "mongoose";
 
 export abstract class BaseTask {
@@ -17,21 +13,19 @@ export abstract class BaseTask {
   protected readonly seasonsService: SeasonsService;
   protected readonly tasksService: TasksService;
   protected readonly usersService: UsersService;
-  protected readonly userTasksService: UserTasksService;
 
   constructor(
     seasonsService: SeasonsService,
     tasksService: TasksService,
     usersService: UsersService,
-    userTasksService: UserTasksService,
   ) {
     this.logger = new Logger(this.constructor.name);
     this.seasonsService = seasonsService;
     this.tasksService = tasksService;
     this.usersService = usersService;
-    this.userTasksService = userTasksService;
   }
 
+  // main template method
   async execute(taskInput: TaskInput): Promise<void> {
     try {
       this.logTaskStart(taskInput);
@@ -50,30 +44,20 @@ export abstract class BaseTask {
     }
   }
 
+  // Abstract methods that must be implemented by child classes
   protected abstract getTaskType(): string;
-  protected abstract calculateXp(
+  protected abstract processTask(
     taskInput: TaskInput,
     userDocument: UserDocument,
     seasonDocument: SeasonDocument,
     taskDocument: TaskDocument,
-  ): Promise<XpEarned>;
+  ): Promise<void>;
 
   protected logTaskStart(taskInput: TaskInput): void {
     this.logger.log({
       level: "info",
       message: `${this.constructor.name} begin execution. Task Input: ${JSON.stringify(taskInput)}`,
     });
-  }
-
-  protected handleError(err: Error): void {
-    const message = `${this.constructor.name} error: ${err.message}`;
-    this.logger.error({
-      level: "error",
-      message: message,
-      error: err,
-    });
-
-    throw new Error(message);
   }
 
   private async validateTask(): Promise<TaskDocument | null> {
@@ -120,6 +104,54 @@ export abstract class BaseTask {
     }
   }
 
+  private async processUsersForSeason(
+    season: SeasonDocument,
+    taskInput: TaskInput,
+    targetTask: TaskDocument,
+  ): Promise<void> {
+    const users = await this.usersService.findUsersBySeason(
+      new Types.ObjectId(season._id?.toString()),
+    );
+
+    if (users.length === 0) {
+      this.logger.log({
+        level: "info",
+        message: `${this.constructor.name} no users found in season ${season._id}. Task execution skipped.`,
+      });
+
+      return;
+    }
+
+    for (const user of users) {
+      if (!this.isUserEligible(user, season, taskInput.height)) {
+        continue;
+      }
+
+      try {
+        // This method is implemented by the child class
+        // each task will have its own implementation
+        await this.processTask(taskInput, user, season, targetTask);
+      } catch (err) {
+        this.logger.error({
+          level: "error",
+          message: `${this.constructor.name} error processing user ${user._id}: ${err.message}`,
+          error: err,
+        });
+      }
+    }
+  }
+
+  protected handleError(err: Error): void {
+    const message = `${this.constructor.name} error: ${err.message}`;
+    this.logger.error({
+      level: "error",
+      message: message,
+      error: err,
+    });
+
+    throw new Error(message);
+  }
+
   private isBlockInSeasonRange(
     height: number,
     season: SeasonDocument,
@@ -151,47 +183,6 @@ export abstract class BaseTask {
     return taskIsInSeason;
   }
 
-  private async processUsersForSeason(
-    season: SeasonDocument,
-    taskInput: TaskInput,
-    targetTask: TaskDocument,
-  ): Promise<void> {
-    const users = await this.usersService.findUsersBySeason(
-      new Types.ObjectId(season._id?.toString()),
-    );
-
-    if (users.length === 0) {
-      this.logger.log({
-        level: "info",
-        message: `${this.constructor.name} no users found in season ${season._id}. Task execution skipped.`,
-      });
-
-      return;
-    }
-
-    for (const user of users) {
-      if (!this.isUserEligible(user, season, taskInput.height)) {
-        continue;
-      }
-
-      try {
-        const xpEarned = await this.calculateXp(
-          taskInput,
-          user,
-          season,
-          targetTask,
-        );
-        await this.processXpEarned(user, season, targetTask, xpEarned);
-      } catch (err) {
-        this.logger.error({
-          level: "error",
-          message: `${this.constructor.name} error processing user ${user._id}: ${err.message}`,
-          error: err,
-        });
-      }
-    }
-  }
-
   private isUserEligible(
     user: UserDocument,
     season: SeasonDocument,
@@ -218,14 +209,5 @@ export abstract class BaseTask {
     }
 
     return true;
-  }
-
-  private async processXpEarned(
-    user: UserDocument,
-    season: SeasonDocument,
-    task: TaskDocument,
-    xpEarned: XpEarned,
-  ): Promise<void> {
-    console.log("TODO");
   }
 }

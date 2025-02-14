@@ -5,9 +5,8 @@ import { UsersService } from "../../collections/users/users.service";
 import { UserDocument } from "../../collections/users/schemas/users.schema";
 import { SeasonDocument } from "../../collections/seasons/schemas/seasons.schema";
 import { TaskDocument } from "../../collections/tasks/schemas/tasks.schema";
-import { UserTasksService } from "../../collections/user-tasks/user-tasks.service";
-import { XpEarned } from "../../collections/user-tasks/schemas/user-tasks.schema";
-import { ConfigHelperService } from "../../config/config-helper.service";
+// import { UserTasksService } from "../../collections/user-tasks/user-tasks.service";
+// import { XpEarned } from "../../collections/user-tasks/schemas/user-tasks.schema";
 import { TaskInput } from "../../shared/types/GeneralTypes";
 import { BaseTask } from "../base/base.task";
 import { RECURRING_TASKS_TYPES } from "../../constants";
@@ -16,42 +15,41 @@ import { RECURRING_TASKS_TYPES } from "../../constants";
 export class ProcessAvaxCollateralsTask extends BaseTask {
   private readonly taskType = RECURRING_TASKS_TYPES.depositAvaxCollateral;
   constructor(
-    tasksService: TasksService,
     seasonsService: SeasonsService,
+    tasksService: TasksService,
     usersService: UsersService,
-    userTasksService: UserTasksService,
-    private readonly configHelperService: ConfigHelperService,
   ) {
-    super(seasonsService, tasksService, usersService, userTasksService);
+    super(seasonsService, tasksService, usersService);
     this.taskType = RECURRING_TASKS_TYPES.depositAvaxCollateral;
   }
 
-  async execute(taskInput: TaskInput): Promise<void> {
-    try {
-      await super.execute(taskInput, this.main.bind(this), this.taskType);
-    } catch (err) {
-      this.logger.error(`Error in ProcessAvaxCollateralsTask: ${err.message}`);
-    }
+  getTaskType(): string {
+    return this.taskType;
   }
 
-  private async main(
+  async processTask(
     taskInput: TaskInput,
     userDocument: UserDocument,
     seasonDocument: SeasonDocument,
     taskDocument: TaskDocument,
-  ): Promise<XpEarned> {
+  ): Promise<void> {
     try {
+      //TODO: put logic to process task here
       const xpObj = {
         period: taskInput.prepTerm,
         xp: 0,
         block: taskInput.height,
       };
-
-      // TODO put logic to calculate xp here
-      //
-      return xpObj;
+      void xpObj;
+      void userDocument;
+      void seasonDocument;
+      void taskDocument;
+      this.logger.log({
+        level: "info",
+        message: `Processing ProcessAvaxCollateralsTask`,
+      });
     } catch (err) {
-      throw new Error(`Error in ProcessAvaxCollateralsTask: ${err.message}`);
+      this.logger.error(`Error in ProcessAvaxCollateralsTask: ${err.message}`);
     }
   }
 }

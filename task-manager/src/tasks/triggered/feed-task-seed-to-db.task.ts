@@ -1,5 +1,4 @@
-import { Injectable } from "@nestjs/common";
-import { Logger } from "@nestjs/common";
+import { Injectable, Logger } from "@nestjs/common";
 import { TasksService } from "../../collections/tasks/tasks.service";
 import { ConfigHelperService } from "../../config/config-helper.service";
 
@@ -14,12 +13,6 @@ export class FeedTaskSeedToDbTask {
 
   async execute(...args: any[]) {
     const [forceUpdate, callbackSetPaused] = args;
-    // const forceUpdate = false;
-    // const callbackSetPaused = (foo) => {
-    //   void foo;
-    // };
-    // console.log('args');
-    // console.log(args);
     try {
       this.logger.log({
         level: "info",

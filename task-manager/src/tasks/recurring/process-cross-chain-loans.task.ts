@@ -1,10 +1,11 @@
 import { Injectable } from "@nestjs/common";
 import { TasksService } from "../../collections/tasks/tasks.service";
+import { TaskDocument } from "../../collections/tasks/schemas/tasks.schema";
 import { SeasonsService } from "../../collections/seasons/seasons.service";
+import { SeasonDocument } from "../../collections/seasons/schemas/seasons.schema";
 import { UsersService } from "../../collections/users/users.service";
 import { UserDocument } from "../../collections/users/schemas/users.schema";
-import { UserTasksService } from "../../collections/user-tasks/user-tasks.service";
-import { ConfigHelperService } from "../../config/config-helper.service";
+// import { UserTasksService } from "../../collections/user-tasks/user-tasks.service";
 import { TaskInput } from "../../shared/types/GeneralTypes";
 import { BaseTask } from "../base/base.task";
 import { RECURRING_TASKS_TYPES } from "../../constants";
@@ -13,25 +14,37 @@ import { RECURRING_TASKS_TYPES } from "../../constants";
 export class ProcessCrossChainLoansTask extends BaseTask {
   private readonly taskType = RECURRING_TASKS_TYPES.mintingBnusdCrossChain;
   constructor(
-    tasksService: TasksService,
     seasonsService: SeasonsService,
+    tasksService: TasksService,
     usersService: UsersService,
-    userTasksService: UserTasksService,
-    private readonly configHelperService: ConfigHelperService,
   ) {
-    super(seasonsService, tasksService, usersService, userTasksService);
+    super(seasonsService, tasksService, usersService);
     this.taskType = RECURRING_TASKS_TYPES.mintingBnusdCrossChain;
   }
 
-  async execute(taskInput: TaskInput): Promise<void> {
-    await super.execute(taskInput, this.main.bind(this), this.taskType);
+  getTaskType(): string {
+    return this.taskType;
   }
 
-  private async main(
+  async processTask(
     taskInput: TaskInput,
     userDocument: UserDocument,
+    seasonDocument: SeasonDocument,
+    taskDocument: TaskDocument,
   ): Promise<void> {
-    // TODO: put task execution logic here
-    void taskInput;
+    try {
+      void taskInput;
+      void userDocument;
+      void seasonDocument;
+      void taskDocument;
+      this.logger.log({
+        level: "info",
+        message: `Processing ${this.constructor.name} task`,
+      });
+    } catch (err) {
+      this.logger.error(
+        `Error processing ${this.constructor.name} task: ${err.message}`,
+      );
+    }
   }
 }
