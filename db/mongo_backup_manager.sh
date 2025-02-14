@@ -1,8 +1,10 @@
 #!/bin/bash
-#!/bin/bash
+
+# Get the current directory
+SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )"
 
 # Define log file
-LOG_FILE="/home/ubuntu/xp-icon-community-backend/db/logs/mongo_backup_manager.log"
+LOG_FILE="${SCRIPT_DIR}/logs/mongo_backup_manager.log"
 
 # Add a separator for each run
 echo "===================================" >> "$LOG_FILE"
@@ -10,7 +12,7 @@ echo "Backup started at $(date '+%Y-%m-%d %H:%M:%S')" >> "$LOG_FILE"
 echo "===================================" >> "$LOG_FILE"
 
 # Load environment variables from .env file
-ENV_FILE="/home/ubuntu/xp-icon-community-backend/db/.env"
+ENV_FILE="${SCRIPT_DIR}/.env"
 if [ -f "$ENV_FILE" ]; then
   set -a
   source "$ENV_FILE"
@@ -25,7 +27,7 @@ health_check() {
   echo "Performing health check..."
 
   # List of required variables
-  REQUIRED_VARS=("CONTAINER_NAME" "S3_BUCKET_NAME" "MONGO_PORT" "MONGO_USER" "MONGO_PASSWORD" "MONGO_DB_NAME")
+  REQUIRED_VARS=("CONTAINER_NAME" "S3_BUCKET_NAME" "MONGO_PORT" "MONGO_USER" "MONGO_PASSWORD" "MONGO_DB_NAME" "AWS_PROFILE")
 
   # Check if each variable is set
   for var in "${REQUIRED_VARS[@]}"; do
@@ -70,7 +72,7 @@ backup() {
   docker cp $CONTAINER_NAME:$BACKUP_FILE_NAME $BACKUP_FILE
 
   # Upload the backup to S3
-  aws s3 cp $BACKUP_FILE $S3_BACKUP_PATH
+  aws s3 cp $BACKUP_FILE $S3_BACKUP_PATH --profile $AWS_PROFILE
 
   if [ $? -eq 0 ]; then
     echo "Backup uploaded to S3 successfully."
@@ -89,7 +91,7 @@ backup() {
 # Function to list backups in S3
 list_backups_s3() {
   echo "Listing MongoDB backups in S3..."
-  aws s3 ls $S3_BACKUP_PATH --recursive
+  aws s3 ls $S3_BACKUP_PATH --recursive --profile $AWS_PROFILE
 }
 
 # Function to list backups in the local directory
@@ -155,7 +157,7 @@ download_backup() {
   DOWNLOAD_FILE=$1
 
   # Check if the backup file exists in S3
-  aws s3 ls $S3_BACKUP_PATH$DOWNLOAD_FILE > /dev/null
+  aws s3 ls $S3_BACKUP_PATH$DOWNLOAD_FILE --profile $AWS_PROFILE > /dev/null
   if [ $? -ne 0 ]; then
     echo "Error: Backup file $DOWNLOAD_FILE not found in S3."
     exit 1
@@ -167,7 +169,7 @@ download_backup() {
   fi
 
   echo "Downloading MongoDB backup from S3..."
-  aws s3 cp $S3_BACKUP_PATH$DOWNLOAD_FILE $S3_BACKUP_DIR_TEMP
+  aws s3 cp $S3_BACKUP_PATH$DOWNLOAD_FILE $S3_BACKUP_DIR_TEMP --profile $AWS_PROFILE
 
   if [ $? -eq 0 ]; then
     echo "Backup downloaded from S3 successfully."
