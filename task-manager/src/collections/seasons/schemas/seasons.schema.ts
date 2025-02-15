@@ -1,4 +1,4 @@
-import { Document, Schema as MongooseSchema, Types } from "mongoose";
+import { Document, Types } from "mongoose";
 import { Prop, Schema, SchemaFactory } from "@nestjs/mongoose";
 
 import MONGO_CONFIG from "../../../config/mongo.config";
@@ -19,12 +19,14 @@ export class Season {
 
   @Prop({
     required: true,
-    validate: [{
-      validator: function(blockEnd: number) {
-        return !this.blockStart || blockEnd > this.blockStart;
+    validate: [
+      {
+        validator: function (blockEnd: number) {
+          return !this.blockStart || blockEnd > this.blockStart;
+        },
+        message: "blockEnd must be greater than blockStart",
       },
-      message: 'blockEnd must be greater than blockStart'
-    }]
+    ],
   })
   blockEnd: number;
 

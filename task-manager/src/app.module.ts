@@ -4,6 +4,7 @@ import { ConfigModule } from "@nestjs/config";
 import { RabbitMQModule } from "./rabbitmq/rabbitmq.module";
 import { TaskProducerModule } from "./tasks/task-producer.module";
 import { TaskConsumerModule } from "./tasks/task-consumer.module";
+import { UsersModule } from "./collections/users/users.module";
 import { AppController } from "./app.controller";
 import { AppService } from "./app.service";
 import MONGO_CONFIG from "./config/mongo.config";
@@ -15,6 +16,7 @@ import MONGO_CONFIG from "./config/mongo.config";
     RabbitMQModule,
     TaskProducerModule,
     TaskConsumerModule,
+    UsersModule,
   ],
   controllers: [AppController],
   providers: [AppService],
