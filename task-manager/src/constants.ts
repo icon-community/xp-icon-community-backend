@@ -73,3 +73,5 @@ export const ICON_CHAIN_INFO = {
 export const SEASONS_ROUTES = {
   sui: 1,
 };
+
+export const MAX_LINKED_WALLETS = 10;

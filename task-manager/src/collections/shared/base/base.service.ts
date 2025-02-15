@@ -78,4 +78,15 @@ export class BaseService<
       .lean()
       .exec() as Promise<ResponseType | null>;
   }
+
+  findOneAndUpdateLean(
+    query: any,
+    update: any,
+    options: any = { new: true }
+  ): Promise<ResponseType | null> {
+    return this.model
+      .findOneAndUpdate(query, update, options)
+      .lean()
+      .exec() as Promise<ResponseType | null>;
+  }
 }

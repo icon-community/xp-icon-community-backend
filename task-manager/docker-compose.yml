@@ -10,7 +10,7 @@ services:
     build: .
     container_name: hana-rewards-backend-scraper
     ports:
-      - '3005:3005'
+      - "3005:3005"
     environment:
       <<: *global-env
       DB_MANAGER_PORT: ${DB_MANAGER_PORT}
@@ -20,11 +20,11 @@ services:
       USER_TASK_COLLECTION: ${USER_TASK_COLLECTION}
       REFERRALS_COLLECTION: ${REFERRALS_COLLECTION}
       DAILY_CHECK_IN_COLLECTION: ${DAILY_CHECK_IN_COLLECTION}
-      NODE_ENV: 'production'
-      RABBITMQ_URL: 'amqp://rabbitmq:5672'
+      NODE_ENV: "production"
+      RABBITMQ_URL: "amqp://rabbitmq:5672"
     depends_on:
       - rabbitmq
-      - mongodb
+      - mongodb-hana-rewards
     networks:
       - app-network
     volumes:
@@ -32,31 +32,31 @@ services:
 
     command:
       [
-        '/usr/src/app/wait-for-it.sh',
-        'rabbitmq',
-        '5672',
-        '--',
-        'npm',
-        'run',
-        'start',
+        "/usr/src/app/wait-for-it.sh",
+        "rabbitmq",
+        "5672",
+        "--",
+        "npm",
+        "run",
+        "start",
       ]
 
   rabbitmq:
-    image: 'rabbitmq:3-management'
+    image: "rabbitmq:3-management"
     container_name: rabbitmq
     ports:
-      - '15672:15672' # RabbitMQ management interface
-      - '5672:5672' # RabbitMQ messaging port
+      - "15672:15672" # RabbitMQ management interface
+      - "5672:5672" # RabbitMQ messaging port
     volumes:
       - ./rabbitmq-data:/var/lib/rabbitmq # Persist RabbitMQ data
     networks:
       - app-network
 
-  mongodb:
-    image: 'mongo:latest'
+  mongodb-hana-rewards:
+    image: "mongo:latest"
     container_name: mongodb-dev
     ports:
-      - '27017:27017'
+      - "27017:27017"
     volumes:
       - ./dev-db:/data/db # Persist MongoDB data
     networks:

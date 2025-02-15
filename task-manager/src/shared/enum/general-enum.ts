@@ -36,4 +36,6 @@ export enum UserTaskStatus {
 export enum Chains {
   icon = "icon",
   evm = "evm",
+  sui = "sui",
+  stellar = "stellar",
 }
