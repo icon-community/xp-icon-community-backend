@@ -60,7 +60,7 @@ export class FeedSeasonSeedToDbTask {
 
       for (const season of seedSeasons) {
         const seasonDoesNotExist = !existingSeasons.find(
-          (s) => s.number === season.number,
+          (s) => s.label === season.label,
         );
 
         if (seasonDoesNotExist || forceUpdate) {

@@ -10,12 +10,17 @@ import {
 import { CreateUserDto } from "./dto/create-user.dto";
 import { LinkWalletDto } from "./dto/link-wallet.dto";
 import { UsersService } from "./users.service";
+import { SeasonsService } from "../seasons/seasons.service";
+import { SeasonResponse } from "../seasons/schemas/seasons.schema";
 
 @Controller("users")
 export class UserController {
   private readonly logger = new Logger(UserController.name);
 
-  constructor(private readonly usersService: UsersService) {}
+  constructor(
+    private readonly usersService: UsersService,
+    private readonly seasonsService: SeasonsService,
+  ) {}
 
   @Post("/create-user")
   async createUser(@Body() createUserDto: CreateUserDto) {
@@ -110,6 +115,77 @@ export class UserController {
         {
           success: false,
           message: "Failed to link wallet",
+          error: error.message,
+        },
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
+    }
+  }
+
+  @Post("/:address/register-season")
+  async registerSeason(
+    @Param("address") address: string,
+    @Body() registerSeasonDto: SeasonResponse,
+  ) {
+    this.logger.log({
+      level: "info",
+      message: `Register season request received. User: ${address}, Season: ${registerSeasonDto.label}`,
+    });
+
+    try {
+      // Find the season
+      const season = await this.seasonsService.findByLabel(
+        registerSeasonDto.label,
+      );
+
+      if (!season) {
+        throw new HttpException(
+          {
+            success: false,
+            message: "Season not found",
+            error: "SEASON_NOT_FOUND",
+          },
+          HttpStatus.NOT_FOUND,
+        );
+      }
+
+      // Register user to season
+      const user = await this.usersService.registerSeason(address, season._id);
+
+      if (!user) {
+        throw new HttpException(
+          {
+            success: false,
+            message: "User not found",
+            error: "USER_NOT_FOUND",
+          },
+          HttpStatus.NOT_FOUND,
+        );
+      }
+
+      this.logger.log({
+        level: "info",
+        message: `User registered to season successfully. User: ${address}, Season: ${registerSeasonDto.label}`,
+      });
+
+      return {
+        data: user,
+        message: "User registered to season successfully",
+      };
+    } catch (error) {
+      this.logger.error(
+        `Failed to register season: ${error.message}`,
+        error.stack,
+      );
+
+      if (error instanceof HttpException) {
+        throw error;
+      }
+
+      throw new HttpException(
+        {
+          success: false,
+          message: "Failed to register season",
           error: error.message,
         },
         HttpStatus.INTERNAL_SERVER_ERROR,

@@ -90,7 +90,29 @@ export class UsersService extends BaseService<
       {
         $push: { linkedWallets: linkWalletDto },
       },
-      { new: true, upsert: false }
+      { new: true, upsert: false },
+    );
+  }
+
+  async registerSeason(
+    address: string,
+    seasonId: Types.ObjectId,
+  ): Promise<UserResponse | null> {
+    return super.findOneAndUpdateLean(
+      {
+        walletAddress: address,
+        "seasons.seasonId": { $ne: seasonId }, // Only if user isn't already registered
+      },
+      {
+        $push: {
+          seasons: {
+            seasonId,
+            registeredAt: new Date(),
+            completedTasks: [],
+          },
+        },
+      },
+      { new: true, upsert: false },
     );
   }
 }

@@ -2,8 +2,8 @@ import { NestFactory } from "@nestjs/core";
 import { AppModule } from "./app.module";
 import { WinstonModule } from "nest-winston";
 import { Logging } from "./shared/logging/custom-logger";
-import { ResponseInterceptor } from './shared/interceptors/response.interceptor';
-import { HttpExceptionFilter } from './shared/filters/http-exception.filter';
+import { ResponseInterceptor } from "./shared/interceptors/response.interceptor";
+import { HttpExceptionFilter } from "./shared/filters/http-exception.filter";
 // import * as mongoose from 'mongoose';
 
 async function bootstrap() {

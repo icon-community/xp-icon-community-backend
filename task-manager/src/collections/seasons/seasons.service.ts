@@ -1,4 +1,4 @@
-import { Model } from "mongoose";
+import { Model, FilterQuery } from "mongoose";
 import { Injectable } from "@nestjs/common";
 import { InjectModel } from "@nestjs/mongoose";
 import { SeasonDocument, SeasonResponse } from "./schemas/seasons.schema";
@@ -21,14 +21,14 @@ export class SeasonsService extends BaseService<
   }
 
   async create(createSeasonDto: CreateSeasonDto): Promise<SeasonResponse> {
-    return super.create(createSeasonDto) as Promise<SeasonResponse>;
+    return super.create(createSeasonDto);
   }
 
   async update(
-    query: UpdateSeasonDto,
+    query: FilterQuery<SeasonDocument>,
     updateSeasonDto: UpdateSeasonDto,
   ): Promise<SeasonResponse> {
-    return super.update(query, updateSeasonDto) as Promise<SeasonResponse>;
+    return super.update(query, updateSeasonDto);
   }
 
   async findAll(): Promise<SeasonResponse[]> {
@@ -36,8 +36,10 @@ export class SeasonsService extends BaseService<
   }
 
   async findActiveSeasons(): Promise<SeasonResponse[]> {
-    return super.findByQuery({ active: true }) as unknown as Promise<
-      SeasonResponse[]
-    >;
+    return super.findAllByQueryLean({ active: true });
+  }
+
+  async findByLabel(label: string): Promise<SeasonResponse> {
+    return super.findByQueryLean({ label: label });
   }
 }

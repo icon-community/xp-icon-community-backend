@@ -40,10 +40,6 @@ export class UpdateUserDto {
   @IsOptional()
   linkedWallets?: LinkedWalletDto[];
 
-  @IsNumber()
-  @IsOptional()
-  dailyCheckInStreak?: number;
-
   @IsArray()
   @ValidateNested({ each: true })
   @Type(() => SeasonDto)

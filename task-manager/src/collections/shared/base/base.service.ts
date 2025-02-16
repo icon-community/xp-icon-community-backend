@@ -1,4 +1,4 @@
-import { Model, Document } from "mongoose";
+import { Model, Document, FilterQuery } from "mongoose";
 
 export class BaseService<
   T extends Document,
@@ -44,7 +44,7 @@ export class BaseService<
     return this.model.findOne(query).exec();
   }
 
-  findByQueryLean(query: UpdateDto): Promise<ResponseType | null> {
+  findByQueryLean(query: FilterQuery<T>): Promise<ResponseType | null> {
     return this.model
       .findOne(query)
       .lean()
@@ -52,7 +52,7 @@ export class BaseService<
   }
 
   async update(
-    query: UpdateDto,
+    query: FilterQuery<T>,
     data: UpdateDto,
   ): Promise<ResponseType | null> {
     return this.model
@@ -82,7 +82,7 @@ export class BaseService<
   findOneAndUpdateLean(
     query: any,
     update: any,
-    options: any = { new: true }
+    options: any = { new: true },
   ): Promise<ResponseType | null> {
     return this.model
       .findOneAndUpdate(query, update, options)

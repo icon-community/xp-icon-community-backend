@@ -66,12 +66,6 @@ export class User {
   linkedWallets: LinkedWallet[];
 
   @Prop({
-    type: Number,
-    default: 0,
-  })
-  dailyCheckInStreak: number;
-
-  @Prop({
     type: [Season],
     default: [],
   })

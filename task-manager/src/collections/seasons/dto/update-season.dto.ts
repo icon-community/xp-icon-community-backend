@@ -1,22 +1,7 @@
-import {
-  IsBoolean,
-  IsNumber,
-  IsString,
-  IsArray,
-  IsOptional,
-  IsMongoId,
-} from "class-validator";
-import { Types, ObjectId } from "mongoose";
+import { IsBoolean, IsNumber, IsArray, IsOptional } from "class-validator";
+import { Types } from "mongoose";
 
 export class UpdateSeasonDto {
-  @IsOptional()
-  @IsMongoId()
-  readonly _id?: ObjectId;
-
-  @IsNumber()
-  @IsOptional()
-  readonly number?: number;
-
   @IsNumber()
   @IsOptional()
   readonly blockStart?: number;
@@ -28,10 +13,6 @@ export class UpdateSeasonDto {
   @IsBoolean()
   @IsOptional()
   readonly active?: boolean;
-
-  @IsString()
-  @IsOptional()
-  readonly contract?: string;
 
   @IsArray()
   @IsOptional()

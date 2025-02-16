@@ -12,7 +12,7 @@ export interface SeasonResponse extends SeasonDocument {
 @Schema()
 export class Season {
   @Prop({ required: true, unique: true })
-  number: number;
+  label: string;
 
   @Prop({ required: true })
   blockStart: number;

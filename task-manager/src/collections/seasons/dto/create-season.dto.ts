@@ -15,9 +15,9 @@ export class TaskReferenceDto {
 }
 
 export class CreateSeasonDto {
-  @IsNumber()
+  @IsString()
   @IsNotEmpty()
-  readonly number: number;
+  readonly label: string;
 
   @IsNumber()
   @IsNotEmpty()
@@ -29,10 +29,6 @@ export class CreateSeasonDto {
 
   @IsBoolean()
   readonly active: boolean;
-
-  @IsString()
-  @IsNotEmpty()
-  readonly contract: string;
 
   @IsArray()
   @ArrayNotEmpty()
