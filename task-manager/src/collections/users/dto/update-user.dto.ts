@@ -4,21 +4,13 @@ import {
   IsOptional,
   IsNumber,
   IsDate,
-  IsEnum,
   ValidateNested,
   ArrayUnique,
   IsMongoId,
 } from "class-validator";
 import { Type } from "class-transformer";
 import { ObjectId } from "mongoose";
-
-class LinkedWalletDto {
-  @IsString()
-  address: string;
-
-  @IsEnum(["evm", "icon"])
-  type: "evm" | "icon";
-}
+import { LinkWalletDto } from "./link-wallet.dto";
 
 class SeasonDto {
   @IsMongoId()
@@ -35,10 +27,10 @@ export class UpdateUserDto {
 
   @IsArray()
   @ValidateNested({ each: true })
-  @Type(() => LinkedWalletDto)
-  @ArrayUnique((wallet: LinkedWalletDto) => wallet.address)
+  @Type(() => LinkWalletDto)
+  @ArrayUnique((wallet: LinkWalletDto) => wallet.address)
   @IsOptional()
-  linkedWallets?: LinkedWalletDto[];
+  linkedWallets?: LinkWalletDto[];
 
   @IsArray()
   @ValidateNested({ each: true })

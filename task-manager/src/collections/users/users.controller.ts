@@ -9,10 +9,9 @@ import {
 } from "@nestjs/common";
 import { CreateUserDto } from "./dto/create-user.dto";
 import { LinkWalletDto } from "./dto/link-wallet.dto";
+import { RegisterToSeasonDto } from "./dto/register-to-season.dto";
 import { UsersService } from "./users.service";
 import { SeasonsService } from "../seasons/seasons.service";
-import { SeasonResponse } from "../seasons/schemas/seasons.schema";
-
 @Controller("users")
 export class UserController {
   private readonly logger = new Logger(UserController.name);
@@ -125,7 +124,7 @@ export class UserController {
   @Post("/:address/register-season")
   async registerSeason(
     @Param("address") address: string,
-    @Body() registerSeasonDto: SeasonResponse,
+    @Body() registerSeasonDto: RegisterToSeasonDto,
   ) {
     this.logger.log({
       level: "info",
@@ -150,7 +149,11 @@ export class UserController {
       }
 
       // Register user to season
-      const user = await this.usersService.registerSeason(address, season._id);
+      const user = await this.usersService.registerSeason(
+        address,
+        season._id,
+        registerSeasonDto.registrationBlock,
+      );
 
       if (!user) {
         throw new HttpException(

@@ -32,13 +32,6 @@ export class UsersService extends BaseService<
     return super.create(createUserDto);
   }
 
-  async update(
-    query: UpdateUserDto,
-    updateUserDto: UpdateUserDto,
-  ): Promise<UserResponse> {
-    return super.update(query, updateUserDto);
-  }
-
   async findByWalletAddress(walletAddress: string): Promise<UserResponse> {
     return super.findByQueryLean({ walletAddress });
   }
@@ -97,6 +90,7 @@ export class UsersService extends BaseService<
   async registerSeason(
     address: string,
     seasonId: Types.ObjectId,
+    registrationBlock: number,
   ): Promise<UserResponse | null> {
     return super.findOneAndUpdateLean(
       {
@@ -107,8 +101,7 @@ export class UsersService extends BaseService<
         $push: {
           seasons: {
             seasonId,
-            registeredAt: new Date(),
-            completedTasks: [],
+            registrationBlock: registrationBlock,
           },
         },
       },
