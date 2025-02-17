@@ -15,5 +15,5 @@ export type RankDataPlain = {
   _id: string;
   address: string;
   total: number;
-  tasks: TaskXp[];
+  tasks: TaskXpPlain[];
 };
