@@ -7,6 +7,6 @@ export const SLOPE_POINT_VARIABLES = {
   x1: 60212985, // block number
   y1: 1672977715, // unix timestamp
 };
-export const SEASON_CONTROLLER_CACHE_MS = 60_000; // 1 min cache
-export const REFERRAL_CONTROLLER_CACHE_MS = 60_000; // 1 min cache
-export const RANKINGS_DEFAULT_CACHE_MS = 300_000; // 5min
+export const SEASON_CONTROLLER_CACHE_MS = 600_000; // 10 min cache
+export const REFERRAL_CONTROLLER_CACHE_MS = 300_000; // 5 min cache
+export const RANKINGS_DEFAULT_CACHE_MS = 600_000; // 10 min

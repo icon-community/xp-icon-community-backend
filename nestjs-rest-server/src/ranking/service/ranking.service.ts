@@ -2,10 +2,11 @@ import { Inject, Injectable } from "@nestjs/common";
 import { UsersDbService } from "../../db/services/users-db.service";
 import { SeasonDbService } from "../../db/services/season-db.service";
 import { UsersTaskDbService } from "../../db/services/user-task-db.service";
-import { RankData, RankDataPlain, TaskXp } from "../../shared/models/types/RankedTypes";
+import { RankDataPlain } from "../../shared/models/types/RankedTypes";
 import { calculateTaskTotalXp } from "../../shared/utils/xp-util";
 import { Cache, CACHE_MANAGER } from "@nestjs/cache-manager";
 import { RANKINGS_DEFAULT_CACHE_MS } from "../../constants";
+import { UserTaskDocument } from "../../db/schemas/UserTask.schema";
 
 @Injectable()
 export class RankingService {
@@ -16,7 +17,7 @@ export class RankingService {
     private userTaskDb: UsersTaskDbService,
   ) {}
 
-  public async getRankingOfSeason(seasonNumber: number): Promise<(RankData | RankDataPlain)[]> {
+  public async getRankingOfSeason(seasonNumber: number): Promise<RankDataPlain[]> {
     const cacheKey = `getRankingOfSeason-${seasonNumber}`;
     const value = await this.cacheManager.get<RankDataPlain[]>(cacheKey);
 
@@ -32,18 +33,22 @@ export class RankingService {
     }
 
     const allUsers = (await this.userDb.getUsersBySeason(season.id)) ?? [];
-    const ranked = [];
+    const ranked: RankDataPlain[] = [];
 
-    for (let i = 0; i < allUsers.length; i++) {
-      const tempData: RankData = {
-        _id: allUsers[i]._id,
-        address: allUsers[i].walletAddress,
+    for (const user of allUsers) {
+      const tempData: RankDataPlain = {
+        _id: user._id.toString(),
+        address: user.walletAddress,
         total: 0,
-        tasks: [] as TaskXp[],
+        tasks: [],
       };
 
-      for (let ii = 0; ii < season.tasks.length; ii++) {
-        const userTasks = await this.userTaskDb.getUserTaskByAllIds(allUsers[i]._id, season.tasks[ii], season._id);
+      const userTasksResults: Array<UserTaskDocument[] | null> = await Promise.all(
+        season.tasks.map((seasonTask) => this.userTaskDb.getUserTaskByAllIds(user._id, seasonTask, season._id)),
+      );
+
+      for (let ii = 0; ii < userTasksResults.length; ii++) {
+        const userTasks = userTasksResults[ii];
 
         if (!userTasks || userTasks.length == 0) {
           continue;
@@ -53,10 +58,11 @@ export class RankingService {
 
         tempData.total = tempData.total + taskTotalXp;
         tempData.tasks.push({
-          task: season.tasks[ii]._id,
+          task: season.tasks[ii]._id.toString(),
           xp: taskTotalXp,
         });
       }
+
       ranked.push(tempData);
     }
 
