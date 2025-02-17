@@ -2,7 +2,7 @@ import { Inject, Injectable } from "@nestjs/common";
 import { UsersDbService } from "../../db/services/users-db.service";
 import { SeasonDbService } from "../../db/services/season-db.service";
 import { UsersTaskDbService } from "../../db/services/user-task-db.service";
-import { RankData, TaskXp } from "../../shared/models/types/RankedTypes";
+import { RankData, RankDataPlain, TaskXp } from "../../shared/models/types/RankedTypes";
 import { calculateTaskTotalXp } from "../../shared/utils/xp-util";
 import { Cache, CACHE_MANAGER } from "@nestjs/cache-manager";
 import { RANKINGS_DEFAULT_CACHE_MS } from "../../constants";
@@ -16,9 +16,9 @@ export class RankingService {
     private userTaskDb: UsersTaskDbService,
   ) {}
 
-  public async getRankingOfSeason(seasonNumber: number): Promise<RankData[]> {
+  public async getRankingOfSeason(seasonNumber: number): Promise<(RankData | RankDataPlain)[]> {
     const cacheKey = `getRankingOfSeason-${seasonNumber}`;
-    const value = await this.cacheManager.get<RankData[]>(cacheKey);
+    const value = await this.cacheManager.get<RankDataPlain[]>(cacheKey);
 
     if (value) {
       // return cached value if exists
