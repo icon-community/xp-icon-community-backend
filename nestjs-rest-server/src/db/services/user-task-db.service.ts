@@ -7,7 +7,9 @@ import { Collections } from "../../shared/models/enum/Collections";
 
 @Injectable()
 export class UsersTaskDbService {
-  constructor(@InjectModel(Collections.USER_TASKS) private userTaskModel: Model<IUserTask>) {}
+  constructor(@InjectModel(Collections.USER_TASKS) private userTaskModel: Model<IUserTask>) {
+    userTaskModel.syncIndexes();
+  }
 
   async createUserTask(task: IUserTask): Promise<UserTaskDocument> {
     const createdUserTask: UserTaskDocument = new this.userTaskModel(task);

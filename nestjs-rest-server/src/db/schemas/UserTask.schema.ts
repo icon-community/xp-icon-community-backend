@@ -58,36 +58,43 @@ export type UserTaskQuery = {
 };
 
 export type UserTaskDocument = HydratedDocument<IUserTask>;
-export const UserTaskSchema = new Schema<IUserTask>({
-  userId: {
-    type: Schema.Types.ObjectId,
-    ref: "User",
-    required: true,
+export const UserTaskSchema = new Schema<IUserTask>(
+  {
+    userId: {
+      type: Schema.Types.ObjectId,
+      ref: "User",
+      required: true,
+    },
+    taskId: {
+      type: Schema.Types.ObjectId,
+      ref: "Task",
+      required: true,
+    },
+    seasonId: {
+      type: Schema.Types.ObjectId,
+      ref: "Season",
+      required: true,
+    },
+    status: {
+      type: String,
+      enum: Status,
+      default: Status.PENDING,
+    },
+    walletAddress: {
+      type: String,
+      required: true,
+    },
+    xpEarned: {
+      type: [XpEarnedSchema],
+    },
+    createdAt: {
+      type: Date,
+      default: Date.now,
+    },
   },
-  taskId: {
-    type: Schema.Types.ObjectId,
-    ref: "Task",
-    required: true,
+  {
+    autoIndex: true,
   },
-  seasonId: {
-    type: Schema.Types.ObjectId,
-    ref: "Season",
-    required: true,
-  },
-  status: {
-    type: String,
-    enum: Status,
-    default: Status.PENDING,
-  },
-  walletAddress: {
-    type: String,
-    required: true,
-  },
-  xpEarned: {
-    type: [XpEarnedSchema],
-  },
-  createdAt: {
-    type: Date,
-    default: Date.now,
-  },
-});
+);
+
+UserTaskSchema.index({ userId: 1, taskId: 1, seasonId: 1 }, { unique: false });

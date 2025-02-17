@@ -1,6 +1,8 @@
-import { RankData } from "../models/types/RankedTypes";
+import { RankData, RankDataPlain } from "../models/types/RankedTypes";
 
-export function getRankingOfSeasonReduced(rankData: RankData[]): { address: string; total: number }[] {
+export function getRankingOfSeasonReduced(
+  rankData: (RankData | RankDataPlain)[],
+): { address: string; total: number }[] {
   const reducedData = [];
   for (let i = 0; i < rankData.length; i++) {
     reducedData.push({

@@ -168,7 +168,9 @@ export class UserService {
 
       // find this user in the rankings and initialize
       // and empty array to store the tasks of this user
-      const thisUserIndex = rankings.findIndex((userIndex) => userIndex._id.equals(user._id));
+      const thisUserIndex = rankings.findIndex((userIndex) => {
+        return userIndex._id === user._id.toString();
+      });
       const tasks: FormattedUserBySeasonTask[] = [];
 
       // find the user above in the rankings and initialize
