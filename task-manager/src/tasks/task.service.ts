@@ -1,6 +1,10 @@
 import { Injectable } from "@nestjs/common";
 import { Logger } from "@nestjs/common";
-import { TaskInput } from "../shared/types/GeneralTypes";
+import {
+  TaskInputTypeTriggered,
+  TaskInputTypeRegistration,
+  TaskInputTypeRecurring,
+} from "../shared/types/GeneralTypes";
 import {
   ProcessSicxCollateralsTask,
   ProcessAvaxCollateralsTask,
@@ -17,8 +21,15 @@ import {
   SubscribeNewsletterTask,
   FeedTaskSeedToDbTask,
   FeedSeasonSeedToDbTask,
+  AwardRegistrationXpTask,
 } from "./triggered";
 import { TRIGGERED_TASKS_TYPES } from "../constants";
+
+type TriggeredTask = {
+  label: string;
+  handlerFunction: { execute: (...args: any[]) => Promise<void> };
+  params: (TaskInputTypeRegistration | boolean | (() => void))[];
+};
 
 @Injectable()
 export class TaskService {
@@ -40,6 +51,7 @@ export class TaskService {
     private readonly subscribeNewsletterTask: SubscribeNewsletterTask,
     private readonly feedTaskSeedToDbTask: FeedTaskSeedToDbTask,
     private readonly feedSeasonSeedToDbTask: FeedSeasonSeedToDbTask,
+    private readonly awardRegistrationXpTask: AwardRegistrationXpTask,
   ) {}
 
   async executeInitTasks() {
@@ -74,7 +86,7 @@ export class TaskService {
     }
   }
 
-  async executeRecurringTasks(taskInput: TaskInput) {
+  async executeRecurringTasks(taskInput: TaskInputTypeRecurring) {
     const recurringTasks = [
       this.processAvaxCollateralsTask,
       this.processCrossChainCollateralsTask,
@@ -92,32 +104,41 @@ export class TaskService {
     }
   }
 
-  async executeTriggeredTasks(taskName: string, callbackSetPaused: () => void) {
-    const triggeredTasks = [
+  async executeTriggeredTasks(
+    taskInput: TaskInputTypeTriggered,
+    callbackSetPaused: () => void,
+  ) {
+    const { taskName, params } = taskInput;
+    const triggeredTasks: TriggeredTask[] = [
       {
         label: TRIGGERED_TASKS_TYPES.subscribeNewsletter,
-        callback: this.subscribeNewsletterTask,
+        handlerFunction: this.subscribeNewsletterTask,
         params: [callbackSetPaused],
       },
       {
         label: TRIGGERED_TASKS_TYPES.feedTaskSeedToDbForce,
-        callback: this.feedTaskSeedToDbTask,
+        handlerFunction: this.feedTaskSeedToDbTask,
         params: [true, callbackSetPaused],
       },
       {
         label: TRIGGERED_TASKS_TYPES.feedTaskSeedToDb,
-        callback: this.feedTaskSeedToDbTask,
+        handlerFunction: this.feedTaskSeedToDbTask,
         params: [false, callbackSetPaused],
       },
       {
         label: TRIGGERED_TASKS_TYPES.feedSeasonSeedToDb,
-        callback: this.feedSeasonSeedToDbTask,
+        handlerFunction: this.feedSeasonSeedToDbTask,
         params: [false, callbackSetPaused],
       },
       {
         label: TRIGGERED_TASKS_TYPES.feedSeasonSeedToDbForce,
-        callback: this.feedSeasonSeedToDbTask,
+        handlerFunction: this.feedSeasonSeedToDbTask,
         params: [true, callbackSetPaused],
+      },
+      {
+        label: TRIGGERED_TASKS_TYPES.registerNewUser,
+        handlerFunction: this.awardRegistrationXpTask,
+        params: [params as TaskInputTypeRegistration],
       },
     ];
 
@@ -139,7 +160,7 @@ export class TaskService {
             message: `Executing task: ${task.label}`,
           });
 
-          await task.callback.execute(...task.params);
+          await task.handlerFunction.execute(...task.params);
           break;
         }
       } catch (err) {

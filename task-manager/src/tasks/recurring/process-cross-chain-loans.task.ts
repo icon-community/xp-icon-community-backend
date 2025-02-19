@@ -6,7 +6,7 @@ import { SeasonDocument } from "../../collections/seasons/schemas/seasons.schema
 import { UsersService } from "../../collections/users/users.service";
 import { UserResponse } from "../../collections/users/schemas/users.schema";
 // import { UserTasksService } from "../../collections/user-tasks/user-tasks.service";
-import { TaskInput } from "../../shared/types/GeneralTypes";
+import { TaskInputTypeRecurring } from "../../shared/types/GeneralTypes";
 import { BaseTask } from "../base/base.task";
 import { RECURRING_TASKS_TYPES } from "../../constants";
 
@@ -27,7 +27,7 @@ export class ProcessCrossChainLoansTask extends BaseTask {
   }
 
   async processTask(
-    taskInput: TaskInput,
+    taskInput: TaskInputTypeRecurring,
     userDocument: UserResponse,
     seasonDocument: SeasonDocument,
     taskDocument: TaskDocument,

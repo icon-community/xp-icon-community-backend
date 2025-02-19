@@ -12,6 +12,7 @@ import { LinkWalletDto } from "./dto/link-wallet.dto";
 import { RegisterToSeasonDto } from "./dto/register-to-season.dto";
 import { UsersService } from "./users.service";
 import { SeasonsService } from "../seasons/seasons.service";
+
 @Controller("users")
 export class UserController {
   private readonly logger = new Logger(UserController.name);
@@ -163,6 +164,19 @@ export class UserController {
             error: "USER_NOT_FOUND",
           },
           HttpStatus.NOT_FOUND,
+        );
+      }
+      try {
+        await this.usersService.awardRegistrationXp({
+          userId: user._id.toString(),
+          seasonId: season._id.toString(),
+          seasonLabel: registerSeasonDto.label,
+          registrationBlock: registerSeasonDto.registrationBlock,
+        });
+      } catch (err) {
+        this.logger.error(
+          `Failed to award registration XP: ${err.message}`,
+          err.stack,
         );
       }
 

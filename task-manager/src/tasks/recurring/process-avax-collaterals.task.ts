@@ -7,7 +7,7 @@ import { SeasonDocument } from "../../collections/seasons/schemas/seasons.schema
 import { TaskDocument } from "../../collections/tasks/schemas/tasks.schema";
 // import { UserTasksService } from "../../collections/user-tasks/user-tasks.service";
 // import { XpEarned } from "../../collections/user-tasks/schemas/user-tasks.schema";
-import { TaskInput } from "../../shared/types/GeneralTypes";
+import { TaskInputTypeRecurring } from "../../shared/types/GeneralTypes";
 import { BaseTask } from "../base/base.task";
 import { RECURRING_TASKS_TYPES } from "../../constants";
 
@@ -28,7 +28,7 @@ export class ProcessAvaxCollateralsTask extends BaseTask {
   }
 
   async processTask(
-    taskInput: TaskInput,
+    taskInput: TaskInputTypeRecurring,
     userDocument: UserResponse,
     seasonDocument: SeasonDocument,
     taskDocument: TaskDocument,

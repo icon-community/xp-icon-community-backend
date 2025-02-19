@@ -6,7 +6,7 @@ import { UserResponse } from "../../collections/users/schemas/users.schema";
 import { SeasonDocument } from "../../collections/seasons/schemas/seasons.schema";
 import { TaskDocument } from "../../collections/tasks/schemas/tasks.schema";
 import { ConfigHelperService } from "../../config/config-helper.service";
-import { TaskInput } from "../../shared/types/GeneralTypes";
+import { TaskInputTypeRecurring } from "../../shared/types/GeneralTypes";
 import { BaseTask } from "../base/base.task";
 import { RECURRING_TASKS_TYPES } from "../../constants";
 
@@ -29,7 +29,7 @@ export class ProcessSuiCrossChainCollateralsTask extends BaseTask {
   }
 
   async processTask(
-    taskInput: TaskInput,
+    taskInput: TaskInputTypeRecurring,
     userDocument: UserResponse,
     seasonDocument: SeasonDocument,
     taskDocument: TaskDocument,

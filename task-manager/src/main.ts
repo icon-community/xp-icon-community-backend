@@ -4,7 +4,7 @@ import { WinstonModule } from "nest-winston";
 import { Logging } from "./shared/logging/custom-logger";
 import { ResponseInterceptor } from "./shared/interceptors/response.interceptor";
 import { HttpExceptionFilter } from "./shared/filters/http-exception.filter";
-import { ValidationPipe } from '@nestjs/common';
+import { ValidationPipe } from "@nestjs/common";
 // import * as mongoose from 'mongoose';
 
 async function bootstrap() {

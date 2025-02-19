@@ -1,5 +1,5 @@
 import { Logger } from "@nestjs/common";
-import { TaskInput } from "../../shared/types/GeneralTypes";
+import { TaskInputTypeRecurring } from "../../shared/types/GeneralTypes";
 import { SeasonsService } from "../../collections/seasons/seasons.service";
 import { SeasonDocument } from "../../collections/seasons/schemas/seasons.schema";
 import { TasksService } from "../../collections/tasks/tasks.service";
@@ -26,7 +26,7 @@ export abstract class BaseTask {
   }
 
   // main template method
-  async execute(taskInput: TaskInput): Promise<void> {
+  async execute(taskInput: TaskInputTypeRecurring): Promise<void> {
     try {
       this.logTaskStart(taskInput);
 
@@ -47,13 +47,13 @@ export abstract class BaseTask {
   // Abstract methods that must be implemented by child classes
   protected abstract getTaskType(): string;
   protected abstract processTask(
-    taskInput: TaskInput,
+    taskInput: TaskInputTypeRecurring,
     userDocument: UserResponse,
     seasonDocument: SeasonDocument,
     taskDocument: TaskDocument,
   ): Promise<void>;
 
-  protected logTaskStart(taskInput: TaskInput): void {
+  protected logTaskStart(taskInput: TaskInputTypeRecurring): void {
     this.logger.log({
       level: "info",
       message: `${this.constructor.name} begin execution. Task Input: ${JSON.stringify(taskInput)}`,
@@ -88,7 +88,7 @@ export abstract class BaseTask {
 
   private async processSeasons(
     activeSeasons: SeasonDocument[],
-    taskInput: TaskInput,
+    taskInput: TaskInputTypeRecurring,
     targetTask: TaskDocument,
   ): Promise<void> {
     for (const season of activeSeasons) {
@@ -106,7 +106,7 @@ export abstract class BaseTask {
 
   private async processUsersForSeason(
     season: SeasonDocument,
-    taskInput: TaskInput,
+    taskInput: TaskInputTypeRecurring,
     targetTask: TaskDocument,
   ): Promise<void> {
     const users = await this.usersService.findUsersBySeason(

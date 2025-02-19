@@ -36,10 +36,7 @@ export class TaskConsumerService implements OnModuleInit {
           level: "info",
           message: `Executing triggered tasks:, ${JSON.stringify(message)}`,
         });
-        this.taskService.executeTriggeredTasks(
-          message.taskName,
-          callbackSetPaused,
-        );
+        this.taskService.executeTriggeredTasks(message, callbackSetPaused);
       },
     );
   }
