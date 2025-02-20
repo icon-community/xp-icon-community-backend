@@ -1,6 +1,7 @@
 import { Injectable } from "@nestjs/common";
 import { TaskProducerService } from "./tasks/task-producer.service";
 import { TRIGGERED_TASKS_TYPES } from "./constants";
+import { TaskInputTypeRegistration } from "./shared/types/GeneralTypes";
 
 @Injectable()
 export class AppService {
@@ -9,6 +10,13 @@ export class AppService {
   async subscribeNewsletter() {
     await this.taskProducerService.sendTaskToTriggeredQueue({
       taskName: TRIGGERED_TASKS_TYPES.subscribeNewsletter,
+    });
+  }
+
+  async awardRegistrationXp(params: TaskInputTypeRegistration) {
+    await this.taskProducerService.sendTaskToTriggeredQueue({
+      taskName: TRIGGERED_TASKS_TYPES.awardRegistrationXp,
+      params: params,
     });
   }
 

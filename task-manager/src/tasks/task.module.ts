@@ -18,6 +18,7 @@ import {
   SubscribeNewsletterTask,
   FeedTaskSeedToDbTask,
   FeedSeasonSeedToDbTask,
+  AwardRegistrationXpTask,
 } from "./triggered";
 import { TasksModule } from "../collections/tasks/tasks.module";
 import { SeasonsModule } from "../collections/seasons/seasons.module";
@@ -42,6 +43,7 @@ import { UsersModule } from "../collections/users/users.module";
     ProcessLockedSavingsTask,
     ProcessNewReferrersTask,
     ProcessNewReferredTask,
+    AwardRegistrationXpTask,
   ],
   exports: [TaskService],
 })

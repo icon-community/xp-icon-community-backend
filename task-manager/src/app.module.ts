@@ -5,7 +5,8 @@ import { RabbitMQModule } from "./rabbitmq/rabbitmq.module";
 import { TaskProducerModule } from "./tasks/task-producer.module";
 import { TaskConsumerModule } from "./tasks/task-consumer.module";
 import { UsersModule } from "./collections/users/users.module";
-import { AppController } from "./app.controller";
+import { SeasonsModule } from "./collections/seasons/seasons.module";
+import { AppController, UserController } from "./app.controller";
 import { AppService } from "./app.service";
 import MONGO_CONFIG from "./config/mongo.config";
 
@@ -17,8 +18,9 @@ import MONGO_CONFIG from "./config/mongo.config";
     TaskProducerModule,
     TaskConsumerModule,
     UsersModule,
+    SeasonsModule,
   ],
-  controllers: [AppController],
+  controllers: [AppController, UserController],
   providers: [AppService],
 })
 export class AppModule {}

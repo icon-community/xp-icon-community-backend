@@ -1,8 +1,3 @@
-export type TaskObject = {
-  taskName: string;
-  [key: string]: any;
-};
-
 export type ParseUrl = {
   protocol: string;
   path: string;
@@ -19,7 +14,7 @@ export type JsonRpcRequest = {
 
 export type TaskInputTypeTriggered = {
   taskName: string;
-  params: TaskInput;
+  params?: TaskInput;
 };
 
 export type TaskInput = TaskInputTypeRecurring | TaskInputTypeRegistration;

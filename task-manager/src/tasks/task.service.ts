@@ -136,7 +136,7 @@ export class TaskService {
         params: [true, callbackSetPaused],
       },
       {
-        label: TRIGGERED_TASKS_TYPES.registerNewUser,
+        label: TRIGGERED_TASKS_TYPES.awardRegistrationXp,
         handlerFunction: this.awardRegistrationXpTask,
         params: [params as TaskInputTypeRegistration],
       },

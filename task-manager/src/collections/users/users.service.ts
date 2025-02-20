@@ -13,8 +13,6 @@ import {
   isSuiAddress,
 } from "../../utils/validate-util";
 import { Chains } from "../../shared/enum/general-enum";
-import { TaskInputTypeRegistration } from "../../shared/types/GeneralTypes";
-import { TaskProducerService } from "../../tasks/task-producer.service";
 
 @Injectable()
 export class UsersService extends BaseService<
@@ -26,7 +24,6 @@ export class UsersService extends BaseService<
   constructor(
     @InjectModel(MONGO_CONFIG.collections.users)
     private readonly usersModel: Model<UserDocument>,
-    private taskProducerService: TaskProducerService,
   ) {
     super(usersModel);
   }
@@ -110,12 +107,5 @@ export class UsersService extends BaseService<
       },
       { new: true, upsert: false },
     );
-  }
-
-  async awardRegistrationXp(params: TaskInputTypeRegistration) {
-    await this.taskProducerService.sendTaskToTriggeredQueue({
-      taskName: "awardRegistrationXp",
-      params: params,
-    });
   }
 }

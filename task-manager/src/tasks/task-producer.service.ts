@@ -7,10 +7,12 @@ import {
 } from "@nestjs/common";
 import { RabbitMQService } from "../rabbitmq/rabbitmq.service";
 import { RABBITMQ_CONFIG } from "../config/rabbitmq.config";
-import { TaskObject } from "../shared/types/GeneralTypes";
 import { SeasonsService } from "../collections/seasons/seasons.service";
 import BlockMonitorTaskRunner from "../utils/block-monitor-task-runner";
-import { TaskInput } from "../shared/types/GeneralTypes";
+import {
+  TaskInput,
+  TaskInputTypeTriggered,
+} from "../shared/types/GeneralTypes";
 import { TaskService } from "./task.service";
 
 @Injectable()
@@ -65,7 +67,10 @@ export class TaskProducerService
     );
   }
 
-  async sendTaskToTriggeredQueue(task: TaskObject, haltAllTasks = false) {
+  async sendTaskToTriggeredQueue(
+    task: TaskInputTypeTriggered,
+    haltAllTasks = false,
+  ) {
     this.rabbitMQService.sendToQueue(
       RABBITMQ_CONFIG.queues.triggeredTasks,
       task,
