@@ -1,6 +1,8 @@
 const fetchRegisteredUsersAndUpdateDb = require("./fetchRegisteredUsersAndUpdateDb");
 const fetchSICXCollateralsAndUpdateDb = require("./fetchSICXCollateralsAndUpdateDb");
 const fetchAVAXCollateralsAndUpdateDb = require("./fetchAVAXCollateralsAndUpdateDb");
+const fetchStellarCollateralsAndUpdateDb = require("./fetchStellarCollateralsAndUpdateDb");
+const fetchStellarLoansAndUpdateDb = require("./fetchStellarLoansAndUpdateDb");
 const fetchLoansAndUpdateDb = require("./fetchLoansAndUpdateDb");
 const fetchLockedSavingsAndUpdateDb = require("./fetchLockedSavingsAndUpdateDb");
 const feedTaskSeedDataToDb = require("./feedTaskSeedDataToDb");
@@ -34,4 +36,6 @@ module.exports = {
   fetchNewReferrersAndUpdateDb,
   fetchNewReferredAndUpdateDb,
   suiDailyCheckInTask,
+  fetchStellarLoansAndUpdateDb,
+  fetchStellarCollateralsAndUpdateDb
 };

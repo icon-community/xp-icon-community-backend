@@ -20,10 +20,10 @@
   {
     "seedId": "LOCKING_SAVINGS_RATE_ICON",
     "type": "onchain",
-    "description": "for locking into the saving rates, the user will receive 1 XP per USD value locked per day. It will be done daily (per chain period)",
+    "description": "for locking into the saving rates, the user will receive 0 XP per USD value locked per day. It will be done daily (per chain period)",
     "criteria": [],
     "title": "locking into saving rates",
-    "rewardFormula": ["amount", "return amount * 1"],
+    "rewardFormula": ["amount", "return amount * 0"],
     "chain": "icon"
   },
   {
@@ -172,6 +172,24 @@
     "criteria": [],
     "title": "One time reward for linking Google account",
     "rewardFormula": ["amount", "return 3000"],
+    "chain": "icon"
+  },
+  {
+    "seedId": "DEPOSIT_NATIVE_STELLAR_COLLATERAL",
+    "type": "xchain",
+    "description": "for depositing native Stellar collateral, the user will receive 1 XP per USD value of the collateral deposited that day. It will be done daily (per chain period)",
+    "criteria": [],
+    "title": "deposit native stellar collateral",
+    "rewardFormula": ["amount", "return amount * 1"],
+    "chain": "icon"
+  },
+  {
+    "seedId": "MINTING_BNUSD_STELLAR",
+    "type": "xchain",
+    "description": "for minting bnUSD on Stellar, the user will receive 2 XP per bnUSD loan held per day. It will be done daily (per chain period)",
+    "criteria": [],
+    "title": "holding a Stellar loan",
+    "rewardFormula": ["amount", "return amount * 2"],
     "chain": "icon"
   }
 ]
