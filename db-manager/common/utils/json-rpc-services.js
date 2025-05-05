@@ -240,6 +240,26 @@ async function getAVAXCollateralInUSDValue(wallet, height) {
   return getDataFromStandings(wallet, "AVAX", "collateral_in_USD", height);
 }
 
+async function getStellarCollateralInUSDValue(wallet, height) {
+  return getDataFromStandings(wallet, "XLM", "collateral_in_USD", height);
+}
+
+async function getStellarDebtInUSDValue(wallet, height) {
+  try {
+    if (!isXChainWallet(wallet)) {
+      throw new Error("wallet is not an XChain wallet");
+    }
+    return getDataFromStandings(wallet, "XLM", "total_debt_in_USD", height);
+  } catch (err) {
+    console.log(`Error getting XChain debt value in USD for wallet ${wallet}`);
+    throw new Error(err.message);
+  }
+}
+
+async function getStellarDebtInUSDValue(wallet, height) {
+  return getDataFromStandings(wallet, "XLM", "total_debt_in_USD", height);
+}
+
 async function getSICXCollateralInUSDValue(wallet, height) {
   return getDataFromStandings(wallet, "sICX", "collateral_in_USD", height);
 }
@@ -378,4 +398,6 @@ module.exports = {
   getSuiXChainDebtInUSDValue,
   getmSuiXChainCollateralInUSDValue,
   getmSuiXChainDebtInUSDValue,
+  getStellarDebtInUSDValue,
+  getStellarCollateralInUSDValue
 };

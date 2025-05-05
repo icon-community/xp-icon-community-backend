@@ -13,21 +13,29 @@ const SELECTED_CHAIN =
   process.env.CHAIN == null ? "mainnet" : process.env.CHAIN;
 const config = {
   tasks: {
+    // ICON tasks
     depositSicxICON: "DEPOSIT_SICX_COLLATERAL_ICON",
     mintingBnusdICON: "MINTING_BNUSD_ICON",
     lockingSavingsRateICON: "LOCKING_SAVINGS_RATE_ICON",
-    registerNewUser: "REGISTER_NEW_USER",
+    // AVAX tasks
     depositAvaxCollateral: "DEPOSIT_AVAX_COLLATERAL_ICON",
+    // Stellar tasks
+    depositStellarCollateral: "DEPOSIT_NATIVE_STELLAR_COLLATERAL",
+    mintingBnusdStellar: "MINTING_BNUSD_STELLAR",
+    //crosschain tasks
     depositNativeCrossChain: "DEPOSIT_NATIVE_CROSSCHAIN_COLLATERAL",
     mintingBnusdCrossChain: "MINTING_BNUSD_CROSSCHAIN",
+    dailyCheckInCrossChain: "DAILY_CHECK_IN_CROSS_CHAIN_COLLATERAL",
+    // SUI tasks
     depositNativeSui: "DEPOSIT_NATIVE_SUI_COLLATERAL",
     depositMSui: "DEPOSIT_M_SUI_COLLATERAL",
     mintingBnusdSui: "MINTING_BNUSD_SUI",
     mintingBnusdMSui: "MINTING_BNUSD_M_SUI",
+    dailyCheckInSui: "DAILY_CHECK_IN_SUI_COLLATERAL",
+    // General tasks
+    registerNewUser: "REGISTER_NEW_USER",
     usingReferralCode: "USING_REFERRAL_CODE",
     referringUser: "REFERRING_USER",
-    dailyCheckInCrossChain: "DAILY_CHECK_IN_CROSS_CHAIN_COLLATERAL",
-    dailyCheckInSui: "DAILY_CHECK_IN_SUI_COLLATERAL",
     hanaNewsletter: "HANA_NEWSLETTER",
     linkTwitterX: "LINK_TWITTER_X",
     linkGoogle: "LINK_GOOGLE",

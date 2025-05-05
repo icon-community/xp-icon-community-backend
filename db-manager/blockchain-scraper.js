@@ -8,31 +8,43 @@ const {
 } = require("./common/utils/utils");
 const MainDb = require("./common/utils/mainDb");
 const {
-  fetchRegisteredUsersAndUpdateDb,
-  fetchSICXCollateralsAndUpdateDb,
-  fetchAVAXCollateralsAndUpdateDb,
-  fetchLoansAndUpdateDb,
-  fetchLockedSavingsAndUpdateDb,
+  // general functions
   feedTaskSeedDataToDb,
   feedSeasonSeedDataToDb,
+  // fetch new users
+  fetchRegisteredUsersAndUpdateDb,
+  // sICX tasks
+  fetchSICXCollateralsAndUpdateDb,
+  // AVAX tasks
+  fetchAVAXCollateralsAndUpdateDb,
+  // general loans
+  fetchLoansAndUpdateDb,
+  // general savings
+  fetchLockedSavingsAndUpdateDb,
+  // New user tasks
   fetchNewUsersAndGiveRegistrationReward,
+  // XChain tasks
   fetchXChainLoansAndUpdateDb,
   fetchXChainCollateralsAndUpdateDb,
+  // SUI tasks
   fetchSuiXChainLoansAndUpdateDb,
   fetchSuiXChainCollateralsAndUpdateDb,
+  suiDailyCheckInTask,
+  // mSUI tasks
   fetchMSuiXChainLoansAndUpdateDb,
   fetchMSuiXChainCollateralsAndUpdateDb,
+  // Referrals tasks
   fetchNewReferrersAndUpdateDb,
   fetchNewReferredAndUpdateDb,
-  suiDailyCheckInTask,
+  // Stellar tasks
+  fetchStellarLoansAndUpdateDb,
+  fetchStellarCollateralsAndUpdateDb,
 } = require("./tasks");
 const config = require("./common/utils/config");
 
 const lineBreak = config.misc.lineBreak;
 const RUN_TIME = parseInt(process.env.TIME);
 const NO_TASK_RUN = process.env.NO_TASK != null;
-// const CHAIN = process.env.CHAIN;
-// void CHAIN;
 
 // instantiate variables
 let monitor = null;
@@ -137,6 +149,15 @@ async function main() {
     // Run task that fetches cross chain collaterals on SUI
     // deposited by each user and updates the db
     tasks.push(taskRunner(fetchSuiXChainCollateralsAndUpdateDb, db));
+
+    // Run task that fetches cross chain loans on Stellar
+    // deposited by each user using XLM token
+    // and updates the db
+  tasks.push(taskRunner(fetchStellarLoansAndUpdateDb, db));
+
+    // Run task that fetches cross chain collaterals on 
+    // Stellar deposited by each user and updates the db
+  tasks.push(taskRunner(fetchStellarCollateralsAndUpdateDb, db));
 
     // Run task that fetches new referrers and new referred and
     // updates the db
