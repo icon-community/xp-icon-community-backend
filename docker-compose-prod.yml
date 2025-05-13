@@ -17,7 +17,7 @@ x-common-rest-server-env: &common-rest-server-env
 
 services:
   auth-server:
-    image: "iconcommunity/icon-wallet-auth-backend-app:1.0.3"
+    image: "iconcommunity/icon-wallet-auth-backend-app:1.0.4"
     container_name: auth-server
     restart: always
     ports:
