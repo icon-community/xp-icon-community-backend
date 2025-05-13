@@ -19,7 +19,7 @@ const config = require("../common/utils/config");
 async function feedSeasonSeedDataToDb(db, useSeed = null, update = false) {
   const seed = useSeed == null ? config.seeds.seasons : useSeed;
   console.log("> Running feedSeasonSeedDataToDb");
-  console.log(`> Seed file: ${seed}`);
+  console.log(`> Seed file: ${JSON.stringify(seed, null,2)}`);
   try {
     console.log("Creating connection to DB");
     await db.createConnection();
