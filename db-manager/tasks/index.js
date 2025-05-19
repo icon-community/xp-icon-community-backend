@@ -17,6 +17,7 @@ const fetchMSuiXChainCollateralsAndUpdateDb = require("./fetchmSuiXChainCollater
 const fetchNewReferrersAndUpdateDb = require("./fetchNewReferrersAndUpdateDb");
 const fetchNewReferredAndUpdateDb = require("./fetchNewReferredAndUpdateDb");
 const suiDailyCheckInTask = require("./suiDailyCheckInTask");
+const crossChainDailyCheckInTask = require("./crossChainDailyCheckInTask");
 
 module.exports = {
   fetchRegisteredUsersAndUpdateDb,
@@ -37,5 +38,6 @@ module.exports = {
   fetchNewReferredAndUpdateDb,
   suiDailyCheckInTask,
   fetchStellarLoansAndUpdateDb,
-  fetchStellarCollateralsAndUpdateDb
+  fetchStellarCollateralsAndUpdateDb,
+  crossChainDailyCheckInTask
 };
