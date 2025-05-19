@@ -17,7 +17,13 @@ async function bootstrap(): Promise<void> {
     winston.format.colorize(),
     winston.format.timestamp(),
     winston.format.align(),
-    winston.format.printf((info) => `${info.timestamp} ${info.level}: ${info.message}`),
+    winston.format.printf((info) => {
+      if ("body" in info) {
+        return `${info.timestamp} ${info.level}: ${info.message}\nRequest Body: ${JSON.stringify(info.body, null, 2)}`;
+      } else {
+        return `${info.timestamp} ${info.level}: ${info.message}`;
+      }
+    }),
   );
 
   const transport = new winston.transports.DailyRotateFile({

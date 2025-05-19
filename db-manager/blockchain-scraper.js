@@ -26,6 +26,7 @@ const {
   // XChain tasks
   fetchXChainLoansAndUpdateDb,
   fetchXChainCollateralsAndUpdateDb,
+  crossChainDailyCheckInTask,
   // SUI tasks
   fetchSuiXChainLoansAndUpdateDb,
   fetchSuiXChainCollateralsAndUpdateDb,
@@ -168,6 +169,7 @@ async function main() {
 
     // Run task that fetches cross chain collaterals deposited by each user and updates the db
     tasks.push(taskRunner(suiDailyCheckInTask, db));
+    tasks.push(taskRunner(crossChainDailyCheckInTask, db));
 
     // create monitor instance
     monitor = new Monitor(
