@@ -132,7 +132,7 @@
   {
     "seedId": "DAILY_CHECK_IN_CROSS_CHAIN_COLLATERAL",
     "type": "xchain",
-    "description": "for depositing native crosschain collateral and making daily check in, the user will receive 1 + (streak count/100) * (value of deposited collateral in USD) XP. It will be done daily (per chain period)",
+    "description": "for depositing native crosschain collateral and making daily check in, the user will (value of deposited collateral in USD) * (streak count/10) XP. It will be done daily (per chain period)",
     "criteria": {},
     "title": "daily check in",
     "rewardFormula": ["amount", "return amount * 1"],

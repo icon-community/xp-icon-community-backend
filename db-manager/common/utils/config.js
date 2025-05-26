@@ -139,7 +139,7 @@ const config = {
     },
   },
   seasonsRoutes: {
-    "mirai-season": 1,
+    "stellar-summer-rewards": 1,
     // uncomment these during testing
     // test1: "1",
     // test2: "2",
