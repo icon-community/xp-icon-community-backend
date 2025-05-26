@@ -1,3 +1,3 @@
 export enum SeasonLabel {
-  "stellar-season" = "stellar-season",
+  "stellar-summer-rewards" = "stellar-summer-rewards",
 }
