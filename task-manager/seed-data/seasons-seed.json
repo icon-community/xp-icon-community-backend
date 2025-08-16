@@ -1,0 +1,20 @@
+[
+  {
+    "label": "mirai-season",
+    "blockStart": 93408451,
+    "blockEnd": 94735157,
+    "active": true,
+    "tasks": [
+      "LOCKING_SAVINGS_RATE_ICON",
+      "REGISTER_NEW_USER",
+      "DEPOSIT_NATIVE_SUI_COLLATERAL",
+      "MINTING_BNUSD_SUI",
+      "USING_REFERRAL_CODE",
+      "REFERRING_USER",
+      "DAILY_CHECK_IN_SUI_COLLATERAL",
+      "HANA_NEWSLETTER",
+      "LINK_TWITTER_X",
+      "LINK_GOOGLE"
+    ]
+  }
+]

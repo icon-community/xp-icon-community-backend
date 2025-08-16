@@ -1,0 +1,10 @@
+export { ProcessSicxCollateralsTask } from "./process-sicx-collaterals.task";
+export { ProcessAvaxCollateralsTask } from "./process-avax-collaterals.task";
+export { ProcessCrossChainCollateralsTask } from "./process-cross-chain-collaterals.task";
+export { ProcessCrossChainLoansTask } from "./process-cross-chain-loans.task";
+export { ProcessSuiCrossChainCollateralsTask } from "./process-sui-cross-chain-collaterals.task";
+export { ProcessDailyCheckInTask } from "./process-daily-check-in.task";
+export { ProcessLoansTask } from "./process-loans.task";
+export { ProcessLockedSavingsTask } from "./process-locked-savings.task";
+export { ProcessNewReferrersTask } from "./process-new-referrers.task";
+export { ProcessNewReferredTask } from "./process-new-referred.task";

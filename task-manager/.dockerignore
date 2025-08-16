@@ -1,0 +1,12 @@
+.git
+.gitignore
+.tmp
+db-dev
+db-manager/.tmp
+db-manager/dev-db
+db-manager/rabbitmq-data
+dev-db
+dist
+logs
+node_modules
+rabbitmq-data

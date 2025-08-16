@@ -1,9 +1,0 @@
-.git
-.gitignore
-node_modules
-rabbitmq-data
-.tmp
-db-manager/rabbitmq-data
-db-manager/.tmp
-db-manager/dev-db
-dev-db
